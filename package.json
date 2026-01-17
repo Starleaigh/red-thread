@@ -1,0 +1,10 @@
+{
+    "name": "red-thread",
+    "private": true,
+    "devDependencies": {
+        "@league-of-foundry-developers/foundry-vtt-types": "^12.331.5"
+    },
+    "dependencies": {
+        "typescript": "^5.9.3"
+    }
+}
