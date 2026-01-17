@@ -1,0 +1,19 @@
+{
+  "name": "red-thread",
+  "title": "Red Thread",
+  "description": "A Foundry VTT module for tethering tokens and visualizing connections.",
+  "version": "0.0.1",
+  "author": "Starleaigh",
+  "minimumCoreVersion": "12",
+  "esmodules": [
+    "src/module.js"
+  ],
+  "scripts": [],
+  "styles": [],
+  "packs": [],
+  "languages": [],
+  "url": "https://github.com/Starleaigh/red-thread",
+  "manifest": "https://github.com/Starleaigh/red-thread/raw/main/manifest.json",
+  "download": "https://github.com/Starleaigh/red-thread/releases/download/v0.0.1/red-thread.zip",
+  "license": "MIT"
+}

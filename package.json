@@ -1,10 +1,14 @@
 {
     "name": "red-thread",
+    "version": "0.0.1",
     "private": true,
     "devDependencies": {
         "@league-of-foundry-developers/foundry-vtt-types": "^12.331.5"
     },
     "dependencies": {
         "typescript": "^5.9.3"
+    },
+    "scripts": {
+        "sync-version": "node update-version.js"
     }
 }
