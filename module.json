@@ -3,8 +3,16 @@
   "title": "Red Thread",
   "description": "A Foundry VTT module for tethering tokens and visualizing connections.",
   "version": "0.0.2",
-  "author": "Starleaigh",
-  "minimumCoreVersion": "12",
+  "authors": [
+    {
+      "name": "Starleaigh",
+      "url": "https://github.com/Starleaigh"
+    }
+  ],
+    "compatibility": {
+    "minimum": "12",
+    "verified": "13"
+  },
   "esmodules": [
     "src/module.js"
   ],

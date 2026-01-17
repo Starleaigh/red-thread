@@ -1,6 +1,6 @@
 {
   "id": "red-thread",
-  "name": "Red Thread",
+  "title": "Red Thread",
   "description": "A Foundry VTT module for tethering tokens and visualizing connections.",
   "version": "0.0.2",
   "authors": [
