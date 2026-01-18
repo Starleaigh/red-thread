@@ -1,16 +1,23 @@
+/// <reference types="@league-of-foundry-developers/foundry-vtt-types" />
 
 // module.js
 
-import { registerHooks } from "./hooks.js";
+import { RedThreadLayer } from "./redThreadLayer.js";
 
 // Notifies when the module is initialized
 Hooks.once("init", () => {
-  console.log("Red Thread | Casefile initialized");
+  console.log("Red Thread | Casefile initialized!");
+
+    CONFIG.Canvas.layers.redThreadLayer = {
+    layerClass: RedThreadLayer,
+    group: "primary"
+    };
 });
 
-// Notifies when the module is ready
-Hooks.once("ready", () =>{
-  console.log("Red Thread | Casefile Ready")
-  registerHooks();
-});
+Hooks.on("canvasReady", () => {
+  console.log("Red Thread | Casefile Ready!");
+
+  const layer = canvas.redThreadLayer;
+  layer?.initializePins();
+})
 
