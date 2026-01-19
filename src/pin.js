@@ -5,6 +5,7 @@ export class Pin {
     this.placeable = placeable;
     this.graphics = new PIXI.Graphics();
     container.addChild(this.graphics);
+    this.graphics.zIndex = 1;
 
     this.visible = true;
     this.color = 0xff0000;
