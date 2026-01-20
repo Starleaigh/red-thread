@@ -16,5 +16,8 @@
   "compatibility": {
     "minimum": "12",
     "verified": "13"
+  },
+  "documentTypes": {
+    "Actor": ["evidence", "poi", "casefile", "investigator"]
   }
 }
