@@ -1,0 +1,38 @@
+{
+  "id": "red-thread",
+  "title": "Red Thread",
+  "description": "An investigative system focused on evidence, connections, and shared boards.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "12",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "Starleaigh",
+      "url": "https://github.com/Starleaigh"
+    }
+  ],
+  "esmodules": [
+    "module/red-thread.js"
+  ],
+  "styles": [
+    "styles/red-thread.css"
+  ],
+  "packs": [],
+  "languages": [],
+  "grid.distance": 1,
+  "grid.units": "",
+  "documentTypes": {
+    "Actor": [
+      "evidence",
+      "poi",
+      "casefile",
+      "investigator"
+    ]
+  },
+  "url": "https://github.com/Starleaigh/red-thread",
+  "manifest": "https://raw.githubusercontent.com/Starleaigh/red-thread/main/manifest.json",
+  "download": "https://github.com/Starleaigh/red-thread/archive/refs/tags/v0.1.0.zip",
+  "license": "MIT"
+}

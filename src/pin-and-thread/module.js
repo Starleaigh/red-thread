@@ -42,36 +42,3 @@ console.log(canvas.primary.children.map(c => `${c.constructor.name} (${c.zIndex}
 console.log("Red Thread | Casefile Ready!");
 
 })
-/*
-Hooks.on("refreshToken", token => {
-  canvas.layers.redThreadLayer?.updatePin(token);
-});
-
-Hooks.on("refreshNote", note => {
-  canvas.layers.redThreadLayer?.updatePin(note);
-});
-
-Hooks.on("updateToken", (token) => {
-  canvas.layers.redThreadLayer?.updatePin(token);
-});
-
-Hooks.on("updateNote", (note) => {
-  canvas.layers.redThreadLayer?.updatePin(note);
-});
-
-Hooks.on("createToken", (token) => {
-  canvas.layers.redThreadLayer?.updatePin(token);
-});
-
-Hooks.on("createNote", (note) => {
-  canvas.layers.redThreadLayer?.updatePin(note);
-});
-
-Hooks.on("deleteToken", (token) => {
-  canvas.layers.redThreadLayer?.removePin(token);
-});
-
-Hooks.on("deleteNote", (note) => {
-  canvas.layers.redThreadLayer?.removePin(note);
-});
-*/

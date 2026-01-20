@@ -23,7 +23,7 @@ const updateFile = (path) => {
     fs.writeFileSync(path, JSON.stringify(data, null, 2));
 };
 
-updateFile("module.json");
+updateFile("system.json");
 updateFile("manifest.json");
 
-console.log(`Updated module + manifest to v${version}`);
+console.log(`Updated system + manifest to v${version}`);

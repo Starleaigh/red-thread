@@ -1,0 +1,24 @@
+<form class="evidence-sheet flexcol">
+  <header class="sheet-header flexrow">
+    <img
+      src="{{actor.img}}"
+      data-edit="img"
+      title="{{actor.name}}"
+      width="64"
+      height="64"
+    />
+
+    <h1>
+      <input
+        name="name"
+        type="text"
+        value="{{actor.name}}"
+        placeholder="Evidence Name"
+      />
+    </h1>
+  </header>
+
+  <section class="sheet-body">
+    <textarea name="system.description">{{system.description}}</textarea>
+  </section>
+</form>
