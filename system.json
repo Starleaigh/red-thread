@@ -24,12 +24,14 @@
   "grid.distance": 1,
   "grid.units": "",
   "documentTypes": {
-    "Actor": [
-      "evidence",
-      "poi",
-      "casefile",
-      "investigator"
-    ]
+    "Actor": {
+      "types": [
+        "evidence",
+        "poi",
+        "casefile",
+        "investigator"
+      ]
+    }
   },
   "url": "https://github.com/Starleaigh/red-thread",
   "manifest": "https://raw.githubusercontent.com/Starleaigh/red-thread/main/manifest.json",

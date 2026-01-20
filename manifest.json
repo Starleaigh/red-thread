@@ -18,6 +18,13 @@
     "verified": "13"
   },
   "documentTypes": {
-    "Actor": ["evidence", "poi", "casefile", "investigator"]
+    "Actor": {
+      "types": [
+        "evidence",
+        "poi",
+        "casefile",
+        "investigator"
+      ]
+    }
   }
 }
