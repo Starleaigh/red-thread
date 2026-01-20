@@ -19,12 +19,9 @@
   },
   "documentTypes": {
     "Actor": {
-      "types": [
-        "evidence",
-        "poi",
-        "casefile",
-        "investigator"
-      ]
-    }
+      "evidence": {}, 
+      "poi": {}, 
+      "casefile": {}, 
+      "investigator": {}
   }
 }

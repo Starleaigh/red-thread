@@ -25,13 +25,10 @@
   "grid.units": "",
   "documentTypes": {
     "Actor": {
-      "types": [
-        "evidence",
-        "poi",
-        "casefile",
-        "investigator"
-      ]
-    }
+      "evidence": {}, 
+      "poi": {}, 
+      "casefile": {}, 
+      "investigator": {}
   },
   "url": "https://github.com/Starleaigh/red-thread",
   "manifest": "https://raw.githubusercontent.com/Starleaigh/red-thread/main/manifest.json",
