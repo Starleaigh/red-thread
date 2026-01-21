@@ -1,18 +1,40 @@
 /// <reference types="@league-of-foundry-developers/foundry-vtt-types" />
 
-export class EvidenceSheet extends ActorSheet {
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ["red-thread", "sheet", "evidence"],
-      template: "systems/red-thread/templates/actors/evidence-sheet.hbs",
-      width: 420,
-      height: 380
-    });
+const { HandlebarsApplicationMixin } = foundry.applications.api;
+const { ActorSheetV2 } = foundry.applications.sheets;
+
+export class EvidenceSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
+  
+  static PARTS = {
+    form:{
+      template: "systems/red-thread/templates/actors/evidence-sheet.hbs"
+    }
   }
 
-  getData() {
-    const context = super.getData();
-    context.system = this.actor.system;
+  static DEFAULT_OPTIONS = {
+    tag: "form",
+    //classes: ["red-thread", "evidence-sheet"],
+    actions: {
+      // define clickhandlers here.
+      evidenceAction: EvidenceSheet.doSomething
+    }
+  }
+/*
+    // Prepares the data object for the Handlebars template
+  async _prepareContext(options) {
+    const context = await super._prepareContext(options);
+    context.system = this.document.system;
+    context.config = CONFIG.red-thread;
+    // Add custom display logic here
     return context;
   }
+
+    // Native JS event listeners (replaces activateListeners)
+  _onRender(context, options) {
+    // Standard listeners or DOM manipulation here
+  }
+
+  static doSomething(event, target) {
+    // Logic for a button with data-action="doSomething"
+  }*/
 }

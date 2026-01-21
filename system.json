@@ -21,15 +21,13 @@
   ],
   "packs": [],
   "languages": [],
-  "grid.distance": 1,
-  "grid.units": "",
   "documentTypes": {
     "Actor": {
       "evidence": {}, 
       "poi": {}, 
       "casefile": {}, 
       "investigator": {}
-  },
+  }},
   "url": "https://github.com/Starleaigh/red-thread",
   "manifest": "https://raw.githubusercontent.com/Starleaigh/red-thread/main/manifest.json",
   "download": "https://github.com/Starleaigh/red-thread/archive/refs/tags/v0.1.0.zip",
