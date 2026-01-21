@@ -9,16 +9,34 @@ export class EvidenceSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     form:{
       template: "systems/red-thread/templates/actors/evidence-sheet.hbs"
     }
-  }
+  };
 
   static DEFAULT_OPTIONS = {
     tag: "form",
+    submitOnChange: true,
+    closeOnSubmit: false,
     //classes: ["red-thread", "evidence-sheet"],
     actions: {
       // define clickhandlers here.
-      evidenceAction: EvidenceSheet.doSomething
+     // evidenceAction: EvidenceSheet.doSomething();
     }
+  };
+
+  async _prepareContext() {
+    return {
+      actor: this.actor,
+      system: this.system
+    }
+  };
+
+/*
+  static doSomething(event, target) {
+    // Logic for a button with data-action="doSomething"
   }
+}
+  */
+}
+
 /*
     // Prepares the data object for the Handlebars template
   async _prepareContext(options) {
@@ -33,8 +51,4 @@ export class EvidenceSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   _onRender(context, options) {
     // Standard listeners or DOM manipulation here
   }
-
-  static doSomething(event, target) {
-    // Logic for a button with data-action="doSomething"
-  }*/
-}
+*/

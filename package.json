@@ -3,7 +3,8 @@
     "version": "0.1.0",
     "private": true,
     "devDependencies": {
-        "@league-of-foundry-developers/foundry-vtt-types": "^12.331.5"
+        "@league-of-foundry-developers/foundry-vtt-types": "13",
+        "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main"
     },
     "dependencies": {
         "typescript": "^5.9.3"

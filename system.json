@@ -4,7 +4,7 @@
   "description": "An investigative system focused on evidence, connections, and shared boards.",
   "version": "0.1.0",
   "compatibility": {
-    "minimum": "12",
+    "minimum": "13",
     "verified": "13"
   },
   "authors": [
@@ -22,12 +22,7 @@
   "packs": [],
   "languages": [],
   "documentTypes": {
-    "Actor": {
-      "evidence": {}, 
-      "poi": {}, 
-      "casefile": {}, 
-      "investigator": {}
-  }},
+    "Actor": { "evidence": {}, "poi": {}, "casefile": {}, "investigator": {} }},
   "url": "https://github.com/Starleaigh/red-thread",
   "manifest": "https://raw.githubusercontent.com/Starleaigh/red-thread/main/manifest.json",
   "download": "https://github.com/Starleaigh/red-thread/archive/refs/tags/v0.1.0.zip",
