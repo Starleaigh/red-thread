@@ -11,3 +11,10 @@ Hooks.once("init", () => {
  // game.actors.registerSheet("red-thread", EvidenceSheet, { types: ["evidence"], makeDefault: true, label: "Evidence Template" });
  
 });
+/*
+  Hooks.on("updateActor", (actor) => {
+  if (this.actor?.id === actor.id) {
+    this.render({ force: true });
+  }
+});
+*/

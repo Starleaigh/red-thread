@@ -1,24 +1,43 @@
-<form class="evidence-sheet flexcol">
+<div class="evidence-sheet flexcol" name="{{actor.name}}" id="{{actor.id}}">
+
   <header class="sheet-header flexrow">
-    <img
-      src="{{actor.img}}"
-      data-edit="img"
-      title="{{actor.name}}"
-      width="64"
-      height="64"
-    />
+    <img src="{{actor.img}}" width="64" height="64">
 
     <h1>
       <input
-        name="name"
         type="text"
-        value="{{actor.name}}"
-        placeholder="Evidence Name"
-      />
+        data-field="text"
+        value="{{system.text}}"
+        {{#unless isLockOwner}}disabled{{/unless}}
+      >
     </h1>
   </header>
 
   <section class="sheet-body">
-    <textarea name="system.description">{{system.description}}</textarea>
+    <textarea
+      data-field="description"
+      {{#unless isLockOwner}}disabled{{/unless}}
+    >{{system.description}}</textarea>
   </section>
-</form>
+
+  <footer class="sheet-footer flexrow">
+
+    {{#if isLockOwner}}
+      <button type="button" data-action="submit">
+        Submit
+      </button>
+
+    {{else if isLocked}}
+      <button type="button" disabled>
+        Claimed by {{lockUser}}
+      </button>
+
+    {{else}}
+      <button type="button" data-action="edit">
+        Edit
+      </button>
+    {{/if}}
+
+  </footer>
+
+</div>
