@@ -1,10 +1,12 @@
-<div class="evidence-sheet flexcol" name="{{actor.name}}" id="{{actor.id}}">
+<div class="evidence-sheet flexcol">
 
   <header class="sheet-header flexrow">
     <img src="{{actor.img}}" width="64" height="64">
 
     <h1>
       <input
+        id="evidence-text"
+        name="text"
         type="text"
         data-field="text"
         value="{{system.text}}"
@@ -15,6 +17,8 @@
 
   <section class="sheet-body">
     <textarea
+      id="evidence-description"
+      name="description"
       data-field="description"
       {{#unless isLockOwner}}disabled{{/unless}}
     >{{system.description}}</textarea>

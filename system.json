@@ -14,10 +14,10 @@
     }
   ],
   "esmodules": [
-    "module/red-thread.js"
+    "./module/red-thread.js"
   ],
   "styles": [
-    "styles/red-thread.css"
+    "./styles/red-thread.css"
   ],
   "packs": [],
   "languages": [],
