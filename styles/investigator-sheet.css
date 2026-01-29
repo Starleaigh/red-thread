@@ -14,38 +14,112 @@
   overflow: visible;
 } /* -- THIS IS NEEDED TO DISPLAY OUTSIDE WINDOW -- */
 
+
+/* ------------------------------------
+
+    --- FOLDER STRUCTURE GOES HERE ---
+
+   ------------------------------------ */ 
+
+.investigator-sheet {
+  position: absolute;
+  width: 500px;
+  height: 700px;
+}
+   
+   /* FOLDER SHELL */
+
+.folder-shell {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  perspective: 1800px;
+}
+
+
+/* FRONT COVER */
+.page .folder-front {
+  position: absolute;
+  inset: 0 ;
+  width: 100%;
+  height: 100%;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(0,0,0,0.02),
+      rgba(0,0,0,0.02) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    linear-gradient(#e0c58b, #d1b06c);
+  transform: rotateY(0deg);
+  transition: transform 0.8s ease;
+  cursor: pointer;
+}
+
+/* BACK COVER */
+.page .folder-back {
+  position: absolute;
+  inset: 0 ;
+  width: 100%;
+  height: 100%;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-right: #00000031;
+  border-right-width: 2px;
+  border-right-style: groove;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(0,0,0,0.02),
+      rgba(0,0,0,0.02) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    linear-gradient(#e0c58b, #d1b06c);
+  transform-origin: left center;
+  transform: rotateY(0deg);
+  transition: transform 0.8s ease;
+  transform: translateZ(-2px);
+  cursor: pointer;
+}
+
+
 /* ------------------------------------
 
     --- PAGE STRUCTURE GOES HERE ---
 
    ------------------------------------ */ 
 
-.book {
-  position: absolute;
-  width: 900px;
-  height: 700px;
-  perspective: 1800px;
-}
-
 .page-stack {
   position: absolute;
-  width: 95%;
+  width: 100%;
+  height: 100%;
+}
+
+.page .paper {
+  position: absolute;
+  margin-top: 3%; /* --- Center pages in folder --- */
+  margin-left: 5%; /* --- Center pages in folder --- */
+  width: 90%;
   height: 95%;
-  top: 0;
-  left: 50%;
+  background: #e5e4cb;
+  color: #000;
+  vertical-align: middle;
+  align-self: center;
+  align-items: center;
 }
 
 /* base page */
 .page {
   position: absolute;
-  width: 50%;
-  height: 100%;
+  inset: 0;
   transform-style: preserve-3d;
   transform-origin: left center; 
 
-  background: #f8f5ee;
-  border: 1px solid #999;
-  color: black;
 }
 
 /* duplex faces */
@@ -54,7 +128,6 @@
   position: absolute;
   inset: 0;
   backface-visibility: hidden;
-  padding: 1rem;
 }
 
 /* -- THIS IS KEEPING DUPLEX PROPERLY REVERSED --*/
@@ -103,7 +176,6 @@
 .page.turn-backward,
 .page.turn-forward {
   transition: none !important;
-  pointer-events: none;
   z-index: 100;
 }
 
@@ -114,8 +186,119 @@
 
 /* ------------------------------------
 
-    --- PLACE FORMATTING UNDER HERE ---
+    --- NAVIGATION ENTITIES ARE HERE ---
 
    ------------------------------------ */ 
 
+.folder-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  background: #d6c08d;
+  border-radius: 8px;
+  font-family: "Special Elite", monospace;
+  z-index: 50;
+}
 
+.folder-label {
+  position: absolute;
+  right: -40px;
+  top: 120px;
+  width: 160px;
+  background: #d6c08d;
+  padding: 8px;
+  font-family: "Special Elite", Courier, monospace;
+  color: #000;
+  transform: rotate(90deg);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.page-corner {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  bottom: 0;
+  cursor: pointer;
+  background: rgba(0, 255, 255, 0.35);
+}
+
+.next-page {
+  right: 0;
+}
+
+.prev-page {
+  left: 0;
+}
+
+/* ------------------------------------
+
+    --- LAYOUT STYLING GOES HERE ---
+
+   ------------------------------------ */ 
+
+/* Layout Styling */
+.profile,
+.characteristics,
+.attributes,
+.status,
+.combat {
+  padding: 16px;
+  color: #000;
+}
+
+.profile-label,
+.characteristics label,
+.attributes label,
+.status label,
+.combat .stat-label {
+  display: flex;
+  font-weight: 600;
+  font-family: "Baskerville";
+  padding: 0px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.stat input {
+  width: 40px;
+  color: #000;
+}
+
+
+.profile-input {
+  background: transparent; 
+  font-family: "Baskerville";
+  color:black;
+  border: none; /* Removes all default borders */
+  border-bottom: 1px solid #00000033; /* Adds a solid bottom line */
+  outline: none; /* Removes the default blue outline when focused */
+  border-radius: 0;
+  height: 15px;
+  margin-top: 5px; /* This + height is to tighten up the input boxes */
+  padding-left: 0px;
+}
+
+.profile-heading {
+  color: black;
+  font-family: "IM Fell DW Pica";
+  font-weight: 600;
+  font-size: large;
+  width:400px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.profile-sections {
+    padding-top: 10px;
+    padding-bottom: 0px;
+    padding-left: 16px;
+    padding-right: 16px;
+    
+}

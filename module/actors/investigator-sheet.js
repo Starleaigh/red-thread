@@ -28,7 +28,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
 
   pageIndex = 0;
   previousPage = 0;
-  pageCount = 6;
+  pageCount = 8;
   isTurning = false;
 
   async _prepareContext() {
@@ -38,12 +38,14 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     // Build pages and compute classes here
     const pages = [
 
-      { index: 0, name: "cover-page", title: "Cover" },
-      { index: 1, name: "profile-page", title: "Profile" },
-      { index: 2, name: "stats-page", title: "Stats" },
-      { index: 3, name: "skills-page", title: "Skills" },
-      { index: 4, name: "inventory-page", title: "Inventory" },
-      { index: 5, name: "notes-page", title: "Notes"}
+      { index: 0, name: "front-folder", title: "Folder Front Cover" },
+      { index: 1, name: "cover-page", title: "Cover" },
+      { index: 2, name: "profile-page", title: "Profile" },
+      { index: 3, name: "stats-page", title: "Stats" },
+      { index: 4, name: "skills-page", title: "Skills" },
+      { index: 5, name: "inventory-page", title: "Inventory" },
+      { index: 6, name: "notes-page", title: "Notes"},
+      { index: 7, name: "back-folder", title: "Folder Back Cover" }
 
     ].map((_, i) => {
       let state = "future";
@@ -52,7 +54,9 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       return { index: i, title: `Page ${i}`, state };
     });
 
-    return { pages };
+    return { 
+      folderOpen,
+      pages };
   }
 
 async _updatePageClasses() {
@@ -109,7 +113,9 @@ static async _onPrevPage(event, target) {
   if (!prev) return;
 
   this.isTurning = true;
+
   this._playAnimation(prev, "turn-backward");
+    
   prev.style.zIndex = 1000; // Bring to top during animation
 
   setTimeout(() => {
@@ -151,5 +157,34 @@ async _onRender(context, options) {
   }); 
   this._updatePageClasses();
 }
+
+// --- FOLDER METHODS ---
+
+async getData() {
+  const data = await super.getData();
+
+  data.folderOpen =
+    this.actor.getFlag("red-thread", "folderOpen") ?? false;
+
+  console.log("folderOpen in getData:", data.folderOpen);
+    
+  return data;
+}
+
+
+static async _onOpenFolder(event, target) {
+  console.log("Red Thread | Folder action fired");
+  await this.actor.setFlag("red-thread", "folderOpen", true);
+  const flag = this.actor.getFlag("red-thread", "folderOpen");
+  console.log("Red Thread | Get Flag: ", flag);
+  this.render({ force: true });
+  console.log("Red Thread | Render Fired!");
+}
+
+static async _onCloseFolder(event, target) {
+  await this.actor.setFlag("red-thread", "folderOpen", false);
+  this.render({ force: true });
+}
+
 
 }
