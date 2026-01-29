@@ -17,10 +17,17 @@
     "./module/red-thread.js"
   ],
   "styles": [
-    "./styles/red-thread.css"
+    "./styles/red-thread.css",
+    "./styles/investigator-sheet.css"
   ],
   "packs": [],
-  "languages": [],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "./lang/en.json"
+    }
+  ],
   "documentTypes": {
     "Actor": { "evidence": {}, "poi": {}, "casefile": {}, "investigator": {} }},
   "url": "https://github.com/Starleaigh/red-thread",

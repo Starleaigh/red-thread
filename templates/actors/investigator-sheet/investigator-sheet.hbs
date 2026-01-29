@@ -1,0 +1,19 @@
+<div class="book">
+  <div class="page-stack">
+    {{#each pages}}
+      <section class="page {{this.state}}" data-index="{{this.index}}" data-action="noop">
+        <div class="front">
+          <h2>{{this.title}}</h2>
+          <p>Front of page {{this.index}}</p>
+        </div>
+
+        <div class="back">
+          <p>Back of page {{this.index}}</p>
+        </div>
+      </section>
+    {{/each}}
+  </div>-
+
+  <button data-action="prevPage">◀</button>
+  <button data-action="nextPage">▶</button>
+</div>

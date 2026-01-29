@@ -1,0 +1,121 @@
+
+/* ------------------------------------------
+
+    --- FOUNDRY WINDOW STYLES DONT TOUCH ---
+
+   ------------------------------------------ */ 
+
+.red-thread.investigator-sheet {
+  overflow: visible;
+  width: 50PX;
+} /* -- THIS IS NEEDED TO DISPLAY OUTSIDE WINDOW -- */
+
+.red-thread.investigator-sheet .window-content {
+  overflow: visible;
+} /* -- THIS IS NEEDED TO DISPLAY OUTSIDE WINDOW -- */
+
+/* ------------------------------------
+
+    --- PAGE STRUCTURE GOES HERE ---
+
+   ------------------------------------ */ 
+
+.book {
+  position: absolute;
+  width: 900px;
+  height: 700px;
+  perspective: 1800px;
+}
+
+.page-stack {
+  position: absolute;
+  width: 95%;
+  height: 95%;
+  top: 0;
+  left: 50%;
+}
+
+/* base page */
+.page {
+  position: absolute;
+  width: 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: left center; 
+
+  background: #f8f5ee;
+  border: 1px solid #999;
+  color: black;
+}
+
+/* duplex faces */
+.page .front,
+.page .back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  padding: 1rem;
+}
+
+/* -- THIS IS KEEPING DUPLEX PROPERLY REVERSED --*/
+.page .back-initialized {
+  transform: rotateY(180deg); 
+}
+
+/* RIGHT STACK (future + current) */
+.page.future,
+.page.current {
+  z-index: 20;
+}
+
+/* LEFT STACK (past) */
+.page.past {
+  z-index: 10;
+}
+
+/* -------------------------------
+
+    --- ANIMATIONS LIVE HERE ---
+
+   ------------------------------- */
+
+/* Page flip forward */
+@keyframes turn-page-forward {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(-180deg); }
+}
+
+/* Page flip backward */
+@keyframes turn-page-backward {
+  0% { transform: rotateY(-180deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+/* Trigger classes */
+.turn-forward {
+  animation: turn-page-forward 0.55s ease-out forwards;
+}
+
+.turn-backward {
+  animation: turn-page-backward 0.55s ease-out forwards;
+}
+
+.page.turn-backward,
+.page.turn-forward {
+  transition: none !important;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.page.no-transition {
+  transition: none !important;
+}
+
+
+/* ------------------------------------
+
+    --- PLACE FORMATTING UNDER HERE ---
+
+   ------------------------------------ */ 
+
+
