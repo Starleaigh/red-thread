@@ -181,9 +181,76 @@ static async _onOpenFolder(event, target) {
   console.log("Red Thread | Render Fired!");
 }
 
+/*
 static async _onCloseFolder(event, target) {
   await this.actor.setFlag("red-thread", "folderOpen", false);
   this.render({ force: true });
+}
+*/
+
+// --- NEW CLOSE FOLDER METHOD --- 
+
+static async _onCloseFolder(event, target) {
+  console.log("Red Thread | CloseFolder fired!");
+  if (this.isTurning) return;
+  console.log("Red Thread | isTurning tag = false ");
+
+  this.isTurning = true;
+
+  const root = this.element;
+  const pages = [...root.querySelectorAll(".page")];
+
+  // Pages that are currently on the left stack
+  const pastPages = pages
+    .filter(p => Number(p.dataset.index) < this.pageIndex)
+    .reverse();
+
+  const flipDuration = 80; // ms per page
+  const totalDuration = pastPages.length * flipDuration + 400;
+
+  // VISUAL FLIP ONLY
+  pastPages.forEach((page, i) => {
+    setTimeout(() => {
+      page.style.zIndex = 1000 + i;
+      console.log("Red Thread | Z-index: ", page.style.zIndex);
+      page.classList.add("turn-backward");
+    }, i * flipDuration);
+  });
+
+  // HARD RESET AFTER ANIMATION
+  setTimeout(() => {
+    // disable transitions FIRST
+
+    pages.forEach(p => p.classList.add("no-transition"));
+
+    // remove ALL animation & state classes
+    pages.forEach(p => {
+      p.classList.remove(
+        "turn-forward",
+        "turn-backward",
+        "is-turning",
+        "past",
+        "current",
+        "future"
+      );
+    });
+
+    // reset state
+    this.pageIndex = 0;
+    this.previousPage = 0;
+
+    // re-apply clean state
+    this._updatePageClasses();
+
+    // re-enable transitions next frame
+    requestAnimationFrame(() => {
+      pages.forEach(p => p.classList.remove("no-transition"));
+    });
+
+    this.isTurning = false;
+    this.close();
+
+  }, totalDuration);
 }
 
 
