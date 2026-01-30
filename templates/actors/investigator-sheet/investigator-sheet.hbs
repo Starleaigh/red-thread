@@ -1,5 +1,5 @@
 
-<div class="investigator-sheet">
+<div class="investigator-sheet" style="width: 500px">
 
     <div class="folder-shell">
 
@@ -106,6 +106,97 @@
 
                 <div class="front">
                   <section class="paper">
+                    <!-- PAGE 2 — Stats and Attributes -->
+                    <section class="characteristics" style="width: 200px">
+                      <label class="profile-heading">Characteristics</label>
+                      {{#each system.characteristics as |stat key|}}
+                        {{#if stat.value}}
+                          <div class="stat">
+                            <label>{{key}}</label>
+                            <input type="number" name="system.characteristics.{{key}}.value" value="{{stat.value}}" />
+                            <label>{{stat.half}}</label>
+                            <label>{{stat.fifth}}</label>
+                          </div>
+                        {{/if}}
+                      {{/each}}
+                    </section>
+
+                    <section class="attributes" style="width: 400px;">
+                      <div>
+                        <label class="profile-heading" style="text-align: center;">Attributes</label>
+                        
+                        <div style="display:inline-block;">
+                          <div style="gap: 20px">
+                            <label style="width: 100px;">Hit Points</label>
+                          </div>
+                          <div>
+                            <input class="profile-input" style="width: 50px" type="number" name="system.characteristics.hp.value" value="{{system.characteristics.hp.value}}" />
+                            <input class="profile-input" style="width: 50px" type="number" name="system.characteristics.hpmax.value" value="{{system.characteristics.hpmax.value}}" />
+                          </div>
+                          <div style="font-size: x-small; height: 20px">
+                            <label style="width: 50px; margin: 0px;">(Current)</label>
+                            <label style="width: 50px; margin: 0px;">(Max)</label>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div>
+                            <label style="width: 100px;">Magic Points</label>
+                          </div>
+                          <div>
+                            <input class="profile-input" style="width: 50px" type="number" name="system.characteristics.currentmag.value" value="{{system.characteristics.currentmag.value}}" />
+                            <input class="profile-input" style="width: 50px" type="number" name="system.characteristics.maxmag.value" value="{{system.characteristics.maxmag.value}}" />
+                          </div>
+                          <div style="font-size: x-small; height: 20px; text-align: center;">
+                            <label style="width: 50px; margin: 0px;">(Current)</label>
+                            <label style="width: 50px; margin: 0px;">(Max)</label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div>
+                          <div>
+                            <label>Sanity</label>
+                            <input class="profile-input" style="width: 40px" type="number" name="system.characteristics.currentsan.value" value="{{system.characteristics.currentsan.value}}" />
+                            <input class="profile-input" style="width: 40px" type="number" name="system.characteristics.maxsan.value" value="{{system.characteristics.maxsan.value}}" />
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+
+                    <section class="status">
+                      <h2>Status</h2>
+                      <label><input type="checkbox" name="system.characteristics.tempinsan" {{checked system.characteristics.tempinsan}} /> Temporary Insanity</label>
+                      <label><input type="checkbox" name="system.characteristics.indefinsan" {{checked system.characteristics.indefinsan}} /> Indefinite Insanity</label>
+                      <label><input type="checkbox" name="system.characteristics.majwound" {{checked system.characteristics.majwound}} /> Major Wound</label>
+                      <label><input type="checkbox" name="system.characteristics.uncon" {{checked system.characteristics.uncon}} /> Unconscious</label>
+                      <label><input type="checkbox" name="system.characteristics.dying" {{checked system.characteristics.dying}} /> Dying</label>
+                    </section>
+
+                    <section class="combat">
+                      <h2>Combat</h2>
+
+                      <div class="stat">
+                        <div class="stat-label">Movement</div>
+                        <input type="number" name="system.characteristics.move.value" value="{{system.characteristics.move.value}}" />
+                      </div>
+
+                      <div class="stat">
+                        <div class="stat-label">Build</div>
+                        <input type="number" name="system.characteristics.build.value" value="{{system.characteristics.build.value}}" />
+                      </div>
+
+                      <div class="stat">
+                        <div class="stat-label">Dodge</div>
+                        <input type="number" name="system.characteristics.dodge.value" value="{{system.characteristics.dodge.value}}" />
+                      </div>
+
+                      <div class="stat">
+                        <div class="stat-label">Damage Bonus</div>
+                        <input type="number" name="system.characteristics.dmgbonus.value" value="{{system.characteristics.dmgbonus.value}}" />
+                      </div>
+                    </section>
                     <div class="page-corner prev-page" data-action="prevPage"></div>
                     <div class="page-corner next-page" data-action="nextPage"></div>
                   </section>

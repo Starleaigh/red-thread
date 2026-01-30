@@ -13,10 +13,14 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
 
   static DEFAULT_OPTIONS = {
     tag: "div",
+    position: {
+      width: 1,
+      height: 1
+    },
     classes: ["red-thread", "investigator-sheet"],
     submitOnChange: false,
     closeOnSubmit: false,
-    resizable: true,
+    resizable: false,
 
     actions: {
       nextPage: InvestigatorSheet._onNextPage,
@@ -55,6 +59,9 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     });
 
     return { 
+      ...context,
+      actor: this.actor,
+      system: this.actor.system,
       folderOpen,
       pages };
   }
@@ -93,7 +100,7 @@ static async _onNextPage(event, target) {
 
   this.isTurning = true;
   
-  this._playAnimation(current, "turn-forward");
+  this._playAnimation(current, "turn-forward", "turn-forward", "turn-backward");
   current.style.zIndex = 1000; // Bring to top during animation
   
   setTimeout(() => {
@@ -114,8 +121,8 @@ static async _onPrevPage(event, target) {
 
   this.isTurning = true;
 
-  this._playAnimation(prev, "turn-backward");
-    
+  this._playAnimation(prev, "turn-backward", "turn-forward", "turn-backward");
+  
   prev.style.zIndex = 1000; // Bring to top during animation
 
   setTimeout(() => {
@@ -125,12 +132,12 @@ static async _onPrevPage(event, target) {
   }, 600);
 }
 
-_playAnimation(el, className) {
+_playAnimation(el, className, rem1, rem2) {
 
   // Freeze motion
   el.classList.add("no-transition");
   // Remove both animation classes
-  el.classList.remove("turn-forward", "turn-backward");
+  el.classList.remove(rem1, rem2);
   // Force reflow for browser to forget animation
   void el.offsetWidth;
   // Reenable transitions
@@ -141,9 +148,39 @@ _playAnimation(el, className) {
 }
 
 async _onRender(context, options) {
+
   await super._onRender(context, options);
   
-    const pages = this.element.querySelectorAll(".page");
+  const folderShell = this.element.querySelector(".folder-shell");
+
+  this._playAnimation(folderShell, "open-folder-trigger", "open-folder-trigger", "close-folder-trigger");
+ 
+  if (folderShell) {
+    this._dragHandle = new foundry.applications.ux.Draggable(
+      this, folderShell);
+  }
+  
+/*
+this._dragHandle = new foundry.applications.ux.Draggable(
+  this,
+  dragHandle
+);
+
+this._dragHandle = new foundry.applications.ux.Draggable(
+  this,
+  this.element,
+  { handle: dragHandle }
+);
+Notice the difference:
+
+👉 root = whole sheet
+👉 handle = drag zone
+
+*/
+
+
+
+  const pages = this.element.querySelectorAll(".page");
 
   pages.forEach((page) => {
     if (!page.classList.contains("initialized")) {
@@ -191,9 +228,9 @@ static async _onCloseFolder(event, target) {
 // --- NEW CLOSE FOLDER METHOD --- 
 
 static async _onCloseFolder(event, target) {
-  console.log("Red Thread | CloseFolder fired!");
+ // console.log("Red Thread | CloseFolder fired!");
   if (this.isTurning) return;
-  console.log("Red Thread | isTurning tag = false ");
+ // console.log("Red Thread | isTurning tag = false ");
 
   this.isTurning = true;
 
@@ -248,10 +285,24 @@ static async _onCloseFolder(event, target) {
     });
 
     this.isTurning = false;
+
     this.close();
 
   }, totalDuration);
 }
 
+async close(options = {}) {
+
+  const folderShell = this.element.querySelector(".folder-shell");
+
+  this._playAnimation(folderShell, "close-folder-trigger", "open-folder-trigger", "close-folder-trigger");
+
+  await Promise.all(
+    folderShell.getAnimations().map(a => a.finished)
+  );
+
+  return super.close(options);
+
+}
 
 }
