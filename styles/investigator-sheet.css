@@ -118,12 +118,11 @@
   width: 100%;
   height: 100%;
 }
-
+/*
 .page .paper {
   position: absolute;
-  margin-top: 3%; /* --- Center pages in folder --- */
-  margin-left: 5%; /* --- Center pages in folder --- */
-  width: 90%;
+  margin-top: 3%; 
+  margin-left: 5%; 
   height: 95%;
   background: #e5e4cb;
   color: #000;
@@ -132,6 +131,15 @@
   align-items: center;
   border: #969696;
 }
+*/
+.paper {
+  position: absolute;
+  width: 95%;
+  height: 95%;
+  vertical-align: middle;
+  align-self: center;
+  align-items: center;
+}
 
 /* base page */
 .page {
@@ -139,6 +147,27 @@
   inset: 0;
   transform-style: preserve-3d;
   transform-origin: left center; 
+
+}
+
+.page-spine {
+  position:absolute;
+  left: 0;
+  top: 0;
+  width: var(--spine-width, 24px);
+  height: 100%;
+  background: transparent;
+  pointer-events: auto;
+}
+
+.page.paper .front,
+.page.paper .back {
+  position: absolute;
+  left: var(--spine-width, 24px);
+  background: #e5e4cb;
+  color: #000;
+  border: #969696;
+  backface-visibility: hidden;
 
 }
 
@@ -164,6 +193,10 @@
 /* LEFT STACK (past) */
 .page.past {
   z-index: 10;
+}
+
+.draggable {
+  -webkit-user-drag: none;
 }
 
 /* -------------------------------

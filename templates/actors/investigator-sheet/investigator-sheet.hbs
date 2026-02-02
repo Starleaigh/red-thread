@@ -6,28 +6,29 @@
         <div class="folder-close" data-action="closeFolder">CLOSE</div>
 
         <div class="page-stack">
-          {{#each pages as |page|}}
-            <section class="page {{this.state}}" data-index="{{this.index}}">
+          {{#each pagesData as |page|}}
+            <section class="page {{this.state}} {{this.type}}" data-index="{{this.index}}">
               
               {{#if (eq page.index 0)}}
 
                 <div class="front">
-                  <div class="folder-front" data-action="nextPage">
-                    <div class="top-secret-stamp">TOP SECRET</div>
-                    <div class="folder-label">{{actor.name}}</div>
-                    <div class="open-folder-hitbox" >OPEN</div>
-                  </div>
+                  <div class="folder-front draggable" data-action="nextPage"></div>
+                  <div class="top-secret-stamp">TOP SECRET</div>
+                  <div class="folder-label">{{actor.name}}</div>
+                  <div class="open-folder-hitbox" >OPEN</div>
                 </div>
 
                 <div class="back">
-                  <div class="folder-back"></div>
+                  <div class="folder-back draggable"></div>
                 </div>
               {{/if}}
 
               {{#if (eq page.index 1)}}
 
+                <div class="page-spine draggable"></div>
+
                 <div class="front">
-                  <section class="paper">
+                  <section class="">
                     <label style="color:black; padding: 20px; font-family: "Special Elite";">Ministry of Paranormal Suppression</label>
                     <h3 style="padding-left: 20px; color: black; font-family: "Special Elite"">INVESTIGATOR DOSSIER</h3>
                     <div class="page-corner prev-page" data-action="prevPage"></div>
@@ -36,7 +37,7 @@
                 </div>
 
                 <div class="back">
-                  <section class="paper">
+                  <section class="">
                     <p>Back of page {{this.index}}</p>
                   </section>
 
@@ -44,8 +45,11 @@
               {{/if}}
                             
               {{#if (eq page.index 2)}}
+              
+                <div class="page-spine draggable"></div>
+
                 <div class="front">
-                  <section class="paper">
+                  <section class="">
                 <!-- PAGE 1 — PROFILE -->
                   <section class="profile-sections" style="padding-top: 15px;">
                     <label class="profile-heading">Investigator Profile:</label>
@@ -97,15 +101,17 @@
                 </div> 
 
                 <div class="back">
-                  <section class="paper">
+                  <section class="">
                   </section>
                 </div> 
 
               {{/if}}
               {{#if (eq page.index 3)}}
+              
+                <div class="page-spine draggable"></div>
 
                 <div class="front">
-                  <section class="paper">
+                  <section class="">
                     <!-- PAGE 2 — Stats and Attributes -->
                     <section class="characteristics" style="width: 200px">
                       <label class="profile-heading">Characteristics</label>
@@ -203,62 +209,71 @@
                 </div>
 
                 <div class="back">
-                  <section class="paper">
+                  <section class="">
                   </section>
                 </div>
               {{/if}}
               {{#if (eq page.index 4)}}
 
+              
+                <div class="page-spine draggable"></div>
+
                 <div class="front">
-                  <section class="paper">
+                  <section class="">
                     <div class="page-corner prev-page" data-action="prevPage"></div>
                     <div class="page-corner next-page" data-action="nextPage"></div>
                   </section>
                 </div>
 
                 <div class="back">
-                  <section class="paper">
+                  <section class="">
                   </section>
                 </div>
               {{/if}}
               {{#if (eq page.index 5)}}
+              
+                <div class="page-spine draggable"></div>
 
                 <div class="front">
-                  <section class="paper">
+                  <section class="">
                     <div class="page-corner prev-page" data-action="prevPage"></div>
                     <div class="page-corner next-page" data-action="nextPage"></div>
                   </section>
                 </div>
 
                 <div class="back">
-                  <section class="paper">
+                  <section class="">
                   </section>
                 </div>
               {{/if}}
               {{#if (eq page.index 6)}}
+            
+                <div class="page-spine draggable"></div>
 
                 <div class="front">
-                  <section class="paper">
+                  <section class="">
                     <div class="page-corner prev-page" data-action="prevPage"></div>
                     <div class="page-corner next-page" data-action="nextPage"></div>
                   </section>
                 </div>
 
                 <div class="back">
-                  <section class="paper">
+                  <section class="">
                   </section>
                 </div>
               {{/if}}
               {{#if (eq page.index 7)}}
+              
+                <div class="page-spine draggable"></div>
 
                 <div class="front">
-                  <div class="folder-front">
+                  <div class="folder-front draggable">
                   </div>
                   <div class="page-corner prev-page" data-action="prevPage"></div>
                 </div>
 
                 <div class="back">
-                  <section class="folder-back">
+                  <section class="folder-back draggable">
                   </section>
                 </div>
               {{/if}}

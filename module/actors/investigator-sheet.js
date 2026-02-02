@@ -18,7 +18,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       height: 1
     },
     classes: ["red-thread", "investigator-sheet"],
-    submitOnChange: false,
+    submitOnChange: true,
     closeOnSubmit: false,
     resizable: false,
 
@@ -40,22 +40,23 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     const folderOpen = this.actor.getFlag("red-thread", "folderOpen") ?? false;
 
     // Build pages and compute classes here
-    const pages = [
+    const pagesData = [
 
-      { index: 0, name: "front-folder", title: "Folder Front Cover" },
-      { index: 1, name: "cover-page", title: "Cover" },
-      { index: 2, name: "profile-page", title: "Profile" },
-      { index: 3, name: "stats-page", title: "Stats" },
-      { index: 4, name: "skills-page", title: "Skills" },
-      { index: 5, name: "inventory-page", title: "Inventory" },
-      { index: 6, name: "notes-page", title: "Notes"},
-      { index: 7, name: "back-folder", title: "Folder Back Cover" }
+      { index: 0, name: "front-folder", title: "Folder Front Cover", type: "folder" },
+      { index: 1, name: "cover-page", title: "Cover", type: "paper" },
+      { index: 2, name: "profile-page", title: "Profile", type: "paper" },
+      { index: 3, name: "stats-page", title: "Stats", type: "paper" },
+      { index: 4, name: "skills-page", title: "Skills", type: "paper" },
+      { index: 5, name: "inventory-page", title: "Inventory", type: "paper" },
+      { index: 6, name: "notes-page", title: "Notes", type: "paper" },
+      { index: 7, name: "back-folder", title: "Folder Back Cover", type: "folder" }
+    ]
 
-    ].map((_, i) => {
+    const pages = pagesData.map((page, i) => {
       let state = "future";
       if (i < this.pageIndex) state = "past";
       if (i === this.pageIndex) state = "current";
-      return { index: i, title: `Page ${i}`, state };
+      return { ...page, state };
     });
 
     return { 
@@ -63,7 +64,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       actor: this.actor,
       system: this.actor.system,
       folderOpen,
-      pages };
+      pagesData };
   }
 
 async _updatePageClasses() {
@@ -152,13 +153,15 @@ async _onRender(context, options) {
   await super._onRender(context, options);
   
   const folderShell = this.element.querySelector(".folder-shell");
+ // const draggable = this.element.querySelector(".draggable");
 
   this._playAnimation(folderShell, "open-folder-trigger", "open-folder-trigger", "close-folder-trigger");
  
-  if (folderShell) {
-    this._dragHandle = new foundry.applications.ux.Draggable(
-      this, folderShell);
-  }
+  this.element.querySelectorAll(".draggable").forEach(el => {
+    new foundry.applications.ux.Draggable(this, el);
+  });
+
+
   
 /*
 this._dragHandle = new foundry.applications.ux.Draggable(
@@ -187,9 +190,11 @@ Notice the difference:
       // Mark as initialized so this only runs once
       page.classList.add("initialized");
 
+
       // Add 'back' class to the back element inside the page
       const back = page.querySelector(".back");
       if (back) back.classList.add("back-initialized");
+
     }
   }); 
   this._updatePageClasses();
@@ -218,12 +223,28 @@ static async _onOpenFolder(event, target) {
   console.log("Red Thread | Render Fired!");
 }
 
-/*
-static async _onCloseFolder(event, target) {
-  await this.actor.setFlag("red-thread", "folderOpen", false);
-  this.render({ force: true });
+
+// Input handling
+
+async _onChangeInput(event) {
+  await super._onChangeInput(event);
+
+  const first = this.actor.system.investigator.firstname?.trim();
+  const last  = this.actor.system.investigator.lastname?.trim();
+
+  if (first || last) {
+    const fullName = [first, last].filter(Boolean).join(" ");
+
+    if (fullName && this.actor.name !== fullName) {
+      await this.actor.update({ name: fullName });
+    }
+  }
 }
-*/
+
+
+
+
+
 
 // --- NEW CLOSE FOLDER METHOD --- 
 
