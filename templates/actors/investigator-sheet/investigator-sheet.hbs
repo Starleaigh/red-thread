@@ -1,5 +1,5 @@
 
-<div class="investigator-sheet" style="width: 500px">
+<div class="investigator-sheet">
 
     <div class="folder-shell">
 
@@ -51,49 +51,49 @@
                 <div class="front">
                   <section class="">
                 <!-- PAGE 1 — PROFILE -->
-                  <section class="profile-sections" style="padding-top: 15px;">
+                  <section class="profile-sections" style="padding-top: 5px;">
                     <label class="profile-heading">Investigator Profile:</label>
-                    <div class="profile-label" style="gap: 5px; margin-top: 20px;">
-                      <label for="first" style="min-width: 150px">First Name</label>
-                      <label for="second" style="min-width: 150px">Last Name</label>
-                      <label for="third" style="min-width: 50px;">Age</label>
-                      <label for="forth" style="min-width: 50px">Sex</label>
+                    <div class="profile-label" style="margin-top: 5px">
+                      <label for="first" style="min-width: 120px">First Name</label>
+                      <label for="second" style="min-width: 120px">Last Name</label>
+                      <label for="third" style="min-width: 40px;">Age</label>
+                      <label for="forth" style="min-width: 40px">Sex</label>
                     </div>
 
-                    <input class="profile-input" style="width: 150px" type="text" name="system.investigator.firstname" value="{{system.investigator.firstname}}" />
-                    <input class="profile-input" style="width: 150px" type="text" name="system.investigator.lastname" value="{{system.investigator.lastname}}" />
-                    <input class="profile-input" style="width: 50px; transform: translateY(-2px); padding-bottom: 5px;" type="text" name="system.investigator.age" value="{{system.investigator.age}}" />
-                    <input class="profile-input" style="width: 50px" type="text" name="system.investigator.pronouns" value="{{system.investigator.pronouns}}" />
+                    <input class="profile-input" style="width: 120px" type="text" name="system.investigator.firstname" value="{{system.investigator.firstname}}" />
+                    <input class="profile-input" style="width: 120px" type="text" name="system.investigator.lastname" value="{{system.investigator.lastname}}" />
+                    <input class="profile-input" style="width: 40px; text-align: center; transform: translateY(-2px); padding-bottom: 5px;" type="text" name="system.investigator.age" value="{{system.investigator.age}}" />
+                    <input class="profile-input" style="width: 40px" type="text" name="system.investigator.pronouns" value="{{system.investigator.pronouns}}" />
 
-                    <div class="profile-label" style="gap: 5px; margin-top: 10px;">
-                      <label for="first" style="width: 150px">Occupation</label>
-                      <label for="second" style="width: 125px">Residence</label>
-                      <label for="third" style="width: 125px">Birthplace</label>
+                    <div class="profile-label" style="margin-top: 1px">
+                      <label for="first" style="width: 120px">Occupation</label>
+                      <label for="second" style="width: 100px">Residence</label>
+                      <label for="third" style="width: 100px">Birthplace</label>
                     </div>
                     
-                    <input class="profile-input" style="width: 150px" type="text" name="system.investigator.occupation" value="{{system.investigator.occupation}}" />
-                    <input class="profile-input" style="width: 125px" type="text" name="system.investigator.residence" value="{{system.investigator.residence}}" />
-                    <input class="profile-input" style="width: 125px" type="text" name="system.investigator.birthplace" value="{{system.investigator.birthplace}}" />
+                    <input class="profile-input" style="width: 120px" type="text" name="system.investigator.occupation" value="{{system.investigator.occupation}}" />
+                    <input class="profile-input" style="width: 100px" type="text" name="system.investigator.residence" value="{{system.investigator.residence}}" />
+                    <input class="profile-input" style="width: 100px" type="text" name="system.investigator.birthplace" value="{{system.investigator.birthplace}}" />
                   </section>
                   <section class="profile-sections">
-                    <label class="profile-label">Appearance and Traits:</label>
-                    <textarea class="profile-input" style="width: 420px; height: 62px; resize: none"></textarea>
+                    <label class="profile-label" style="margin-top: 0px">Appearance and Traits:</label>
+                    <textarea class="profile-textarea"></textarea>
                   </section>
                   <section class="profile-sections">
                     <label class="profile-label">Ideology and Beliefs:</label>
-                    <textarea class="profile-input" style="width: 420px; height: 62px; resize: none"></textarea>
+                    <textarea class="profile-textarea"></textarea>
                   </section>
                   <section class="profile-sections">
                     <label class="profile-label">Scars and disorders:</label>
-                    <textarea class="profile-input" style="width: 420px; height: 62px; resize: none"></textarea>
+                    <textarea class="profile-textarea"></textarea>
                   </section>
                   <section class="profile-sections">
                     <label class="profile-label">Significant persons / locations:</label>
-                    <textarea class="profile-input" style="width: 420px; height: 62px; resize: none"></textarea>
+                    <textarea class="profile-textarea"></textarea>
                   </section>
                   <section class="profile-sections">
                     <label class="profile-label">Strange Encounters:</label>
-                    <textarea class="profile-input" style="width: 420px; height: 62px; resize: none"></textarea>
+                    <textarea class="profile-textarea"></textarea>
                   </section>
                   <div class="page-corner prev-page" data-action="prevPage"></div>
                   <div class="page-corner next-page" data-action="nextPage"></div>
@@ -101,7 +101,9 @@
                 </div> 
 
                 <div class="back">
-                  <section class="">
+                  <section class="profile-sections" style="padding-top: 10px">
+                    <label class="profile-label">History:</label>
+                    <textarea class="profile-textarea" style="height: 500px"></textarea>
                   </section>
                 </div> 
 
@@ -127,7 +129,7 @@
                       {{/each}}
                     </section>
 
-                    <section class="attributes" style="width: 400px;">
+                    <section class="attributes" style="width: 200px;">
                       <div>
                         <label class="profile-heading" style="text-align: center;">Attributes</label>
                         
@@ -171,7 +173,7 @@
                       </div>
                     </section>
 
-                    <section class="status">
+                    <section class="status" style="width: 200px;">
                       <h2>Status</h2>
                       <label><input type="checkbox" name="system.characteristics.tempinsan" {{checked system.characteristics.tempinsan}} /> Temporary Insanity</label>
                       <label><input type="checkbox" name="system.characteristics.indefinsan" {{checked system.characteristics.indefinsan}} /> Indefinite Insanity</label>

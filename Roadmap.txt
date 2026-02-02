@@ -1,0 +1,122 @@
+Investigator Sheet
+
+Finish all investigator pages
+- No refactors
+- No partials yet
+
+Add drag-mode scaling
+ - One CSS class
+ - Applied only during drag
+
+Move the window positioning logic
+- Center window on folder
+- Make window inert
+
+Add shadow and offset for page depth again
+- Only on paper pages
+- folder can have separate shadow style
+
+Freeze the investigator sheet
+- This becomes the gold standard
+
+Only after that do we extract:
+- casefile folders
+- POI folders
+- shared partials
+- socket locking
+
+
+
+--------------------------------
+CSS Clean up
+
+/* BASE: all pages */
+.page .front,
+.page .back {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+/* PAPER overrides */
+.page.paper .front,
+.page.paper .back {
+  left: var(--spine-width);
+  width: calc(100% - var(--spine-width));
+}
+
+/* FOLDER overrides */
+.page.folder .front,
+.page.folder .back {
+  left: 0;
+  width: 100%;
+}
+
+Move all inline styles to CSS if possible
+
+----------------------------------
+
+Move to partials - elegance upgrade
+
+Instead of:
+
+{{#if (eq page.index 2)}}
+  ...profile page...
+{{/if}}
+
+
+Do this:
+
+<section class="page {{page.state}} {{page.type}}" data-index="{{page.index}}">
+  {{> (lookup . "partial") }}
+</section>
+
+
+And in context: (partial may take over title?)
+
+pagesData = [
+  { index: 0, type: "folder", partial: "page-folder-front", state },
+  { index: 1, type: "paper",  partial: "page-cover", state },
+  { index: 2, type: "paper",  partial: "page-profile", state },
+  ...
+];
+
+
+This:
+
+deletes ~60% of the template logic
+makes page meaning explicit
+keeps animations untouched
+
+
+Extract common page chrome into a wrapper partial
+
+Example partial: page-base.hbs
+
+<div class="page-spine draggable"></div>
+
+<div class="front">
+  {{> @partial-block }}
+</div>
+
+<div class="back">
+  {{#if back}}
+    {{> back }}
+  {{/if}}
+</div>
+
+
+Then page content becomes:
+
+{{#> page-base}}
+  ...profile content...
+{{/page-base}}
+
+
+This keeps:
+- DOM consistent
+- spine logic unified
+- future changes easy
+
+Will need to use a unique id if we want players to be able to create pages

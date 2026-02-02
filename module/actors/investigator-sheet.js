@@ -15,7 +15,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     tag: "div",
     position: {
       width: 1,
-      height: 1
+      height: 1,
     },
     classes: ["red-thread", "investigator-sheet"],
     submitOnChange: true,
@@ -66,6 +66,14 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       folderOpen,
       pagesData };
   }
+
+  // In your sheet class
+  _constrainPosition(position) {
+  // Return the position unchanged, so it can move anywhere
+  return position;
+}
+
+
 
 async _updatePageClasses() {
   const root = this.element;

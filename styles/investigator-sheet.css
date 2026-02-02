@@ -10,6 +10,10 @@
   background: none;
   border: none;
   box-shadow: none;
+  left: 250px;
+  top: 350px;
+  width: 1px !important;
+  height: 1px;
 } 
 
 /* -- THIS IS NEEDED TO DISPLAY OUTSIDE WINDOW -- */
@@ -19,6 +23,8 @@
   background: none;
   border: none;
   backdrop-filter: none;
+  width: 1px;
+  height: 1px;
 
 }
  
@@ -26,6 +32,8 @@
   background: none;
   border: none;
   visibility: hidden;
+  width: 1px;
+  height: 1px;
 }
 /* -- THIS IS NEEDED TO DISPLAY OUTSIDE WINDOW -- */
 
@@ -38,8 +46,10 @@
 
 .investigator-sheet {
   position: absolute;
-  width: 500px;
-  height: 700px;
+  width: 400px; /* Created originally 500 * 700 */
+  height: 560px;
+  top: -350px;
+  left: 100px;
 }
    
    /* FOLDER SHELL */
@@ -132,14 +142,7 @@
   border: #969696;
 }
 */
-.paper {
-  position: absolute;
-  width: 95%;
-  height: 95%;
-  vertical-align: middle;
-  align-self: center;
-  align-items: center;
-}
+
 
 /* base page */
 .page {
@@ -148,6 +151,15 @@
   transform-style: preserve-3d;
   transform-origin: left center; 
 
+}
+
+.paper {
+  position: absolute;
+  width: 95%;
+  height: 95%;
+  vertical-align: middle;
+  align-self: center;
+  align-items: center;
 }
 
 .page-spine {
@@ -160,6 +172,14 @@
   pointer-events: auto;
 }
 
+/* duplex faces */
+.page .front,
+.page .back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+
 .page.paper .front,
 .page.paper .back {
   position: absolute;
@@ -169,14 +189,6 @@
   border: #969696;
   backface-visibility: hidden;
 
-}
-
-/* duplex faces */
-.page .front,
-.page .back {
-  position: absolute;
-  inset: 0;
-  backface-visibility: hidden;
 }
 
 /* -- THIS IS KEEPING DUPLEX PROPERLY REVERSED --*/
@@ -266,7 +278,7 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  padding: 8px 12px;
+  padding: 6px 8px;
   cursor: pointer;
   background: #d6c08d;
   border-radius: 8px;
@@ -328,7 +340,9 @@
   display: flex;
   font-weight: 600;
   font-family: "Baskerville";
+  font-size: small;
   padding: 0px;
+  gap: 5px;
 }
 
 .stat {
@@ -347,14 +361,30 @@
 .profile-input {
   background: transparent; 
   font-family: "Baskerville";
+  font-size: small;
   color:black;
   border: none; /* Removes all default borders */
   border-bottom: 1px solid #00000033; /* Adds a solid bottom line */
   outline: none; /* Removes the default blue outline when focused */
   border-radius: 0;
-  height: 15px;
-  margin-top: 5px; /* This + height is to tighten up the input boxes */
+  height: 13px;
+  padding-top: 2px;
   padding-left: 0px;
+}
+
+.profile-textarea {
+  background: transparent; 
+  font-family: "Baskerville";
+  font-size: small;
+  color:black;
+  border: none; /* Removes all default borders */
+  border-bottom: 1px solid #00000033; /* Adds a solid bottom line */
+  outline: none; /* Removes the default blue outline when focused */
+  border-radius: 0;
+  height: 66px;
+  width: 335px;
+  padding: 0px;
+  resize: none;
 }
 
 .profile-heading {
@@ -364,13 +394,13 @@
   font-size: large;
   width:400px;
   padding-top: 10px;
-  padding-bottom: 10px;
+  padding-bottom: 5px;
 }
 
 .profile-sections {
-    padding-top: 10px;
+    padding-top: 0px;
     padding-bottom: 0px;
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 12px;
+    padding-right: 12px;
     
 }
