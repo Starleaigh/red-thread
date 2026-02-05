@@ -10,10 +10,8 @@
   background: none;
   border: none;
   box-shadow: none;
-  left: 250px;
-  top: 350px;
-  width: 1px !important;
-  height: 1px;
+  pointer-events: none;
+
 } 
 
 /* -- THIS IS NEEDED TO DISPLAY OUTSIDE WINDOW -- */
@@ -23,8 +21,6 @@
   background: none;
   border: none;
   backdrop-filter: none;
-  width: 1px;
-  height: 1px;
 
 }
  
@@ -32,8 +28,6 @@
   background: none;
   border: none;
   visibility: hidden;
-  width: 1px;
-  height: 1px;
 }
 /* -- THIS IS NEEDED TO DISPLAY OUTSIDE WINDOW -- */
 
@@ -48,13 +42,14 @@
   position: absolute;
   width: 400px; /* Created originally 500 * 700 */
   height: 560px;
-  top: -350px;
-  left: 100px;
+  pointer-events: auto;
+  /*top: -350px;
+  left: 100px;*/
 }
    
    /* FOLDER SHELL */
 
-.folder-shell {
+.investigator-sheet .folder-shell {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -68,7 +63,7 @@
 
 
 /* FRONT COVER */
-.page .folder-front {
+.investigator-sheet .page .folder-front {
   position: absolute;
   inset: 0 ;
   width: 100%;
@@ -90,7 +85,7 @@
 }
 
 /* BACK COVER */
-.page .folder-back {
+.investigator-sheet .page .folder-back {
   position: absolute;
   inset: 0 ;
   width: 100%;
@@ -123,7 +118,7 @@
 
    ------------------------------------ */ 
 
-.page-stack {
+.investigator-sheet .page-stack {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -145,7 +140,7 @@
 
 
 /* base page */
-.page {
+.investigator-sheet .page {
   position: absolute;
   inset: 0;
   transform-style: preserve-3d;
@@ -153,7 +148,7 @@
 
 }
 
-.paper {
+.investigator-sheet .paper {
   position: absolute;
   width: 95%;
   height: 95%;
@@ -162,7 +157,7 @@
   align-items: center;
 }
 
-.page-spine {
+.investigator-sheet .page-spine {
   position:absolute;
   left: 0;
   top: 0;
@@ -173,15 +168,15 @@
 }
 
 /* duplex faces */
-.page .front,
-.page .back {
+.investigator-sheet .page .front,
+.investigator-sheet .page .back {
   position: absolute;
   inset: 0;
   backface-visibility: hidden;
 }
 
-.page.paper .front,
-.page.paper .back {
+.investigator-sheet .page.paper .front,
+.investigator-sheet .page.paper .back {
   position: absolute;
   left: var(--spine-width, 24px);
   background: #e5e4cb;
@@ -192,23 +187,24 @@
 }
 
 /* -- THIS IS KEEPING DUPLEX PROPERLY REVERSED --*/
-.page .back-initialized {
+.investigator-sheet .page .back-initialized {
   transform: rotateY(180deg); 
 }
 
 /* RIGHT STACK (future + current) */
-.page.future,
-.page.current {
+.investigator-sheet .page.future,
+.investigator-sheet .page.current {
   z-index: 20;
 }
 
 /* LEFT STACK (past) */
-.page.past {
+.investigator-sheet .page.past {
   z-index: 10;
 }
 
-.draggable {
+.investigator-sheet .draggable {
   -webkit-user-drag: none;
+
 }
 
 /* -------------------------------
@@ -241,29 +237,29 @@
 }
 
 /* Trigger classes */
-.turn-forward {
+.investigator-sheet .turn-forward {
   animation: turn-page-forward 0.55s ease-out forwards;
 }
 
-.turn-backward {
+.investigator-sheet .turn-backward {
   animation: turn-page-backward 0.55s ease-out forwards;
 }
 
-.page.turn-backward,
-.page.turn-forward {
+.investigator-sheet .page.turn-backward,
+.investigator-sheet .page.turn-forward {
   transition: none !important;
   z-index: 100;
 }
 
-.open-folder-trigger {
+.investigator-sheet .open-folder-trigger {
   animation: open-folder 1s ease-out forwards;
 }
-.close-folder-trigger {
+.investigator-sheet .close-folder-trigger {
   animation: close-folder 1s ease-out forwards;
 }
 
 
-.page.no-transition {
+.investigator-sheet .page.no-transition {
   transition: none !important;
 }
 
@@ -274,7 +270,7 @@
 
    ------------------------------------ */ 
 
-.folder-close {
+.investigator-sheet .folder-close {
   position: absolute;
   top: 10px;
   right: 10px;
@@ -286,7 +282,7 @@
   z-index: 9999;
 }
 
-.folder-label {
+.investigator-sheet .folder-label {
   position: absolute;
   right: -40px;
   top: 120px;
@@ -299,7 +295,7 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 
-.page-corner {
+.investigator-sheet .page-corner {
   position: absolute;
   width: 50px;
   height: 50px;
@@ -308,11 +304,11 @@
   background: rgba(0, 255, 255, 0.35);
 }
 
-.next-page {
+.investigator-sheet .next-page {
   right: 0;
 }
 
-.prev-page {
+.investigator-sheet .prev-page {
   left: 0;
 }
 
@@ -323,20 +319,20 @@
    ------------------------------------ */ 
 
 /* Layout Styling */
-.profile,
-.characteristics,
-.attributes,
-.status,
-.combat {
+.investigator-sheet .profile,
+.investigator-sheet .characteristics,
+.investigator-sheet .attributes,
+.investigator-sheet .status,
+.investigator-sheet .combat {
   padding: 16px;
   color: #000;
 }
 
-.profile-label,
-.characteristics label,
-.attributes label,
-.status label,
-.combat .stat-label {
+.investigator-sheet .profile-label,
+.investigator-sheet .characteristics label,
+.investigator-sheet .attributes label,
+.investigator-sheet .status label,
+.investigator-sheet .combat .stat-label {
   display: flex;
   font-weight: 600;
   font-family: "Baskerville";
@@ -345,20 +341,20 @@
   gap: 5px;
 }
 
-.stat {
+.investigator-sheet .stat {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-top: 8px;
 }
 
-.stat input {
+.investigator-sheet .stat input {
   width: 40px;
   color: #000;
 }
 
 
-.profile-input {
+.investigator-sheet .profile-input {
   background: transparent; 
   font-family: "Baskerville";
   font-size: small;
@@ -372,7 +368,7 @@
   padding-left: 0px;
 }
 
-.profile-textarea {
+.investigator-sheet .profile-textarea {
   background: transparent; 
   font-family: "Baskerville";
   font-size: small;
@@ -387,7 +383,7 @@
   resize: none;
 }
 
-.profile-heading {
+.investigator-sheet .profile-heading {
   color: black;
   font-family: "IM Fell DW Pica";
   font-weight: 600;
@@ -397,7 +393,7 @@
   padding-bottom: 5px;
 }
 
-.profile-sections {
+.investigator-sheet .profile-sections {
     padding-top: 0px;
     padding-bottom: 0px;
     padding-left: 12px;

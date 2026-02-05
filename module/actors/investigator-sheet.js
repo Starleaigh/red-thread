@@ -13,10 +13,6 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
 
   static DEFAULT_OPTIONS = {
     tag: "div",
-    position: {
-      width: 1,
-      height: 1,
-    },
     classes: ["red-thread", "investigator-sheet"],
     submitOnChange: true,
     closeOnSubmit: false,
@@ -161,33 +157,216 @@ async _onRender(context, options) {
   await super._onRender(context, options);
   
   const folderShell = this.element.querySelector(".folder-shell");
- // const draggable = this.element.querySelector(".draggable");
 
   this._playAnimation(folderShell, "open-folder-trigger", "open-folder-trigger", "close-folder-trigger");
  
-  this.element.querySelectorAll(".draggable").forEach(el => {
-    new foundry.applications.ux.Draggable(this, el);
-  });
+
+// START OF DRAG CODE
+
+ // this.element.querySelectorAll(".draggable").forEach(el => {
+ //   new foundry.applications.ux.Draggable(this, el);
+//  });
 
 
-  
+const sheet = this.element.querySelector(".investigator-sheet");
+const content = this.element.querySelector(".window-content");
+
+const SCALE = 0.2;
+let dragging = false;
+
+sheet.addEventListener("pointerdown", (e) => {
+  if (!e.target.classList.contains("draggable")) return;
+  if (e.button !== 0) return;
+
+  dragging = true;
+  sheet.setPointerCapture(e.pointerId);
+
+  const contentRect = content.getBoundingClientRect();
+
+  // Snap center of *sheet* to mouse
+  sheet.style.transition = "transform 0.15s ease";
+  sheet.style.transformOrigin = "center center";
+  sheet.style.transform = `scale(${SCALE})`;
+
+  sheet.style.left =
+    `${e.clientX - contentRect.left - sheet.offsetWidth / 2}px`;
+  sheet.style.top =
+    `${e.clientY - contentRect.top - sheet.offsetHeight / 2}px`;
+
+  e.preventDefault();
+});
+
+
+
+document.addEventListener("pointermove", (e) => {
+  if (!dragging) return;
+
+  const contentRect = content.getBoundingClientRect();
+
+  sheet.style.left =
+    `${e.clientX - contentRect.left - sheet.offsetWidth / 2}px`;
+  sheet.style.top =
+    `${e.clientY - contentRect.top - sheet.offsetHeight / 2}px`;
+});
+
+
+
+document.addEventListener("pointerup", (e) => {
+  if (!dragging) return;
+
+  dragging = false;
+  sheet.releasePointerCapture(e.pointerId);
+
+  sheet.style.transition = "transform 0.15s ease";
+  sheet.style.transform = "scale(1)";
+  sheet.style.transformOrigin = "center center";
+});
+
+
+
+
+
+
 /*
-this._dragHandle = new foundry.applications.ux.Draggable(
-  this,
-  dragHandle
-);
+const folder = this.element.querySelector(".investigator-sheet");
+const SCALE = 0.2;
 
-this._dragHandle = new foundry.applications.ux.Draggable(
-  this,
-  this.element,
-  { handle: dragHandle }
-);
-Notice the difference:
+let dragging = false;
 
-👉 root = whole sheet
-👉 handle = drag zone
+folder.addEventListener("pointerdown", (e) => {
+  if (!e.target.classList.contains("draggable")) return;
+  if (e.button !== 0) return;
+
+  dragging = true;
+  folder.setPointerCapture(e.pointerId);
+
+  const rect = folder.getBoundingClientRect();
+
+  // remove transitions during drag
+  folder.style.transition = "none";
+  folder.style.transformOrigin = "center center";
+  folder.style.transform = `scale(${SCALE})`;
+
+
+  // immediately center on pointer
+  folder.style.left = `${e.clientX - rect.width / 2}px`;
+  folder.style.top  = `${e.clientY - rect.height / 2}px`;
+
+  e.preventDefault();
+});
+
+document.addEventListener("pointermove", (e) => {
+  if (!dragging) return;
+
+  const rect = folder.getBoundingClientRect();
+
+  folder.style.left = `${e.clientX - rect.width / 2}px`;
+  folder.style.top  = `${e.clientY - rect.height / 2}px`;
+});
+
+document.addEventListener("pointerup", (e) => {
+  if (!dragging) return;
+
+  dragging = false;
+  folder.releasePointerCapture(e.pointerId);
+
+  // restore scale smoothly
+  folder.style.transition = "transform 0.15s ease";
+  folder.style.transform = "scale(1)";
+});
 
 */
+
+///// Draggable location on the folder 
+/*
+const folder = this.element.querySelector(".investigator-sheet");
+const SCALE = 0.8;
+
+let dragState = null;
+
+folder.addEventListener("pointerdown", (e) => {
+  if (!e.target.classList.contains("draggable")) {
+    console.log("Red Thread | Pointer down fired... Not draggable!!!");
+    return;
+  }
+  if (e.button !== 0) return;
+
+  const rect = folder.getBoundingClientRect();
+
+  // Pointer anchor inside the folder
+  const offsetX = e.clientX - rect.left;
+  const offsetY = e.clientY - rect.top;
+
+  // Scale origin relative to folder
+  const originX = (offsetX / rect.width) * 100;
+  const originY = (offsetY / rect.height) * 100;
+
+  dragState = {
+    offsetX,
+    offsetY
+  };
+
+  folder.setPointerCapture(e.pointerId);
+
+  folder.style.transformOrigin = `${originX}% ${originY}%`;
+  folder.style.transition = "transform 0.15s ease";
+  folder.style.transform = `scale(${SCALE})`;
+
+  e.preventDefault();
+});
+
+document.addEventListener("pointermove", (e) => {
+  if (!dragState) return;
+
+  // Absolute placement — no deltas
+  const left = e.clientX - dragState.offsetX;
+  const top  = e.clientY - dragState.offsetY;
+
+  folder.style.left = `${left}px`;
+  folder.style.top  = `${top}px`;
+});
+
+document.addEventListener("pointerup", (e) => {
+  if (!dragState) return;
+
+  dragState = null;
+  folder.releasePointerCapture(e.pointerId);
+
+  // Reset scale
+  folder.style.transition = "transform 0.15s ease";
+  folder.style.transform = "scale(1)";
+  folder.style.transformOrigin = "center center";
+*/
+
+/*
+  // --- Bounds snap ---
+  const playArea = document.querySelector("#board"); // adjust if needed
+  if (!playArea) return;
+
+  const playRect = playArea.getBoundingClientRect();
+  const folderRect = folder.getBoundingClientRect();
+
+  let finalLeft = folderRect.left;
+  let finalTop  = folderRect.top;
+
+  if (folderRect.left < playRect.left)
+    finalLeft = playRect.left;
+
+  if (folderRect.top < playRect.top)
+    finalTop = playRect.top;
+
+  if (folderRect.right > playRect.right)
+    finalLeft = playRect.right - folderRect.width;
+
+  if (folderRect.bottom > playRect.bottom)
+    finalTop = playRect.bottom - folderRect.height;
+
+  folder.style.left = `${finalLeft}px`;
+  folder.style.top  = `${finalTop}px`;
+});
+*/
+
+// END OF DRAG CODE
 
 
 
