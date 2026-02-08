@@ -14,7 +14,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
   static DEFAULT_OPTIONS = {
     tag: "div",
     classes: ["red-thread", "investigator-sheet"],
-    submitOnChange: true,
+    submitOnChange: false,
     closeOnSubmit: false,
     resizable: false,
 
@@ -34,6 +34,9 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
   async _prepareContext() {
     const context = await super._prepareContext();
     const folderOpen = this.actor.getFlag("red-thread", "folderOpen") ?? false;
+    const actor = this.actor.isToken
+      ? this.actor.baseActor
+      : this.actor; // Enforce one truth for Actor Data (No Token data as source)
 
     // Build pages and compute classes here
     const pagesData = [
@@ -104,6 +107,9 @@ static async _onNextPage(event, target) {
   if (!current) return;
 
   this.isTurning = true;
+
+  // 🔊 PLAY SOUND HERE
+  playPageSound();
   
   this._playAnimation(current, "turn-forward", "turn-forward", "turn-backward");
   current.style.zIndex = 1000; // Bring to top during animation
@@ -125,6 +131,9 @@ static async _onPrevPage(event, target) {
   if (!prev) return;
 
   this.isTurning = true;
+
+  // 🔊 PLAY SOUND HERE
+  playPageSound();
 
   this._playAnimation(prev, "turn-backward", "turn-forward", "turn-backward");
   
@@ -155,11 +164,22 @@ _playAnimation(el, className, rem1, rem2) {
 async _onRender(context, options) {
 
   await super._onRender(context, options);
-  
+
+  this._bindFieldListeners(); // Data Handling
+
+  console.log("Red Thread | Root Element: ", this.element);
+  console.log("Red Thread | Is form: ", this.element.tagName);
+  console.log("Red Thread | Found form: ", this.element.querySelector("form"));
+
   const folderShell = this.element.querySelector(".folder-shell");
 
   this._playAnimation(folderShell, "open-folder-trigger", "open-folder-trigger", "close-folder-trigger");
- 
+   
+  // 🔊 PLAY SOUND HERE
+  foundry.audio.AudioHelper.play({
+    src: "systems/red-thread/assets/sounds/folderflip.mp3",
+    volume: 0.6
+  }, true);
 
 // START OF DRAG CODE
 
@@ -182,7 +202,7 @@ sheet.addEventListener("pointerdown", (e) => {
   sheet.setPointerCapture(e.pointerId);
 
   const contentRect = content.getBoundingClientRect();
-
+/*
   // Snap center of *sheet* to mouse
   sheet.style.transition = "transform 0.15s ease";
   sheet.style.transformOrigin = "center center";
@@ -192,7 +212,7 @@ sheet.addEventListener("pointerdown", (e) => {
     `${e.clientX - contentRect.left - sheet.offsetWidth / 2}px`;
   sheet.style.top =
     `${e.clientY - contentRect.top - sheet.offsetHeight / 2}px`;
-
+*/
   e.preventDefault();
 });
 
@@ -202,6 +222,11 @@ document.addEventListener("pointermove", (e) => {
   if (!dragging) return;
 
   const contentRect = content.getBoundingClientRect();
+
+  // Snap center of *sheet* to mouse
+  sheet.style.transition = "transform 0.15s ease";
+  sheet.style.transformOrigin = "center center";
+  sheet.style.transform = `scale(${SCALE})`;
 
   sheet.style.left =
     `${e.clientX - contentRect.left - sheet.offsetWidth / 2}px`;
@@ -221,10 +246,6 @@ document.addEventListener("pointerup", (e) => {
   sheet.style.transform = "scale(1)";
   sheet.style.transformOrigin = "center center";
 });
-
-
-
-
 
 
 /*
@@ -387,8 +408,8 @@ document.addEventListener("pointerup", (e) => {
   this._updatePageClasses();
 }
 
-// --- FOLDER METHODS ---
-
+// --- DATA METHODS ---
+/*
 async getData() {
   const data = await super.getData();
 
@@ -400,19 +421,39 @@ async getData() {
   return data;
 }
 
+// Input handling
+*/
 
-static async _onOpenFolder(event, target) {
-  console.log("Red Thread | Folder action fired");
-  await this.actor.setFlag("red-thread", "folderOpen", true);
-  const flag = this.actor.getFlag("red-thread", "folderOpen");
-  console.log("Red Thread | Get Flag: ", flag);
-  this.render({ force: true });
-  console.log("Red Thread | Render Fired!");
+_bindFieldListeners() {
+  if (!this.element) return;
+
+  this.element.addEventListener("input", this._onFieldChange);
+  this.element.addEventListener("change", this._onFieldChange);
+}
+
+get dataActor() {
+  return this.actor.isToken ? this.actor.baseActor : this.actor;
+}
+
+_onFieldChange = async (event) => {
+  const el = event.target;
+  if (!el?.dataset?.field) return;
+
+  let value;
+  if (el.type === "checkbox") {
+    value = el.checked;
+  } else {
+    value = el.value;
+  }
+
+  await this.dataActor.update(
+    { [el.dataset.field]: value },
+    { render: false }
+  );
 }
 
 
-// Input handling
-
+/*
 async _onChangeInput(event) {
   await super._onChangeInput(event);
 
@@ -429,7 +470,17 @@ async _onChangeInput(event) {
 }
 
 
+*/
+// --- FOLDER METHODS ---
 
+static async _onOpenFolder(event, target) {
+  console.log("Red Thread | Folder action fired");
+  await this.actor.setFlag("red-thread", "folderOpen", true);
+  const flag = this.actor.getFlag("red-thread", "folderOpen");
+  console.log("Red Thread | Get Flag: ", flag);
+  this.render({ force: true });
+  console.log("Red Thread | Render Fired!");
+}
 
 
 
@@ -456,11 +507,18 @@ static async _onCloseFolder(event, target) {
   // VISUAL FLIP ONLY
   pastPages.forEach((page, i) => {
     setTimeout(() => {
+      playPageSound();
       page.style.zIndex = 1000 + i;
       console.log("Red Thread | Z-index: ", page.style.zIndex);
       page.classList.add("turn-backward");
     }, i * flipDuration);
   });
+    
+  // 🔊 PLAY SOUND HERE
+  foundry.audio.AudioHelper.play({
+    src: "systems/red-thread/assets/sounds/folderflip.mp3",
+    volume: 0.6
+  }, true);
 
   // HARD RESET AFTER ANIMATION
   setTimeout(() => {
@@ -513,4 +571,17 @@ async close(options = {}) {
 
 }
 
+}
+
+  // PAGE SOUND FUNCTION
+
+const PAGE_SOUNDS = [
+  "systems/red-thread/assets/sounds/pageflip1.mp3",
+  "systems/red-thread/assets/sounds/pageflip2.mp3",
+  "systems/red-thread/assets/sounds/pageflip3.mp3"
+];
+
+function playPageSound(volume = 0.6) {
+  const src = PAGE_SOUNDS[Math.floor(Math.random() * PAGE_SOUNDS.length)];
+  foundry.audio.AudioHelper.play({ src, volume }, true);
 }

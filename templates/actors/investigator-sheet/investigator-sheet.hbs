@@ -1,5 +1,5 @@
 
-<div class="investigator-sheet">
+<div class="investigator-sheet"> 
 
     <div class="folder-shell">
 
@@ -14,8 +14,8 @@
                 <div class="front">
                   <div class="folder-front draggable" ></div>
                   <div class="top-secret-stamp">TOP SECRET</div>
-                  <div class="folder-label" data-action="nextPage">{{actor.name}}</div>
-                  <div class="open-folder-hitbox" >OPEN</div>
+                  <div class="folder-label" data-action="nextPage">{{@root.actor.name}}</div>
+                  <div class="open-folder-hitbox">OPEN</div>
                 </div>
 
                 <div class="back">
@@ -60,10 +60,10 @@
                       <label for="forth" style="min-width: 40px">Sex</label>
                     </div>
 
-                    <input class="profile-input" style="width: 120px" type="text" name="system.investigator.firstname" value="{{system.investigator.firstname}}" />
-                    <input class="profile-input" style="width: 120px" type="text" name="system.investigator.lastname" value="{{system.investigator.lastname}}" />
-                    <input class="profile-input" style="width: 40px; text-align: center; transform: translateY(-2px); padding-bottom: 5px;" type="text" name="system.investigator.age" value="{{system.investigator.age}}" />
-                    <input class="profile-input" style="width: 40px" type="text" name="system.investigator.pronouns" value="{{system.investigator.pronouns}}" />
+                    <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.firstname" value="{{@root.system.investigator.firstname}}"/>
+                    <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.lastname" value="{{@root.system.investigator.lastname}}"/>
+                    <input class="profile-input" style="width: 39px; text-align: center; transform: translateY(-2px); padding-bottom: 5px;" type="text" data-field="system.investigator.age" value="{{@root.system.investigator.age}}" />
+                    <input class="profile-input" style="width: 39px; text-align: center;" type="text" data-field="system.investigator.sex" value="{{@root.system.investigator.sex}}" />
 
                     <div class="profile-label" style="margin-top: 1px">
                       <label for="first" style="width: 120px">Occupation</label>
@@ -71,29 +71,29 @@
                       <label for="third" style="width: 100px">Birthplace</label>
                     </div>
                     
-                    <input class="profile-input" style="width: 120px" type="text" name="system.investigator.occupation" value="{{system.investigator.occupation}}" />
-                    <input class="profile-input" style="width: 100px" type="text" name="system.investigator.residence" value="{{system.investigator.residence}}" />
-                    <input class="profile-input" style="width: 100px" type="text" name="system.investigator.birthplace" value="{{system.investigator.birthplace}}" />
+                    <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.occupation" value="{{@root.system.investigator.occupation}}" />
+                    <input class="profile-input" style="width: 100px" type="text" data-field="system.investigator.residence" value="{{@root.system.investigator.residence}}" />
+                    <input class="profile-input" style="width: 100px" type="text" data-field="system.investigator.birthplace" value="{{@root.system.investigator.birthplace}}" />
                   </section>
                   <section class="profile-sections">
                     <label class="profile-label" style="margin-top: 0px">Appearance and Traits:</label>
-                    <textarea class="profile-textarea"></textarea>
+                    <textarea class="profile-textarea" data-field="system.investigator.appearance">{{@root.system.investigator.appearance}}</textarea>
                   </section>
                   <section class="profile-sections">
                     <label class="profile-label">Ideology and Beliefs:</label>
-                    <textarea class="profile-textarea"></textarea>
+                    <textarea class="profile-textarea" data-field="system.investigator.ideology">{{@root.system.investigator.ideology}}</textarea>
                   </section>
                   <section class="profile-sections">
                     <label class="profile-label">Scars and disorders:</label>
-                    <textarea class="profile-textarea"></textarea>
+                    <textarea class="profile-textarea" data-field="system.investigator.disorders">{{@root.system.investigator.disorders}}</textarea>
                   </section>
                   <section class="profile-sections">
-                    <label class="profile-label">Significant persons / locations:</label>
-                    <textarea class="profile-textarea"></textarea>
+                    <label class="profile-label">Significant persons / locations / items:</label>
+                    <textarea class="profile-textarea" data-field="system.investigator.significant">{{@root.system.investigator.significant}}</textarea>
                   </section>
                   <section class="profile-sections">
                     <label class="profile-label">Strange Encounters:</label>
-                    <textarea class="profile-textarea"></textarea>
+                    <textarea class="profile-textarea" data-field="system.investigator.encounters">{{@root.system.investigator.encounters}}</textarea>
                   </section>
                   <div class="page-corner prev-page" data-action="prevPage"></div>
                   <div class="page-corner next-page" data-action="nextPage"></div>
@@ -103,7 +103,7 @@
                 <div class="back">
                   <section class="profile-sections" style="padding-top: 10px">
                     <label class="profile-label">History:</label>
-                    <textarea class="profile-textarea" style="height: 500px"></textarea>
+                    <textarea class="profile-textarea" style="height: 500px" data-field="system.investigator.backstory">{{@root.system.investigator.backstory}}</textarea>
                   </section>
                 </div> 
 
