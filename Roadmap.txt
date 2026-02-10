@@ -3,14 +3,17 @@ Investigator Sheet
 Finish all investigator pages
 - No refactors
 - No partials yet
+- Add Photo
 
-Add drag-mode scaling
+Add drag-mode scaling - DONE
  - One CSS class
  - Applied only during drag
 
-Move the window positioning logic
+Move the window positioning logic - DONE
 - Center window on folder
 - Make window inert
+
+Resize opition
 
 Add shadow and offset for page depth again
 - Only on paper pages
@@ -25,6 +28,12 @@ Only after that do we extract:
 - shared partials
 - socket locking
 
+--------------------
+
+Issues
+
+Investigators are not renamed in the Actor Folders and become do not open after dragging to the board unless link actor is checked. Token Name does not update on updating actor.name
+--- This is fixed upon a refresh after Link actor sheet is checked
 
 
 --------------------------------

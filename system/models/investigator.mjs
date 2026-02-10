@@ -7,6 +7,8 @@ export class InvestigatorDataModel extends foundry.abstract.TypeDataModel {
 
     return {
       investigator: new fields.SchemaField({
+        defaultportrait: new fields.StringField({ initial: "./systems/red-thread/assets/images/default-profile.jpg" }),
+        portrait: new fields.StringField({ initial: "" }),
         firstname: new fields.StringField({ initial: "" }),
         lastname: new fields.StringField({ initial: "" }),
         age: new fields.StringField({ initial: "" }),

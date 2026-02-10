@@ -181,6 +181,7 @@
   color: #000;
   border: #969696;
   backface-visibility: hidden;
+  box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.2);
 
 }
 
@@ -315,6 +316,23 @@
     --- LAYOUT STYLING GOES HERE ---
 
    ------------------------------------ */ 
+
+.investigator-sheet .photo-background {
+  position: absolute;
+  background: #dfd7c6;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  width: 150px;
+  height: fit-content;
+  top: 15px;
+  right: 50px;
+  transform: rotateZ(-3deg);
+}
+
+.investigator-sheet .profile-picture {
+  padding: 10px;
+  width: 85%;
+  height: auto;
+}
 
 /* Layout Styling */
 .investigator-sheet .profile,

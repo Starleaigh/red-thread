@@ -20,6 +20,13 @@
 
                 <div class="back">
                   <div class="folder-back draggable"></div>
+                    <div class="photo-background">
+                      <div>
+                        <img class="profile-picture" style="position: absolute; left: 7.5%; top: 7.5%; cursor: pointer;" data-action="changePortrait" src="{{@root.portraitSrc}}"/>
+                        <img style="position: absolute; width: 20%; top: -34px; right: 5px; transform: rotateZ(-40deg);" src="systems/red-thread/assets/images/paperclip-front.png"/>
+                      </div>
+                    </div>
+                    <input type="file" accept="image/*" data-action="upload-portrait"/>
                 </div>
               {{/if}}
 
@@ -29,8 +36,9 @@
 
                 <div class="front">
                   <section class="">
-                    <label style="color:black; padding: 20px; font-family: "Special Elite";">Ministry of Paranormal Suppression</label>
+                    <label style="top: 50px; color:black; padding: 20px; text-align: center; font-family: "Special Elite";">Ministry of Paranormal & Occult Security</label>
                     <h3 style="padding-left: 20px; color: black; font-family: "Special Elite"">INVESTIGATOR DOSSIER</h3>
+                    <img style="position: absolute; width: 200px; height: 200px; left: 25%; top: 33%; opacity: 15%;" src="systems/red-thread/assets/images/Coven-trans.png"/>
                     <div class="page-corner prev-page" data-action="prevPage"></div>
                     <div class="page-corner next-page" data-action="nextPage"></div>
                   </section>
@@ -129,7 +137,7 @@
                       {{/each}}
                     </section>
 
-                    <section class="attributes" style="width: 200px;">
+                    <section class="attributes" style="width: 150px; display: inline-block;">
                       <div>
                         <label class="profile-heading" style="text-align: center;">Attributes</label>
                         
@@ -173,7 +181,7 @@
                       </div>
                     </section>
 
-                    <section class="status" style="width: 200px;">
+                    <section class="status" style="width: 150px; display: inline-block;">
                       <h2>Status</h2>
                       <label><input type="checkbox" name="system.characteristics.tempinsan" {{checked system.characteristics.tempinsan}} /> Temporary Insanity</label>
                       <label><input type="checkbox" name="system.characteristics.indefinsan" {{checked system.characteristics.indefinsan}} /> Indefinite Insanity</label>

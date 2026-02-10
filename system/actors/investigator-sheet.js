@@ -22,10 +22,11 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       nextPage: InvestigatorSheet._onNextPage,
       prevPage: InvestigatorSheet._onPrevPage,
       openFolder: InvestigatorSheet._onOpenFolder,
-      closeFolder: InvestigatorSheet._onCloseFolder
+      closeFolder: InvestigatorSheet._onCloseFolder,
+      changePortrait: InvestigatorSheet.prototype._openPortraitDialog
     }
   };
-
+  
   pageIndex = 0;
   previousPage = 0;
   pageCount = 8;
@@ -58,10 +59,18 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       return { ...page, state };
     });
 
+    // Portrait Management
+    const system = actor.system.investigator;
+
+    let portraitSrc = system.portrait;
+    if (!portraitSrc) portraitSrc = system.defaultportrait;
+    console.log("Red Thread | portraitSrc: ", portraitSrc);
+
     return { 
       ...context,
       actor: this.actor,
       system: this.actor.system,
+      portraitSrc,
       folderOpen,
       pagesData };
   }
@@ -165,11 +174,19 @@ async _onRender(context, options) {
 
   await super._onRender(context, options);
 
-  this._bindFieldListeners(); // Data Handling
+// ----- CALL DATA HANDLING ------
 
-  console.log("Red Thread | Root Element: ", this.element);
-  console.log("Red Thread | Is form: ", this.element.tagName);
-  console.log("Red Thread | Found form: ", this.element.querySelector("form"));
+  this._bindFieldListeners(); 
+
+ // this._updatePortrait(this.actor.system.investigator.portrait);
+
+// ----- PORTRAIT CHANGE HANDLER --------
+ // this.element
+ //   .querySelector('[data-action="change-portrait"]')
+//    ?.addEventListener('click', () => this._openPortraitDialog());
+
+
+// -------- FOLDER ANIMATION --------
 
   const folderShell = this.element.querySelector(".folder-shell");
 
@@ -181,18 +198,15 @@ async _onRender(context, options) {
     volume: 0.6
   }, true);
 
-// START OF DRAG CODE
-
- // this.element.querySelectorAll(".draggable").forEach(el => {
- //   new foundry.applications.ux.Draggable(this, el);
-//  });
-
+// ------------- START OF DRAG CODE ---------------
 
 const sheet = this.element.querySelector(".investigator-sheet");
 const content = this.element.querySelector(".window-content");
 
 const SCALE = 0.2;
 let dragging = false;
+
+// ------------- POINTER DOWN --------------------
 
 sheet.addEventListener("pointerdown", (e) => {
   if (!e.target.classList.contains("draggable")) return;
@@ -216,7 +230,7 @@ sheet.addEventListener("pointerdown", (e) => {
   e.preventDefault();
 });
 
-
+// ----------- POINTER DRAG ----------
 
 document.addEventListener("pointermove", (e) => {
   if (!dragging) return;
@@ -234,7 +248,7 @@ document.addEventListener("pointermove", (e) => {
     `${e.clientY - contentRect.top - sheet.offsetHeight / 2}px`;
 });
 
-
+// -------- POINTER UP ---------
 
 document.addEventListener("pointerup", (e) => {
   if (!dragging) return;
@@ -247,7 +261,7 @@ document.addEventListener("pointerup", (e) => {
   sheet.style.transformOrigin = "center center";
 });
 
-
+// ----------- OLD DRAG CODE KEEP FOR POTENTIAL MOPDIFICATION TO THE DRAG LOGIC --------------
 /*
 const folder = this.element.querySelector(".investigator-sheet");
 const SCALE = 0.2;
@@ -390,6 +404,7 @@ document.addEventListener("pointerup", (e) => {
 // END OF DRAG CODE
 
 
+// -------- INITIALIZE PAGES IN THE DOM ---------------------
 
   const pages = this.element.querySelectorAll(".page");
 
@@ -409,20 +424,8 @@ document.addEventListener("pointerup", (e) => {
 }
 
 // --- DATA METHODS ---
-/*
-async getData() {
-  const data = await super.getData();
-
-  data.folderOpen =
-    this.actor.getFlag("red-thread", "folderOpen") ?? false;
-
-  console.log("folderOpen in getData:", data.folderOpen);
-    
-  return data;
-}
 
 // Input handling
-*/
 
 _bindFieldListeners() {
   if (!this.element) return;
@@ -435,6 +438,8 @@ get dataActor() {
   return this.actor.isToken ? this.actor.baseActor : this.actor;
 }
 
+// Live updates to sheet
+
 _onFieldChange = async (event) => {
   const el = event.target;
   if (!el?.dataset?.field) return;
@@ -446,35 +451,132 @@ _onFieldChange = async (event) => {
     value = el.value;
   }
 
-  await this.dataActor.update(
-    { [el.dataset.field]: value },
+  const updateData = {
+    [el.dataset.field]: value
+  };
+
+  await this.dataActor.update(updateData, { render: false });
+
+  // Only recompute name if relevant fields changed
+  if (
+    el.dataset.field === "system.investigator.firstname" ||
+    el.dataset.field === "system.investigator.lastname"
+  ) {
+    this._updateActorNameFromSystem(this.actor.system);
+  }
+};
+
+// Change Actor.name to follow name input fields
+
+_updateActorNameFromSystem(system) {
+  const first = system.investigator?.firstname?.trim() ?? "";
+  const last  = system.investigator?.lastname?.trim() ?? "";
+
+  let name = [first, last].filter(Boolean).join(" ");
+  if (!name) name = "Investigator";
+
+  // Avoid infinite update loops
+  if (this.actor.name === name) return;
+
+  return this.actor.update(
+    { name },
     { render: false }
   );
 }
 
+// ------ PORTRAIT DIALOG BOX LOAD -------------
 
-/*
-async _onChangeInput(event) {
-  await super._onChangeInput(event);
+async _openPortraitDialog(event, target) {
+  const sheet = this;
 
-  const first = this.actor.system.investigator.firstname?.trim();
-  const last  = this.actor.system.investigator.lastname?.trim();
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.style.display = "none";
 
-  if (first || last) {
-    const fullName = [first, last].filter(Boolean).join(" ");
+  input.addEventListener("change", async e => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    if (fullName && this.actor.name !== fullName) {
-      await this.actor.update({ name: fullName });
-    }
-  }
+    const actor = sheet.actor.isToken
+      ? sheet.actor.baseActor
+      : sheet.actor;
+
+    const ext = file.name.split(".").pop().toLowerCase();
+    const filename = `${actor.id}.${ext}`;
+    const uploadPath = `worlds/${game.world.id}/actors`;
+
+    await ensureDirectory("data", uploadPath);
+
+    const result = await foundry.applications.apps.FilePicker.upload(
+      "data",
+      uploadPath,
+      file,
+      { name: filename }
+    );
+
+    await actor.update({
+      "system.investigator.portrait": result.path,
+      img: result.path,
+      "prototypeToken.texture.src": result.path
+    }, { render: false });
+
+    // ✅ update only the image
+    sheet._updatePortrait(result.path);
+    sheet._updateTokens(result.path);
+
+  
+  });
+
+  document.body.appendChild(input);
+  input.click();
+  document.body.removeChild(input);
 }
 
 
-*/
+_updatePortrait(src) {
+  const fallback = this.actor.system.investigator.defaultportrait;
+  const finalSrc = src || fallback;
+
+  const img = this.element.querySelector<HTMLImageElement>(".investigator-portrait");
+  if (!img) return;
+
+  // 🔥 HARD cache-bust so browser updates immediately
+  const bustedSrc = `${finalSrc}?v=${performance.now()}`;
+
+  // Force reflow inside transformed/foldered element
+  img.style.display = "none";
+  img.offsetHeight; // trigger reflow
+  img.src = bustedSrc;
+  img.style.display = "";
+
+  img.onerror = () => { 
+    img.onerror = null;
+    img.src = fallback;
+  };
+}
+
+_updateTokens(src) {
+  const finalSrc = src || this.actor.system.investigator.defaultportrait;
+
+  canvas?.tokens?.placeables
+    .filter(t => t.actor?.id === this.actor.id)
+    .forEach(token => {
+      // Update the token document texture
+      token.document.update({ "texture.src": finalSrc }).then(() => {
+      //  token.draw(); // Force instant redraw
+      });
+    });
+}
+
+
+
+
+
 // --- FOLDER METHODS ---
 
 static async _onOpenFolder(event, target) {
-  console.log("Red Thread | Folder action fired");
+//  console.log("Red Thread | Folder action fired");
   await this.actor.setFlag("red-thread", "folderOpen", true);
   const flag = this.actor.getFlag("red-thread", "folderOpen");
   console.log("Red Thread | Get Flag: ", flag);
@@ -584,4 +686,19 @@ const PAGE_SOUNDS = [
 function playPageSound(volume = 0.6) {
   const src = PAGE_SOUNDS[Math.floor(Math.random() * PAGE_SOUNDS.length)];
   foundry.audio.AudioHelper.play({ src, volume }, true);
+}
+
+// CREATE FOLDER FUNCTION
+
+// --------- FOLDER DIRECTORY CREATION -----------------
+
+async function ensureDirectory(source, path) {
+  try {
+    await foundry.applications.apps.FilePicker.createDirectory(source, path);
+  } catch (err) {
+    // Folder already exists → safe to ignore
+    if (!err.message?.includes("EEXIST")) {
+      console.error("Failed to create directory:", err);
+    }
+  }
 }
