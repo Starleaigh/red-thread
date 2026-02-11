@@ -535,14 +535,20 @@ async _openPortraitDialog(event, target) {
 
 
 _updatePortrait(src) {
+  console.log("RED Thread | Src: ", src);
+
   const fallback = this.actor.system.investigator.defaultportrait;
   const finalSrc = src || fallback;
 
-  const img = this.element.querySelector<HTMLImageElement>(".investigator-portrait");
-  if (!img) return;
+  const img = this.element.querySelector(".profile-picture");
+  if (!img) {
+    console.warn("Red Thread | Portrait img not found in DOM: ", this);
+    return;
+  }
 
   // 🔥 HARD cache-bust so browser updates immediately
-  const bustedSrc = `${finalSrc}?v=${performance.now()}`;
+  const bustedSrc = `${finalSrc}?v=${Date.now()}`;
+  console.log("RED Thread | Busted Src: ", bustedSrc);
 
   // Force reflow inside transformed/foldered element
   img.style.display = "none";
