@@ -1,0 +1,377 @@
+
+<div class="investigator-sheet"> 
+
+    <div class="folder-shell">
+
+        <div class="folder-close" data-action="closeFolder">CLOSE</div>
+
+        <div class="page-stack">
+          {{#each pagesData as |page|}}
+            <section class="page {{this.state}} {{this.type}}" data-index="{{this.index}}">
+              
+              {{#if (eq page.index 0)}}
+
+                <div class="front">
+                  <div class="folder-front draggable" ></div>
+                  <div class="top-secret-stamp">TOP SECRET</div>
+                  <div class="folder-label" data-action="nextPage">{{@root.actor.name}}</div>
+                </div>
+
+                <div class="back">
+                  <div class="folder-back draggable"></div>
+                    <div class="photo-background">
+                      <div>
+                        <img class="profile-picture" data-action="changePortrait" src="{{@root.portraitSrc}}"/>
+                        <img style="position: absolute; width: 20%; top: -34px; right: 5px; transform: rotateZ(-40deg);" src="systems/red-thread/assets/images/paperclip-front.png"/>
+                      </div>
+                    </div>
+                </div>
+              {{/if}}
+
+              {{#if (eq page.index 1)}}
+
+                <div class="page-spine draggable"></div>
+
+                <div class="front">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+
+                  <div class="basePageLayout">
+                    <label style="top: 50px; color:black; padding: 20px; text-align: center; font-family: "Special Elite";">Ministry of Paranormal & Occult Security</label>
+                    <h3 style="padding-left: 20px; color: black; font-family: "Special Elite"">INVESTIGATOR DOSSIER</h3>
+
+                    <section class="profile-sections" style="padding-top: 5px;">
+                      <label class="profile-heading">Investigator Profile:</label>
+                      <div class="profile-label" style="margin-top: 5px">
+                        <label for="first" style="min-width: 120px">First Name</label>
+                        <label for="second" style="min-width: 120px">Last Name</label>
+                        <label for="third" style="min-width: 40px;">Age</label>
+                        <label for="forth" style="min-width: 40px">Sex</label>
+                      </div>
+
+                      <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.firstname" value="{{@root.system.investigator.firstname}}"/>
+                      <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.lastname" value="{{@root.system.investigator.lastname}}"/>
+                      <input class="profile-input" style="width: 39px; text-align: center; transform: translateY(-2px); padding-bottom: 5px;" type="text" data-field="system.investigator.age" value="{{@root.system.investigator.age}}" />
+                      <input class="profile-input" style="width: 39px; text-align: center;" type="text" data-field="system.investigator.sex" value="{{@root.system.investigator.sex}}" />
+
+                      <div class="profile-label" style="margin-top: 1px">
+                        <label for="first" style="width: 120px">Occupation</label>
+                        <label for="second" style="width: 100px">Residence</label>
+                        <label for="third" style="width: 100px">Birthplace</label>
+                      </div>
+                      
+                      <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.occupation" value="{{@root.system.investigator.occupation}}" />
+                      <input class="profile-input" style="width: 100px" type="text" data-field="system.investigator.residence" value="{{@root.system.investigator.residence}}" />
+                      <input class="profile-input" style="width: 100px" type="text" data-field="system.investigator.birthplace" value="{{@root.system.investigator.birthplace}}" />
+                    </section>
+
+                    <div class="page-corner prev-page" data-action="prevPage"></div>
+                    <div class="page-corner next-page" data-action="nextPage"></div>
+                  </div>
+                </div>
+
+                <div class="back">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+                  <div class="basePageLayout">
+                    <section class="profile-sections">
+                      <label class="profile-label" style="margin-top: 0px">Appearance and Traits:</label>
+                      <textarea class="profile-textarea" data-field="system.investigator.appearance">{{@root.system.investigator.appearance}}</textarea>
+                    </section>
+                    <section class="profile-sections">
+                      <label class="profile-label">Ideology and Beliefs:</label>
+                      <textarea class="profile-textarea" data-field="system.investigator.ideology">{{@root.system.investigator.ideology}}</textarea>
+                    </section>
+                    <section class="profile-sections">
+                      <label class="profile-label">Scars and disorders:</label>
+                      <textarea class="profile-textarea" data-field="system.investigator.disorders">{{@root.system.investigator.disorders}}</textarea>
+                    </section>
+                    <section class="profile-sections">
+                      <label class="profile-label">Significant persons / locations / items:</label>
+                      <textarea class="profile-textarea" data-field="system.investigator.significant">{{@root.system.investigator.significant}}</textarea>
+                    </section>
+                    <section class="profile-sections">
+                      <label class="profile-label">Strange Encounters:</label>
+                      <textarea class="profile-textarea" data-field="system.investigator.encounters">{{@root.system.investigator.encounters}}</textarea>
+                    </section>
+                  </div>
+                </div>
+              {{/if}}
+                            
+              {{#if (eq page.index 2)}}
+              
+                <div class="page-spine draggable"></div>
+
+                <div class="front">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+                  <div class="basePageLayout">
+                  <!-- PAGE 1 — PROFILE -->
+                    <section class="profile-sections" style="padding-top: 10px">
+                      <label class="profile-label">History:</label>
+                      <textarea class="profile-textarea" style="height: 500px" data-field="system.investigator.backstory">{{@root.system.investigator.backstory}}</textarea>
+                    </section>
+
+                    <div class="page-corner prev-page" data-action="prevPage"></div>
+                    <div class="page-corner next-page" data-action="nextPage"></div>
+                  </div>
+                </div> 
+
+                <div class="back">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+                  <div class="basePageLayout">
+                    <label class="profile-heading">Characteristics</label>
+                    
+                    <section class="characteristics">
+                      <div class="stat" data-derived-row>
+                        <label>STR</label>
+                        <input type="number" data-derived-source data-field="system.investigator.str" value="{{@root.system.investigator.str}}" />
+                        <label data-derived-target="half"></label>
+                        <label data-derived-target="fifth"></label>
+                      </div>
+                      <div class="stat" data-derived-row>
+                        <label>CON</label>
+                        <input type="number" data-derived-source data-field="system.investigator.con" value="{{@root.system.investigator.con}}" />
+                        <label data-derived-target="half"></label>
+                        <label data-derived-target="fifth"></label>
+                      </div>
+                      <div class="stat" data-derived-row>
+                        <label>DEX</label>
+                        <input type="number" data-derived-source data-field="system.investigator.dex" value="{{@root.system.investigator.dex}}" />
+                        <label data-derived-target="half"></label>
+                        <label data-derived-target="fifth"></label>
+                      </div>
+                        <div class="stat" data-derived-row>
+                        <label>INT</label>
+                        <input type="number" data-derived-source data-field="system.investigator.int" value="{{@root.system.investigator.int}}" />
+                        <label data-derived-target="half"></label>
+                        <label data-derived-target="fifth"></label>
+                      </div>
+                    </section>
+
+                    <section class="characteristics">
+                      <div class="stat" data-derived-row>
+                        <label>SIZ</label>
+                        <input type="number" data-derived-source data-field="system.investigator.siz" value="{{@root.system.investigator.siz}}" />
+                        <label data-derived-target="half"></label>
+                        <label data-derived-target="fifth"></label>
+                      </div>
+                      <div class="stat" data-derived-row>
+                        <label>POW</label>
+                        <input type="number" data-derived-source data-field="system.investigator.pow" value="{{@root.system.investigator.pow}}" />
+                        <label data-derived-target="half"></label>
+                        <label data-derived-target="fifth"></label>
+                      </div>
+                      <div class="stat" data-derived-row>
+                        <label>APP</label>
+                        <input type="number" data-derived-source data-field="system.investigator.app" value="{{@root.system.investigator.app}}" />
+                        <label data-derived-target="half"></label>
+                        <label data-derived-target="fifth"></label>
+                      </div>
+                        <div class="stat" data-derived-row>
+                        <label>EDU</label>
+                        <input type="number" data-derived-source data-field="system.investigator.edu" value="{{@root.system.investigator.edu}}" />
+                        <label data-derived-target="half"></label>
+                        <label data-derived-target="fifth"></label>
+                      </div>
+                    </section>
+
+                    <section class="status" style="width: 150px; display: inline-block;">
+                      <h2>Status</h2>
+                      <label><input type="checkbox" data-field="system.investigator.temp_insanity_bool" {{checked @root.system.investigator.temp_insanity_bool}} /> Temporary Insanity</label>
+                      <label><input type="checkbox" data-field="system.investigator.indef_insanity_bool" {{checked @root.system.investigator.indef_insanity_bool}} /> Indefinite Insanity</label>
+                      <label><input type="checkbox" data-field="system.investigator.major_wound_bool" {{checked @root.system.investigator.major_wound_bool}} /> Major Wound</label>
+                      <label><input type="checkbox" data-field="system.investigator.unconscious_bool" {{checked @root.system.investigator.unconscious_bool}} /> Unconscious</label>
+                      <label><input type="checkbox" data-field="system.investigator.dying_bool" {{checked @root.system.investigator.dying_bool}} /> Dying</label>
+                    </section>
+
+                  </div>
+                </div> 
+
+              {{/if}}
+              {{#if (eq page.index 3)}}
+              
+                <div class="page-spine draggable"></div>
+
+                <div class="front">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/> 
+                    <!-- PAGE 2 — Stats and Attributes -->
+                  <div class="basePageLayout">
+
+                    <section class="attributes" style="width: 150px; display: inline-block;">
+                      <div>
+                        <label class="profile-heading" style="text-align: center;">Attributes</label>
+                        
+                        <div style="display:inline-block;">
+                          <div style="gap: 20px">
+                            <label style="width: 100px;">Hit Points</label>
+                          </div>
+                          <div>
+                            <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.hp" value="{{@root.system.investigator.hp}}" />
+                            <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.hp_max" value="{{@root.system.investigator.hp_max}}" />
+                          </div>
+                          <div style="font-size: x-small; height: 20px">
+                            <label style="width: 50px; margin: 0px;">(Current)</label>
+                            <label style="width: 50px; margin: 0px;">(Max)</label>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div>
+                            <label style="width: 100px;">Magic Points</label>
+                          </div>
+                          <div>
+                            <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.mp" value="{{@root.system.investigator.mp}}" />
+                            <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.mp_max" value="{{@root.system.investigator.mp_max}}" />
+                          </div>
+                          <div style="font-size: x-small; height: 20px; text-align: center;">
+                            <label style="width: 50px; margin: 0px;">(Current)</label>
+                            <label style="width: 50px; margin: 0px;">(Max)</label>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div>
+                          <div>
+                            <label>Sanity</label>
+                            <input class="profile-input" style="width: 40px" type="number" data-field="system.investigator.san" value="{{@root.system.investigator.san}}" />
+                            <input class="profile-input" style="width: 40px" type="number" data-field="system.investigator.san_max" value="{{@root.system.investigator.san_max}}" />
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+
+
+                    <section class="combat">
+                      <h2>Combat</h2>
+
+                      <div class="stat">
+                        <div class="stat-label">Movement</div>
+                        <input type="number" name="system.characteristics.move.value" value="{{system.characteristics.move.value}}" />
+                      </div>
+
+                      <div class="stat">
+                        <div class="stat-label">Build</div>
+                        <input type="number" name="system.characteristics.build.value" value="{{system.characteristics.build.value}}" />
+                      </div>
+
+                      <div class="stat">
+                        <div class="stat-label">Dodge</div>
+                        <input type="number" name="system.characteristics.dodge.value" value="{{system.characteristics.dodge.value}}" />
+                      </div>
+
+                      <div class="stat">
+                        <div class="stat-label">Damage Bonus</div>
+                        <input type="number" name="system.characteristics.dmgbonus.value" value="{{system.characteristics.dmgbonus.value}}" />
+                      </div>
+                    </section>
+
+                    <div class="page-corner prev-page" data-action="prevPage"></div>
+                    <div class="page-corner next-page" data-action="nextPage"></div>
+                  
+                  </div>
+                </div>
+
+                <div class="back">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+                  <section class="basePageLayout">
+                    <label class="profile-label">Skills</label>
+                      {{#each @root.skills}}
+                        <div class="skill">
+                          <input type="checkbox" data-field="this.improvement" {{checked this.improvement}} />
+                          <label>{{this.name}}</label>
+                          <input type="number" data-field="this.base" value="{{this.base}}" />
+                          <span>{{this.half}}</span><span>{{this.fifth}}</span>
+                        </div>
+                      {{/each}}
+                  </section>
+                </div>
+              {{/if}}
+              {{#if (eq page.index 4)}}
+
+              
+                <div class="page-spine draggable"></div>
+
+                <div class="front">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+                  <div class="basePageLayout">
+
+                    <label class="profile-label">Skills</label>
+                    <ul>
+                      {{#each @root.skills as |skill|}}
+                        <li data-skill-id="{{@root.skill.id}}">
+                          <span>{{@root.skill.name}}</span>
+                          <input type="number" value="{{@root.skill.value}}" data-field="system.items.{{@root.skills.id}}.base" />
+                          <span>Half: {{@root.skill.half}} | Fifth: {{@root.skill.fifth}}</span>
+                        </li>
+                      {{/each}}
+                    </ul>
+
+                    <div class="page-corner prev-page" data-action="prevPage"></div>
+                    <div class="page-corner next-page" data-action="nextPage"></div>
+                  </div>
+                </div>
+
+                <div class="back">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+                  <div class="basePageLayout">
+                  </div>
+                </div>
+              {{/if}}
+              {{#if (eq page.index 5)}}
+              
+                <div class="page-spine draggable"></div>
+
+                <div class="front">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+                  <div class="basePageLayout">
+                    <div class="page-corner prev-page" data-action="prevPage"></div>
+                    <div class="page-corner next-page" data-action="nextPage"></div>
+                  </div>
+                </div>
+
+                <div class="back">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+                  <div class="basePageLayout">
+                  </div>
+                </div>
+              {{/if}}
+              {{#if (eq page.index 6)}}
+            
+                <div class="page-spine draggable"></div>
+
+                <div class="front">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+                  <div class="basePageLayout">
+                    <div class="page-corner prev-page" data-action="prevPage"></div>
+                    <div class="page-corner next-page" data-action="nextPage"></div>
+                  </div>
+                </div>
+
+                <div class="back">
+                  <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+                  <div class="basePageLayout">
+                  </div>
+                </div>
+              {{/if}}
+              {{#if (eq page.index 7)}}
+              
+                <div class="page-spine draggable"></div>
+
+                <div class="front">
+                  <div class="folder-front draggable">
+                  </div>
+                  <div class="page-corner prev-page" data-action="prevPage"></div>
+                </div>
+
+                <div class="back">
+                  <section class="folder-back draggable">
+                  </section>
+                </div>
+              {{/if}}
+
+            </section>
+          {{/each}}
+        </div>
+      
+
+  </div>
+</div>

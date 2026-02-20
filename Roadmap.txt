@@ -9,10 +9,6 @@ Add drag-mode scaling - DONE
  - One CSS class
  - Applied only during drag
 
-Move the window positioning logic - DONE
-- Center window on folder
-- Make window inert
-
 Resize opition
 
 Add shadow and offset for page depth again
@@ -34,6 +30,8 @@ Issues
 
 Investigators are not renamed in the Actor Folders and become do not open after dragging to the board unless link actor is checked. Token Name does not update on updating actor.name
 --- This is fixed upon a refresh after Link actor sheet is checked
+
+--- Page sounds play for everyone
 
 
 --------------------------------
@@ -129,3 +127,85 @@ This keeps:
 - future changes easy
 
 Will need to use a unique id if we want players to be able to create pages
+
+
+
+DATA MODEL EXAMPLE
+Functions pointed to from class
+------------------------------------
+
+// items/skills.js
+export function skillValue(item) {
+  const base = item.system.base ?? 0;
+  const occupation = item.system.occupation ? 20 : 0;
+  return base + occupation;
+}
+
+export function skillHalf(item) {
+  return Math.floor(skillValue(item) / 2);
+}
+
+---------------------------------------
+
+// items/weapons.js
+export async function rollWeaponDamage(item) {
+  if (!item.isWeapon) return null;
+  return new Roll(item.system.damage).roll({async: true});
+}
+
+--------------------------------------
+//red-thread-tiem.js
+
+import * as Skills from "./skills.js";
+import * as Weapons from "./weapons.js";
+
+export class RedThreadItem extends Item {
+
+  get isSkill() { return this.type === "skill"; }
+  get isWeapon() { return this.type === "weapon"; }
+
+  get value() {
+    if (this.isSkill) return Skills.skillValue(this);
+    return null;
+  }
+
+  get half() {
+    if (this.isSkill) return Skills.skillHalf(this);
+    return null;
+  }
+
+  async rollDamage() {
+    if (this.isWeapon) return Weapons.rollWeaponDamage(this);
+  }
+}
+
+
+
+--------------------------------------
+System	            Actor class & data model	      Item class & data model	      Compendium items
+Cthulhu	            InvestigatorDataModel	          CthulhuItem	                  Skills, weapons, notes
+Red Thread / Noir	  NoirInvestigatorDataModel	      NoirItem	                    Skills, gadgets, weapons
+
+
+
+
+
+
+
+this.element.addEventListener("input", async (event) => {
+  const input = event.target;
+  const skillId = input.closest("[data-skill-id]")?.dataset.skillId;
+  if (!skillId) return;
+
+  const value = Number(input.value) || 0;
+  const skill = this.actor.items.get(skillId);
+  if (!skill) return;
+
+  await skill.update({ "system.base": value }, { render: false });
+
+  // Update half/fifth immediately
+  const derived = input.closest("li").querySelector(".derived");
+  if (derived) {
+    derived.textContent = `Half: ${skill.half} | Fifth: ${skill.fifth}`;
+  }
+});

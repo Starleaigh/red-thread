@@ -7,7 +7,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
 
   static PARTS = {
     main: {
-      template: "./systems/red-thread/templates/actors/investigator-sheet/investigator-sheet.hbs"
+      template: "./systems/red-thread/system/actors/templates/investigator-sheet/investigator-sheet.hbs"
     }
   };
 
@@ -21,7 +21,6 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     actions: {
       nextPage: InvestigatorSheet._onNextPage,
       prevPage: InvestigatorSheet._onPrevPage,
-      openFolder: InvestigatorSheet._onOpenFolder,
       closeFolder: InvestigatorSheet._onCloseFolder,
       changePortrait: InvestigatorSheet.prototype._openPortraitDialog
     }
@@ -38,6 +37,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     const actor = this.actor.isToken
       ? this.actor.baseActor
       : this.actor; // Enforce one truth for Actor Data (No Token data as source)
+  //  const actor = this.actor.baseActor;
 
     // Build pages and compute classes here
     const pagesData = [
@@ -52,13 +52,26 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       { index: 7, name: "back-folder", title: "Folder Back Cover", type: "folder" }
     ]
 
+    // Get all items of type "skill" for this actor
+    const skills = this.actor.items.filter(i => i.type === "skill")
+      .map(skill => ({
+        id: skill.id,
+        name: skill.name,
+        base: skill.system.base ?? 0,
+        occupation: skill.system.occupation ?? false,
+        value: skill.value,  // Uses RedThreadItem getter
+        half: skill.half,
+        fifth: skill.fifth
+      }));
+
+/*
     const pages = pagesData.map((page, i) => {
       let state = "future";
       if (i < this.pageIndex) state = "past";
       if (i === this.pageIndex) state = "current";
       return { ...page, state };
     });
-
+*/
     // Portrait Management
     const system = actor.system.investigator;
 
@@ -72,7 +85,9 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       system: this.actor.system,
       portraitSrc,
       folderOpen,
-      pagesData };
+      pagesData,
+      skills 
+    };
   }
 
   // In your sheet class
@@ -177,6 +192,7 @@ async _onRender(context, options) {
 // ----- CALL DATA HANDLING ------
 
   this._bindFieldListeners(); 
+  this._refreshAllDerivedRows(); // initialize half/fifth on load
 
  // this._updatePortrait(this.actor.system.investigator.portrait);
 
@@ -198,208 +214,85 @@ async _onRender(context, options) {
     volume: 0.6
   }, true);
 
+
+
+
+
+
 // ------------- START OF DRAG CODE ---------------
 
-const sheet = this.element.querySelector(".investigator-sheet");
-const content = this.element.querySelector(".window-content");
-
+const sheet = document.querySelector(".investigator-sheet");
 const SCALE = 0.2;
 let dragging = false;
+let fullSizeDrag = false;
+let grabOffset = { x: 0, y: 0 };
+let transformOrigin = { x: "50%", y: "50%" };
 
-// ------------- POINTER DOWN --------------------
+// Prevent context menu from blocking right-click drag
+sheet.addEventListener("contextmenu", (e) => e.preventDefault());
 
+// Pointer Down
 sheet.addEventListener("pointerdown", (e) => {
   if (!e.target.classList.contains("draggable")) return;
-  if (e.button !== 0) return;
 
-  dragging = true;
-  sheet.setPointerCapture(e.pointerId);
+  if (e.pointerType === "mouse") {
+    dragging = true;
+    fullSizeDrag = e.button === 2; // right-click = full size drag
+    sheet.setPointerCapture(e.pointerId);
 
-  const contentRect = content.getBoundingClientRect();
-/*
-  // Snap center of *sheet* to mouse
-  sheet.style.transition = "transform 0.15s ease";
-  sheet.style.transformOrigin = "center center";
-  sheet.style.transform = `scale(${SCALE})`;
+    const rect = sheet.getBoundingClientRect();
+    grabOffset.x = e.clientX - rect.left;
+    grabOffset.y = e.clientY - rect.top;
 
-  sheet.style.left =
-    `${e.clientX - contentRect.left - sheet.offsetWidth / 2}px`;
-  sheet.style.top =
-    `${e.clientY - contentRect.top - sheet.offsetHeight / 2}px`;
-*/
-  e.preventDefault();
-});
-
-// ----------- POINTER DRAG ----------
-
-document.addEventListener("pointermove", (e) => {
-  if (!dragging) return;
-
-  const contentRect = content.getBoundingClientRect();
-
-  // Snap center of *sheet* to mouse
-  sheet.style.transition = "transform 0.15s ease";
-  sheet.style.transformOrigin = "center center";
-  sheet.style.transform = `scale(${SCALE})`;
-
-  sheet.style.left =
-    `${e.clientX - contentRect.left - sheet.offsetWidth / 2}px`;
-  sheet.style.top =
-    `${e.clientY - contentRect.top - sheet.offsetHeight / 2}px`;
-});
-
-// -------- POINTER UP ---------
-
-document.addEventListener("pointerup", (e) => {
-  if (!dragging) return;
-
-  dragging = false;
-  sheet.releasePointerCapture(e.pointerId);
-
-  sheet.style.transition = "transform 0.15s ease";
-  sheet.style.transform = "scale(1)";
-  sheet.style.transformOrigin = "center center";
-});
-
-// ----------- OLD DRAG CODE KEEP FOR POTENTIAL MOPDIFICATION TO THE DRAG LOGIC --------------
-/*
-const folder = this.element.querySelector(".investigator-sheet");
-const SCALE = 0.2;
-
-let dragging = false;
-
-folder.addEventListener("pointerdown", (e) => {
-  if (!e.target.classList.contains("draggable")) return;
-  if (e.button !== 0) return;
-
-  dragging = true;
-  folder.setPointerCapture(e.pointerId);
-
-  const rect = folder.getBoundingClientRect();
-
-  // remove transitions during drag
-  folder.style.transition = "none";
-  folder.style.transformOrigin = "center center";
-  folder.style.transform = `scale(${SCALE})`;
+    // Compute % transform-origin based on grab point
+    const originX = (grabOffset.x / rect.width) * 100;
+    const originY = (grabOffset.y / rect.height) * 100;
+    transformOrigin.x = `${originX}%`;
+    transformOrigin.y = `${originY}%`;
 
 
-  // immediately center on pointer
-  folder.style.left = `${e.clientX - rect.width / 2}px`;
-  folder.style.top  = `${e.clientY - rect.height / 2}px`;
-
-  e.preventDefault();
-});
-
-document.addEventListener("pointermove", (e) => {
-  if (!dragging) return;
-
-  const rect = folder.getBoundingClientRect();
-
-  folder.style.left = `${e.clientX - rect.width / 2}px`;
-  folder.style.top  = `${e.clientY - rect.height / 2}px`;
-});
-
-document.addEventListener("pointerup", (e) => {
-  if (!dragging) return;
-
-  dragging = false;
-  folder.releasePointerCapture(e.pointerId);
-
-  // restore scale smoothly
-  folder.style.transition = "transform 0.15s ease";
-  folder.style.transform = "scale(1)";
-});
-
-*/
-
-///// Draggable location on the folder 
-/*
-const folder = this.element.querySelector(".investigator-sheet");
-const SCALE = 0.8;
-
-let dragState = null;
-
-folder.addEventListener("pointerdown", (e) => {
-  if (!e.target.classList.contains("draggable")) {
-    console.log("Red Thread | Pointer down fired... Not draggable!!!");
-    return;
+    if (!fullSizeDrag) {
+      sheet.style.transformOrigin = `${transformOrigin.x} ${transformOrigin.y}`;
+      sheet.style.transition = "transform 0.15s ease";
+      sheet.style.transform = `scale(${SCALE})`;
+    }
+    else {
+      sheet.style.transition = "none";
+      sheet.style.transform = "scale(1)";
+      sheet.style.transformOrigin = "center center";
+    }
   }
-  if (e.button !== 0) return;
-
-  const rect = folder.getBoundingClientRect();
-
-  // Pointer anchor inside the folder
-  const offsetX = e.clientX - rect.left;
-  const offsetY = e.clientY - rect.top;
-
-  // Scale origin relative to folder
-  const originX = (offsetX / rect.width) * 100;
-  const originY = (offsetY / rect.height) * 100;
-
-  dragState = {
-    offsetX,
-    offsetY
-  };
-
-  folder.setPointerCapture(e.pointerId);
-
-  folder.style.transformOrigin = `${originX}% ${originY}%`;
-  folder.style.transition = "transform 0.15s ease";
-  folder.style.transform = `scale(${SCALE})`;
-
-  e.preventDefault();
 });
 
 document.addEventListener("pointermove", (e) => {
-  if (!dragState) return;
+  if (!dragging) return;
 
-  // Absolute placement — no deltas
-  const left = e.clientX - dragState.offsetX;
-  const top  = e.clientY - dragState.offsetY;
-
-  folder.style.left = `${left}px`;
-  folder.style.top  = `${top}px`;
+  // Move sheet so the grab point is under cursor
+  sheet.style.left = `${e.clientX - grabOffset.x}px`;
+  sheet.style.top = `${e.clientY - grabOffset.y}px`;
 });
 
 document.addEventListener("pointerup", (e) => {
-  if (!dragState) return;
+  if (!dragging) return;
+  dragging = false;
 
-  dragState = null;
-  folder.releasePointerCapture(e.pointerId);
+  sheet.releasePointerCapture(e.pointerId);
+  if (!fullSizeDrag) {
+    // Animate back to full size
+  // Animate back to full size using the same transform-origin
+  sheet.style.transition = "transform 0.15s ease";
+  sheet.style.transform = `scale(1)`;
 
-  // Reset scale
-  folder.style.transition = "transform 0.15s ease";
-  folder.style.transform = "scale(1)";
-  folder.style.transformOrigin = "center center";
-*/
-
-/*
-  // --- Bounds snap ---
-  const playArea = document.querySelector("#board"); // adjust if needed
-  if (!playArea) return;
-
-  const playRect = playArea.getBoundingClientRect();
-  const folderRect = folder.getBoundingClientRect();
-
-  let finalLeft = folderRect.left;
-  let finalTop  = folderRect.top;
-
-  if (folderRect.left < playRect.left)
-    finalLeft = playRect.left;
-
-  if (folderRect.top < playRect.top)
-    finalTop = playRect.top;
-
-  if (folderRect.right > playRect.right)
-    finalLeft = playRect.right - folderRect.width;
-
-  if (folderRect.bottom > playRect.bottom)
-    finalTop = playRect.bottom - folderRect.height;
-
-  folder.style.left = `${finalLeft}px`;
-  folder.style.top  = `${finalTop}px`;
+  // Optional: after grow animation, reset origin to center for next drag
+  sheet.addEventListener(
+    "transitionend",
+    function resetOrigin() {
+      sheet.style.transformOrigin = "center center";
+      sheet.removeEventListener("transitionend", resetOrigin);
+    }
+  );
+  }
 });
-*/
 
 // END OF DRAG CODE
 
@@ -444,18 +337,13 @@ _onFieldChange = async (event) => {
   const el = event.target;
   if (!el?.dataset?.field) return;
 
-  let value;
-  if (el.type === "checkbox") {
-    value = el.checked;
-  } else {
-    value = el.value;
-  }
+  const value = el.type === "checkbox" ? el.checked : el.value;
 
-  const updateData = {
-    [el.dataset.field]: value
-  };
+  await this.dataActor.update({ [el.dataset.field]: value }, { render: false });
 
-  await this.dataActor.update(updateData, { render: false });
+  // Update Derived Values in DOM
+  if (el.type === "number") this._updateDerivedForInput(el);
+
 
   // Only recompute name if relevant fields changed
   if (
@@ -483,6 +371,45 @@ _updateActorNameFromSystem(system) {
     { render: false }
   );
 }
+
+_updateDerivedForInput(el) {
+const row = el.closest("[data-derived-row]");
+  if (!row) return;
+
+  // Find source value in this row (explicit source or current input)
+  const sourceEl =
+    row.querySelector("[data-derived-source]") ||
+    (el.type === "number" ? el : null);
+
+  if (!sourceEl) return;
+
+  const base = Number(sourceEl.value) || 0;
+
+  // Update any derived targets in the row
+  for (const target of row.querySelectorAll("[data-derived-target]")) {
+    const mode = target.dataset.derivedTarget; // "half", "fifth", or number like "3"
+    let result = base;
+
+    if (mode === "half") result = Math.floor(base / 2);
+    else if (mode === "fifth") result = Math.floor(base / 5);
+    else if (!Number.isNaN(Number(mode)) && Number(mode) !== 0) {
+      result = Math.floor(base / Number(mode));
+    }
+
+    target.textContent = String(result);
+  }
+}
+
+_refreshAllDerivedRows() {
+  if (!this.element) return;
+
+  const rows = this.element.querySelectorAll("[data-derived-row]");
+  for (const row of rows) {
+    const sourceEl = row.querySelector("[data-derived-source]");
+    if (sourceEl) this._updateDerivedForInput(sourceEl);
+  }
+}
+
 
 // ------ PORTRAIT DIALOG BOX LOAD -------------
 
@@ -574,22 +501,6 @@ _updateTokens(src) {
       });
     });
 }
-
-
-
-
-
-// --- FOLDER METHODS ---
-
-static async _onOpenFolder(event, target) {
-//  console.log("Red Thread | Folder action fired");
-  await this.actor.setFlag("red-thread", "folderOpen", true);
-  const flag = this.actor.getFlag("red-thread", "folderOpen");
-  console.log("Red Thread | Get Flag: ", flag);
-  this.render({ force: true });
-  console.log("Red Thread | Render Fired!");
-}
-
 
 
 // --- NEW CLOSE FOLDER METHOD --- 
@@ -708,3 +619,5 @@ async function ensureDirectory(source, path) {
     }
   }
 }
+
+

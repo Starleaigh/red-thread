@@ -1,0 +1,37 @@
+﻿Red Thread Redundancy Scan (excluding src)
+Date: 2026-02-11
+
+High-confidence redundant/stale items
+
+2) Unused actor type placeholders - Held for future use
+- Files: system.json, manifest.json
+- Keys: documentTypes.Actor.poi, documentTypes.Actor.casefile
+- Why: Declared but no sheet/model/templates registered for these types yet. Keep only if intentionally reserved.
+
+3) Unused template wiring/state in investigator sheet - Look into pages & pagesData
+- File: system/actors/investigator-sheet.js
+- Item: const pages = pagesData.map(...) is computed then not returned/used.
+
+7) Large commented legacy drag implementations - Pull out drag code for referenced scale origins
+- File: system/actors/investigator-sheet.js
+- Block: "OLD DRAG CODE KEEP FOR POTENTIAL..." and following drag variants/bounds block.
+- Why: Entire blocks are commented and superseded by active drag logic above.
+
+9) Evidence sheet redundant/unused fields/options - Examine these
+- File: system/actors/evidence-sheet.js
+- Item: typingInterval, typingTimeout, lastValues are declared but never used.
+- Item: template is declared in PARTS.main and repeated again in DEFAULT_OPTIONS (duplicate config).
+- Item: resizeable appears misspelled (Foundry uses resizable), so this option is effectively nonfunctional.
+
+10) Unreferenced image assets - Remove unused assets
+- Folder: assets/images
+- Files: 586.jpg, Coven-Bw.bmp, default-profile.avif, default-profile.bmp, paperclip-back.png
+- Why: No references found in templates/system/styles (excluding src).
+
+11) Dev-only planning notes
+- File: Roadmap.txt
+- Why: Not runtime code; safe to keep as docs, but irrelevant to shipped behavior.
+
+Notes
+- Kept out of this list: active files and assets currently referenced (e.g., Coven-trans.png, paperclip-front.png, default-profile.jpg, sound assets).
+- This is a static usage scan; dynamic references via external modules/macros are always a possible exception.

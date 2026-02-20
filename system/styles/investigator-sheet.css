@@ -175,6 +175,8 @@
 
 .investigator-sheet .page.paper .front,
 .investigator-sheet .page.paper .back {
+  display: flex;
+  align-items: center;
   position: absolute;
   left: var(--spine-width, 24px);
   background: #e5e4cb;
@@ -183,6 +185,15 @@
   backface-visibility: hidden;
   box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.2);
 
+}
+
+.investigator-sheet .basePageLayout {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  padding-bottom: 10px;
+  padding-top: 10px;
 }
 
 /* -- THIS IS KEEPING DUPLEX PROPERLY REVERSED --*/
@@ -321,18 +332,29 @@
   position: absolute;
   background: #dfd7c6;
   box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-  width: 150px;
-  height: fit-content;
+  width: auto;
+  max-width: 150px;
   top: 15px;
   right: 50px;
   transform: rotateZ(-3deg);
 }
 
 .investigator-sheet .profile-picture {
+  position: relative;
   padding: 10px;
-  width: 85%;
+  width: 100%;
   height: auto;
+  cursor: pointer;
 }
+
+.investigator-sheet .watermark {
+  position: relative;
+  width: 100%;
+  height: auto;
+  padding: 40px;
+  opacity: 10%;
+}
+
 
 /* Layout Styling */
 .investigator-sheet .profile,
@@ -342,6 +364,12 @@
 .investigator-sheet .combat {
   padding: 16px;
   color: #000;
+}
+
+.investigator-sheet .characteristics {
+  width: 175px;
+  position: relative;
+  display: inline-block;
 }
 
 .investigator-sheet .profile-label,
@@ -360,15 +388,53 @@
 .investigator-sheet .stat {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-top: 8px;
+  gap: 5px;
+  margin-top: 5px;
+}
+.investigator-sheet .stat label {
+  width: 30px;
+  justify-content: center;
 }
 
 .investigator-sheet .stat input {
   width: 40px;
   color: #000;
+  background: transparent;
+  justify-items: center;
+  padding: 0px;
+  border: 1px solid #000;
 }
 
+.investigator-sheet .skill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 0px;
+  max-width: 50%;
+  justify-content: center;
+}
+.investigator-sheet .skill label {
+  width: 75px;
+  font-size: 8pt;
+}
+
+.investigator-sheet .skill input {
+  width: 30px;
+  height: 20px;
+  color: #000;
+  background: transparent;
+  justify-items: center;
+  padding: 0px;
+  border: 1px solid #000;
+}
+
+.investigator-sheet .skill input[type="checkbox"] {
+    border: none;
+    --checkbox-size: 15px;
+    --checkbox-checked-color: darkgreen;
+    position: relative;
+    top: 3px;
+}
 
 .investigator-sheet .profile-input {
   background: transparent; 
@@ -407,6 +473,8 @@
   width:400px;
   padding-top: 10px;
   padding-bottom: 5px;
+  display: block;
+
 }
 
 .investigator-sheet .profile-sections {

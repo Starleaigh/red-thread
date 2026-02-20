@@ -17,15 +17,15 @@
     "./system/red-thread.js"
   ],
   "styles": [
-    "./styles/red-thread.css",
-    "./styles/investigator-sheet.css"
+    "./system/styles/red-thread.css",
+    "./system/styles/investigator-sheet.css"
   ],
   "packs": [],
   "languages": [
     {
       "lang": "en",
       "name": "English",
-      "path": "./lang/en.json"
+      "path": "./system/lang/en.json"
     }
   ],
   "documentTypes": {
@@ -34,8 +34,14 @@
       "poi": {},
       "casefile": {},
       "investigator": {}
+    },
+
+    "Item": {
+      "skill": {},
+      "weapon": {}
     }
   },
+
   "url": "https://github.com/Starleaigh/red-thread",
   "manifest": "https://raw.githubusercontent.com/Starleaigh/red-thread/main/manifest.json",
   "download": "https://github.com/Starleaigh/red-thread/archive/refs/tags/v0.1.0.zip",
