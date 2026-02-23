@@ -37,6 +37,7 @@
     },
 
     "Item": {
+      "occupation": {},
       "skill": {},
       "weapon": {}
     }

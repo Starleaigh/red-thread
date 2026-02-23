@@ -11,7 +11,7 @@ export class EvidenceSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
   static PARTS = {
     main:{
-      template: "./systems/red-thread/templates/actors/evidence-sheet.hbs"
+      template: "./systems/red-thread/system/actors/templates/evidence-sheet.hbs"
     }
   }
 
@@ -19,7 +19,7 @@ export class EvidenceSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     tag: "div",
     // id: "red-thread",
     classes: ["red-thread", "evidence-sheet"],
-    template: "./systems/red-thread/templates/actors/evidence-sheet.hbs",
+    template: "./systems/red-thread/system/actors/templates/evidence-sheet.hbs",
     submitOnChange: false,
     closeOnSubmit: false,
     resizeable: true,

@@ -15,6 +15,8 @@
                   <div class="folder-front draggable" ></div>
                   <div class="top-secret-stamp">TOP SECRET</div>
                   <div class="folder-label" data-action="nextPage">{{@root.actor.name}}</div>
+                  <img style="position: absolute; width: 7%; height: 12%; top: -13px; left: 55px; transform: rotateZ(41deg);" src="systems/red-thread/assets/images/paperclip-back.png"/>
+
                 </div>
 
                 <div class="back">
@@ -275,11 +277,13 @@
                   <section class="basePageLayout">
                     <label class="profile-label">Skills</label>
                       {{#each @root.skills}}
-                        <div class="skill">
-                          <input type="checkbox" data-field="this.improvement" {{checked this.improvement}} />
+                        <div class="skill" data-derived-row data-item-id="{{this.id}}">
+                          <input type="checkbox" data-item-id="{{this.id}}" data-field="system.improvement" {{checked this.improvement}} />
                           <label>{{this.name}}</label>
-                          <input type="number" data-field="this.base" value="{{this.base}}" />
-                          <span>{{this.half}}</span><span>{{this.fifth}}</span>
+                          <input type="number" data-derived-source data-item-id="{{this.id}}" data-field="system.base" value="{{this.base}}" />
+
+                          <!-- Derived Values -->
+                          <label data-derived-target="half"></label><label data-derived-target="fifth"></label>
                         </div>
                       {{/each}}
                   </section>
@@ -293,17 +297,6 @@
                 <div class="front">
                   <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
                   <div class="basePageLayout">
-
-                    <label class="profile-label">Skills</label>
-                    <ul>
-                      {{#each @root.skills as |skill|}}
-                        <li data-skill-id="{{@root.skill.id}}">
-                          <span>{{@root.skill.name}}</span>
-                          <input type="number" value="{{@root.skill.value}}" data-field="system.items.{{@root.skills.id}}.base" />
-                          <span>Half: {{@root.skill.half}} | Fifth: {{@root.skill.fifth}}</span>
-                        </li>
-                      {{/each}}
-                    </ul>
 
                     <div class="page-corner prev-page" data-action="prevPage"></div>
                     <div class="page-corner next-page" data-action="nextPage"></div>

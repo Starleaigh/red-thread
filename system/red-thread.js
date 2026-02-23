@@ -26,3 +26,5 @@ Hooks.once("init", () => {
  
 });
 
+Hooks.on("preRenderActorSheet", () => console.trace("RENDER TRIGGERED"));
+

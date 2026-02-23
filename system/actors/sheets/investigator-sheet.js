@@ -36,8 +36,8 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     const folderOpen = this.actor.getFlag("red-thread", "folderOpen") ?? false;
     const actor = this.actor.isToken
       ? this.actor.baseActor
-      : this.actor; // Enforce one truth for Actor Data (No Token data as source)
-  //  const actor = this.actor.baseActor;
+      : this.actor; 
+    // Enforce one truth for Actor Data (No Token data as source) Make sure Actor Link is on!!!
 
     // Build pages and compute classes here
     const pagesData = [
@@ -59,6 +59,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
         name: skill.name,
         base: skill.system.base ?? 0,
         occupation: skill.system.occupation ?? false,
+        improvement: skill.system.improvement ?? false,
         value: skill.value,  // Uses RedThreadItem getter
         half: skill.half,
         fifth: skill.fifth
@@ -77,7 +78,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
 
     let portraitSrc = system.portrait;
     if (!portraitSrc) portraitSrc = system.defaultportrait;
-    console.log("Red Thread | portraitSrc: ", portraitSrc);
+  //  console.log("Red Thread | portraitSrc: ", portraitSrc);
 
     return { 
       ...context,
@@ -186,13 +187,12 @@ _playAnimation(el, className, rem1, rem2) {
 }
 
 async _onRender(context, options) {
-
   await super._onRender(context, options);
 
 // ----- CALL DATA HANDLING ------
 
   this._bindFieldListeners(); 
-  this._refreshAllDerivedRows(); // initialize half/fifth on load
+  this._loadDerivedRows(); // initialize half/fifth on load
 
  // this._updatePortrait(this.actor.system.investigator.portrait);
 
@@ -218,13 +218,14 @@ async _onRender(context, options) {
 
 
 
-
-// ------------- START OF DRAG CODE ---------------
+// ------------------------------------------------------
+//               START OF DRAG CODE 
+// ------------------------------------------------------
 
 const sheet = document.querySelector(".investigator-sheet");
 const SCALE = 0.2;
 let dragging = false;
-let fullSizeDrag = false;
+let tinyDrag = false;
 let grabOffset = { x: 0, y: 0 };
 let transformOrigin = { x: "50%", y: "50%" };
 
@@ -237,7 +238,7 @@ sheet.addEventListener("pointerdown", (e) => {
 
   if (e.pointerType === "mouse") {
     dragging = true;
-    fullSizeDrag = e.button === 2; // right-click = full size drag
+    tinyDrag = e.button === 2; // right-click = full size drag
     sheet.setPointerCapture(e.pointerId);
 
     const rect = sheet.getBoundingClientRect();
@@ -251,7 +252,7 @@ sheet.addEventListener("pointerdown", (e) => {
     transformOrigin.y = `${originY}%`;
 
 
-    if (!fullSizeDrag) {
+    if (tinyDrag) {
       sheet.style.transformOrigin = `${transformOrigin.x} ${transformOrigin.y}`;
       sheet.style.transition = "transform 0.15s ease";
       sheet.style.transform = `scale(${SCALE})`;
@@ -277,7 +278,7 @@ document.addEventListener("pointerup", (e) => {
   dragging = false;
 
   sheet.releasePointerCapture(e.pointerId);
-  if (!fullSizeDrag) {
+  if (tinyDrag) {
     // Animate back to full size
   // Animate back to full size using the same transform-origin
   sheet.style.transition = "transform 0.15s ease";
@@ -294,11 +295,16 @@ document.addEventListener("pointerup", (e) => {
   }
 });
 
-// END OF DRAG CODE
+// ---------------------------------------------------------
+//                    END OF DRAG CODE
+// ---------------------------------------------------------
+
+
 
 
 // -------- INITIALIZE PAGES IN THE DOM ---------------------
 
+// Makes sure all pages are rendered once
   const pages = this.element.querySelectorAll(".page");
 
   pages.forEach((page) => {
@@ -323,44 +329,120 @@ document.addEventListener("pointerup", (e) => {
 _bindFieldListeners() {
   if (!this.element) return;
 
-  this.element.addEventListener("input", this._onFieldChange);
-  this.element.addEventListener("change", this._onFieldChange);
+  this.element.removeEventListener("input", this._delegatedInputHandler);
+  this._delegatedInputHandler = this._delegatedInputHandler ?? ((event) => {
+    const el = event.target;
+    if (!(el instanceof HTMLElement)) return;
+
+    if (el.dataset.itemId) {
+      this._onSkillFieldChange(event);
+    } else if (el.dataset.field) {
+      this._onFieldChange(event);
+    }
+  });
+
+  this.element.addEventListener("input", this._delegatedInputHandler);
 }
+
 
 get dataActor() {
   return this.actor.isToken ? this.actor.baseActor : this.actor;
 }
 
 // Live updates to sheet
-
 _onFieldChange = async (event) => {
   const el = event.target;
-  if (!el?.dataset?.field) return;
+  if (!el.dataset?.field) return;
 
-  const value = el.type === "checkbox" ? el.checked : el.value;
+  const value = el.type === "checkbox"
+    ? el.checked
+    : (el.type === "number" ? Number(el.value) : el.value);
+
 
   await this.dataActor.update({ [el.dataset.field]: value }, { render: false });
 
   // Update Derived Values in DOM
-  if (el.type === "number") this._updateDerivedForInput(el);
+ // if (el.type === "number") this._updateDerivedForInput(el);
+  if (el.type === "number") {
+    const row = el.closest("[data-derived-row]");
+    this._updateDerived(row, value);
+  } 
 
 
   // Only recompute name if relevant fields changed
   if (
+    el.dataset.field === "system.investigator.title" ||
     el.dataset.field === "system.investigator.firstname" ||
+    el.dataset.field === "system.investigator.middlename" ||
     el.dataset.field === "system.investigator.lastname"
   ) {
     this._updateActorNameFromSystem(this.actor.system);
   }
 };
 
-// Change Actor.name to follow name input fields
+// Live updates to the skills
+_onSkillFieldChange = async (event) => {
+  const el = event.target;
+  if (!el?.dataset?.itemId || !el.dataset?.field) return;
 
+  const value = el.type === "checkbox"
+    ? el.checked
+    : Number(el.value);
+
+  const item = this.actor.items.get(el.dataset.itemId);
+  if (!item) return;
+
+  await item.update({ [el.dataset.field]: value }, { render: false });
+
+  if (el.type === "number") {
+  const row = el.closest("[data-derived-row]");
+ // const row = el.closest("[data-item-id]");
+//const value = item.value; // getter
+
+  this._updateDerived(row, value);
+  }
+};
+
+// instant update derived values
+_updateDerived(row, base) {
+  if (!row) return;
+
+  const baseValue = Number(base) || 0;
+
+  for (const target of row.querySelectorAll("[data-derived-target]")) {
+    const mode = target.dataset.derivedTarget;
+    let result = baseValue;
+
+    if (mode === "half") result = Math.floor(baseValue / 2);
+    else if (mode === "fifth") result = Math.floor(baseValue / 5);
+    else if (!isNaN(Number(mode)) && Number(mode) !== 0) {
+      result = Math.floor(baseValue / Number(mode));
+    }
+
+    target.textContent = String(result);
+  }
+}
+
+// Makes sure derived values appear on load
+_loadDerivedRows() {
+  if (!this.element) return;
+
+  const rows = this.element.querySelectorAll("[data-derived-row]");
+  for (const row of rows) {
+    const sourceEl = row.querySelector("[data-derived-source]");
+    const value = sourceEl.value;
+    if (sourceEl) this._updateDerived(row, value);
+  }
+}
+
+// Change Actor.name to follow name input fields
 _updateActorNameFromSystem(system) {
+  const title = system.investigator?.title?.trim() ?? "";
   const first = system.investigator?.firstname?.trim() ?? "";
+  const middle = system.investigator?.middlename?.trim() ?? "";
   const last  = system.investigator?.lastname?.trim() ?? "";
 
-  let name = [first, last].filter(Boolean).join(" ");
+  let name = [title, first, middle, last].filter(Boolean).join(" ");
   if (!name) name = "Investigator";
 
   // Avoid infinite update loops
@@ -371,45 +453,6 @@ _updateActorNameFromSystem(system) {
     { render: false }
   );
 }
-
-_updateDerivedForInput(el) {
-const row = el.closest("[data-derived-row]");
-  if (!row) return;
-
-  // Find source value in this row (explicit source or current input)
-  const sourceEl =
-    row.querySelector("[data-derived-source]") ||
-    (el.type === "number" ? el : null);
-
-  if (!sourceEl) return;
-
-  const base = Number(sourceEl.value) || 0;
-
-  // Update any derived targets in the row
-  for (const target of row.querySelectorAll("[data-derived-target]")) {
-    const mode = target.dataset.derivedTarget; // "half", "fifth", or number like "3"
-    let result = base;
-
-    if (mode === "half") result = Math.floor(base / 2);
-    else if (mode === "fifth") result = Math.floor(base / 5);
-    else if (!Number.isNaN(Number(mode)) && Number(mode) !== 0) {
-      result = Math.floor(base / Number(mode));
-    }
-
-    target.textContent = String(result);
-  }
-}
-
-_refreshAllDerivedRows() {
-  if (!this.element) return;
-
-  const rows = this.element.querySelectorAll("[data-derived-row]");
-  for (const row of rows) {
-    const sourceEl = row.querySelector("[data-derived-source]");
-    if (sourceEl) this._updateDerivedForInput(sourceEl);
-  }
-}
-
 
 // ------ PORTRAIT DIALOG BOX LOAD -------------
 
