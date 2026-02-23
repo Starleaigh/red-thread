@@ -179,7 +179,7 @@
   align-items: center;
   position: absolute;
   left: var(--spine-width, 24px);
-  background: #e5e4cb;
+  background: #e7e2d8;
   color: #000;
   border: #969696;
   backface-visibility: hidden;
@@ -294,15 +294,14 @@
 
 .investigator-sheet .folder-label {
   position: absolute;
-  right: -40px;
-  top: 120px;
-  width: 160px;
-  background: #d6c08d;
+  width: 170px;
+  text-align: center;
+  background: #e7e2d8;
   padding: 8px;
   font-family: "Special Elite", Courier, monospace;
   color: #000;
-  transform: rotate(90deg);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  transform-origin: left;
+  box-shadow: 0px 0px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .investigator-sheet .page-corner {
