@@ -436,7 +436,7 @@ _loadDerivedRows() {
 }
 
 // Change Actor.name to follow name input fields
-_updateActorNameFromSystem(system) {
+async _updateActorNameFromSystem(system) {
   const title = system.investigator?.title?.trim() ?? "";
   const first = system.investigator?.firstname?.trim() ?? "";
   const middle = system.investigator?.middlename?.trim() ?? "";
@@ -448,10 +448,38 @@ _updateActorNameFromSystem(system) {
   // Avoid infinite update loops
   if (this.actor.name === name) return;
 
-  return this.actor.update(
-    { name },
-    { render: false }
-  );
+  await this.actor.update({ name }, { render: false });
+
+  // Patch DOM manually
+  const label = this.element.querySelector(".folder-label");
+  if (label) label.textContent = name;
+
+  // Force directory refresh
+  ui.actors.render();
+
+  // Update name across active scene tokens
+ // for (const token of this.actor.getActiveTokens(true)) {
+ //   await token.document.update({ name }, { render: false });
+ // }
+
+  for (const scene of game.scenes) {
+  const updates = [];
+
+  for (const token of scene.tokens) {
+    if (token.actorId === this.actor.id && token.actorLink) {
+      updates.push({
+        _id: token.id,
+        name: name
+      });
+    }
+  }
+
+  if (updates.length) {
+    await scene.updateEmbeddedDocuments("Token", updates);
+  }
+}
+
+
 }
 
 // ------ PORTRAIT DIALOG BOX LOAD -------------
@@ -493,7 +521,7 @@ async _openPortraitDialog(event, target) {
 
     // ✅ update only the image
     sheet._updatePortrait(result.path);
-    sheet._updateTokens(result.path);
+    await sheet._updateTokens(result.path);
 
   
   });
@@ -530,8 +558,35 @@ _updatePortrait(src) {
     img.onerror = null;
     img.src = fallback;
   };
+
+  // Force directory refresh
+  ui.actors.render();
+
 }
 
+async _updateTokens(src) {
+  const finalSrc = src || this.actor.system.investigator.defaultportrait;
+
+  for (const scene of game.scenes) {
+    const updates = [];
+
+    for (const token of scene.tokens) {
+      if (token.actorId === this.actor.id && token.actorLink) {
+        updates.push({
+          _id: token.id,
+          texture: { src: finalSrc }
+        });
+      }
+    }
+
+    if (updates.length) {
+      await scene.updateEmbeddedDocuments("Token", updates);
+    }
+  }
+}
+
+
+/*
 _updateTokens(src) {
   const finalSrc = src || this.actor.system.investigator.defaultportrait;
 
@@ -544,7 +599,7 @@ _updateTokens(src) {
       });
     });
 }
-
+*/
 
 // --- NEW CLOSE FOLDER METHOD --- 
 

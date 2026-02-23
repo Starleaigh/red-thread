@@ -44,17 +44,29 @@
                     <section class="profile-sections" style="padding-top: 5px;">
                       <label class="profile-heading">Investigator Profile:</label>
                       <div class="profile-label" style="margin-top: 5px">
-                        <label for="first" style="min-width: 120px">First Name</label>
-                        <label for="second" style="min-width: 120px">Last Name</label>
-                        <label for="third" style="min-width: 40px;">Age</label>
-                        <label for="forth" style="min-width: 40px">Sex</label>
+                        <label for="first" style="min-width: 39px">Title</label>
+                        <label for="second" style="min-width: 120px">First Name</label>
+                        <label for="third" style="min-width: 120px">Middle Name</label>
                       </div>
 
-                      <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.firstname" value="{{@root.system.investigator.firstname}}"/>
-                      <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.lastname" value="{{@root.system.investigator.lastname}}"/>
-                      <input class="profile-input" style="width: 39px; text-align: center; transform: translateY(-2px); padding-bottom: 5px;" type="text" data-field="system.investigator.age" value="{{@root.system.investigator.age}}" />
-                      <input class="profile-input" style="width: 39px; text-align: center;" type="text" data-field="system.investigator.sex" value="{{@root.system.investigator.sex}}" />
+                      <div>
+                        <input class="profile-input" style="width: 39px" type="text" data-field="system.investigator.title" value="{{@root.system.investigator.title}}"/>
+                        <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.firstname" value="{{@root.system.investigator.firstname}}"/>
+                        <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.middlename" value="{{@root.system.investigator.middlename}}"/>
+                      </div>
+             
+                      <div class="profile-label" style="margin-top: 5px">
+                        <label for="first" style="min-width: 120px">Last Name</label>
+                        <label for="second" style="min-width: 40px;">Age</label>
+                        <label for="third" style="min-width: 40px">Sex</label>
+                      </div>
 
+                      <div>
+                        <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.lastname" value="{{@root.system.investigator.lastname}}"/>
+                        <input class="profile-input" style="width: 39px; text-align: center; transform: translateY(-2px); padding-bottom: 5px;" type="text" data-field="system.investigator.age" value="{{@root.system.investigator.age}}" />
+                        <input class="profile-input" style="width: 39px; text-align: center;" type="text" data-field="system.investigator.sex" value="{{@root.system.investigator.sex}}" />
+                      </div>
+                      
                       <div class="profile-label" style="margin-top: 1px">
                         <label for="first" style="width: 120px">Occupation</label>
                         <label for="second" style="width: 100px">Residence</label>
