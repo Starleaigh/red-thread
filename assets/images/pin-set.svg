@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <filter id="pin-shadow" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="0" dy="1" stdDeviation="1" flood-color="#000000" flood-opacity="0.4"/>
+  </filter>
+
+  <g filter="url(#pin-shadow)">
+    <!-- Pin head — same size as canvas pin -->
+    <ellipse cx="16" cy="11" rx="7" ry="7" fill="#cc2200"/>
+    <!-- Shine highlight -->
+    <ellipse cx="13.5" cy="8.5" rx="2.5" ry="2" fill="rgba(255,255,255,0.35)"/>
+    <!-- Collar — sits lower, most of shaft is buried in board -->
+    <rect x="13.5" y="16" width="5" height="2.5" rx="1" fill="#991a00"/>
+    <!-- Short stub shaft — pin is pushed in, only a little shows -->
+    <line x1="16" y1="18.5" x2="16" y2="22" stroke="#888888" stroke-width="2" stroke-linecap="round"/>
+    <!-- Point just barely visible -->
+    <circle cx="16" cy="22" r="1" fill="#555555"/>
+  </g>
+
+  <!-- Board surface line to reinforce pushed-in reading -->
+  <line x1="6" y1="23.5" x2="26" y2="23.5" stroke="rgba(0,0,0,0.12)" stroke-width="1" stroke-linecap="round"/>
+</svg>

@@ -63,20 +63,12 @@
 /* FRONT COVER */
 .investigator-sheet .page .folder-front {
   position: absolute;
-  inset: 0 ;
+  inset: 0;
   width: 100%;
   height: 100%;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
-  background:
-    repeating-linear-gradient(
-      45deg,
-      rgba(0,0,0,0.02),
-      rgba(0,0,0,0.02) 1px,
-      transparent 1px,
-      transparent 3px
-    ),
-    linear-gradient(#e0c58b, #d1b06c);
+  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02) 1px, transparent 6px, transparent 6px), linear-gradient(#e0c58b, #d1b06c);
   transform: rotateY(0deg);
   transition: transform 0.8s ease;
   cursor: pointer;
@@ -85,28 +77,22 @@
 /* BACK COVER */
 .investigator-sheet .page .folder-back {
   position: absolute;
-  inset: 0 ;
+  inset: 0;
   width: 100%;
   height: 100%;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
+  background: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.02) 1px, transparent 6px, transparent 6px), linear-gradient(#e0c58b, #d1b06c);
+  transform: rotateY(0deg);
+  transition: transform 0.8s ease;
+  cursor: pointer;
+
   border-right: #00000031;
   border-right-width: 2px;
   border-right-style: groove;
-  background:
-    repeating-linear-gradient(
-      45deg,
-      rgba(0,0,0,0.02),
-      rgba(0,0,0,0.02) 1px,
-      transparent 1px,
-      transparent 3px
-    ),
-    linear-gradient(#e0c58b, #d1b06c);
+
   transform-origin: left center;
-  transform: rotateY(0deg);
-  transition: transform 0.8s ease;
   transform: translateZ(-2px);
-  cursor: pointer;
 }
 
 
@@ -169,6 +155,7 @@
 .investigator-sheet .page .front,
 .investigator-sheet .page .back {
   position: absolute;
+  display: flex;
   inset: 0;
   backface-visibility: hidden;
 }
@@ -282,26 +269,31 @@
 
 .investigator-sheet .folder-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  padding: 6px 8px;
+  top: 2px;
+  right: 2px;
+  height: 12pt;
+  padding: 2px 3px;
   cursor: pointer;
-  background: #d6c08d;
-  border-radius: 8px;
-  font-family: "Special Elite", monospace;
+  background: #c7c1a800;
+  border-radius: 4px;
+  font-family: "'Special Elite'";
+  box-shadow: 0px 0px 0px 1px rgb(20 20 20 / 30%);
   z-index: 9999;
+  color: #000000;
+  font-size: 8pt;
 }
 
 .investigator-sheet .folder-label {
   position: absolute;
-  width: 170px;
+  width: 160px;
+  height: auto;
   text-align: center;
-  background: #e7e2d8;
-  padding: 8px;
+  background: #ddc68e;
+  padding: 9px 7px 6px 7px;
   font-family: "Special Elite", Courier, monospace;
   color: #000;
   transform-origin: left;
-  box-shadow: 0px 0px 1px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 1px 2px rgb(51 44 44 / 30%);
 }
 
 .investigator-sheet .page-corner {
@@ -326,6 +318,24 @@
     --- LAYOUT STYLING GOES HERE ---
 
    ------------------------------------ */ 
+
+.investigator-sheet .top-secret-stamp {
+  position: absolute;
+  transform: rotateZ(50deg);
+  width: 350px;
+  height: 103px;
+  left: 7%;
+  top: 41%;
+  padding: 34px;
+  border: 3px #8b0000ab;
+  border-style: dashed;
+  color: #8b0000ab;
+  align-content: center;
+  text-align: center;
+  font-size: xx-large;
+  font-family: 'SPECIAL ELITE';
+  pointer-events: none;
+}
 
 .investigator-sheet .photo-background {
   position: absolute;

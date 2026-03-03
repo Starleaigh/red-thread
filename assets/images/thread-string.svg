@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 6" width="32" height="6">
+  <!-- Base thread body - twisted rope appearance -->
+  <!-- Main strand A - curves over -->
+  <path d="M0 2 C4 0, 8 0, 12 2 C16 4, 20 4, 24 2 C28 0, 32 0, 32 2"
+        fill="none" stroke="#8B1A00" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Main strand B - curves under -->
+  <path d="M0 4 C4 6, 8 6, 12 4 C16 2, 20 2, 24 4 C28 6, 32 6, 32 4"
+        fill="none" stroke="#6B1200" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Highlight filament - thin bright line suggesting twist -->
+  <path d="M0 3 C4 1.5, 8 1.5, 12 3 C16 4.5, 20 4.5, 24 3 C28 1.5, 32 1.5, 32 3"
+        fill="none" stroke="#CC3311" stroke-width="0.6" stroke-linecap="round" opacity="0.7"/>
+</svg>

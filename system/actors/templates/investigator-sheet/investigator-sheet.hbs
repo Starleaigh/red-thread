@@ -3,7 +3,8 @@
 
     <div class="folder-shell">
 
-        <div class="folder-close" data-action="closeFolder">CLOSE</div>
+        <div class="rt-pin-anchor"></div>
+        <div class="folder-close" data-action="closeFolder">X</div>
 
         <div class="page-stack">
           {{#each pagesData as |page|}}
@@ -12,22 +13,28 @@
               {{#if (eq page.index 0)}}
 
                 <div class="front">
-                  <div class="folder-front draggable" ></div>
-                  <div class="top-secret-stamp">TOP SECRET</div>
-                  <div style="transform: rotate(90deg); position: absolute; right: 15px; top: 45px;">
-                    <div class="folder-label" data-action="nextPage">{{@root.actor.name}}</div>
+                  <div class="folder-front draggable" >
+                    <div class="top-secret-stamp">
+                      <label>TOP SECRET</label>
+                    </div>
+                    <div style="display: flex; align-self: start; transform: rotate(90deg); position: absolute; right: 15px; top: 30px;">
+                      <label class="folder-label" data-action="nextPage">{{@root.actor.name}}</label>
+                    </div>
+                    <div>
+                      <img style="position: absolute; width: 7%; height: 12%; top: -13px; left: 55px; transform: rotateZ(41deg); pointer-events: none;" src="systems/red-thread/assets/images/paperclip-back.png"/>
+                    </div>
                   </div>
-                  <img style="position: absolute; width: 7%; height: 12%; top: -13px; left: 55px; transform: rotateZ(41deg);" src="systems/red-thread/assets/images/paperclip-back.png"/>
                 </div>
 
                 <div class="back">
-                  <div class="folder-back draggable"></div>
+                  <div class="folder-back draggable">
                     <div class="photo-background">
                       <div>
                         <img class="profile-picture" data-action="changePortrait" src="{{@root.portraitSrc}}"/>
                         <img style="position: absolute; width: 20%; top: -34px; right: 5px; transform: rotateZ(-40deg);" src="systems/red-thread/assets/images/paperclip-front.png"/>
                       </div>
                     </div>
+                  </div>
                 </div>
               {{/if}}
 
