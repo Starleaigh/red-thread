@@ -4,21 +4,22 @@ import { isCaseboard } from "../scene/scene-type.js";
 
 // ─────────────────────────────────────────────────────────────
 //  THREAD STORE
-//  All thread data lives as a scene flag:
-//    scene.flags["red-thread"].threads  →  Thread[]
 //
 //  Thread schema:
 //  {
-//    id:          string   — unique identifier (randomID)
+//    id:          string   — unique identifier
 //    fromTokenId: string   — token document id
 //    toTokenId:   string   — token document id
 //    color:       string   — "red" | "white" | "yellow" | "blue"
 //    label:       string   — optional display label
-//    sceneId:     string   — owning scene id (for validation)
+//    sceneId:     string   — owning scene id
 //  }
 //
-//  All mutations broadcast via socket so every connected
-//  client updates their renderer without a full scene reload.
+//  PERMISSIONS
+//  Players pass only { fromTokenId, toTokenId } to GM.
+//  GM validates, builds thread object, writes flag,
+//  then syncs full thread array to all clients.
+//  Players never need token document permissions.
 // ─────────────────────────────────────────────────────────────
 
 export const THREAD_COLORS = {
@@ -33,9 +34,7 @@ const FLAG_KEY   = "threads";
 const SOCKET_ID  = "system.red-thread";
 
 // ─────────────────────────────────────────────────────────────
-//  SOCKET SETUP
-//  Register once on init. All clients listen for thread
-//  mutations broadcast by the initiating client.
+//  SOCKET
 // ─────────────────────────────────────────────────────────────
 
 export function initThreadSocket() {
@@ -49,15 +48,66 @@ function _emit(packet) {
   game.socket.emit(SOCKET_ID, packet);
 }
 
-function _handleSocketPacket(packet) {
-  const { action, sceneId, thread, threadId } = packet;
+async function _handleSocketPacket(packet) {
+  const { type, sceneId } = packet;
   const scene = game.scenes.get(sceneId);
   if (!scene || !isCaseboard(scene)) return;
 
-  switch (action) {
-    case "create": _applyCreate(scene, thread); break;
-    case "update": _applyUpdate(scene, thread); break;
-    case "delete": _applyDelete(scene, threadId); break;
+  if (type === "request") {
+    // Only GM processes write requests
+    if (!game.user.isGM) return;
+
+    const { action, fromTokenId, toTokenId, thread, threadId } = packet;
+
+    switch (action) {
+
+      case "create": {
+        // Validate both tokens exist on this scene
+        const from = scene.tokens.get(fromTokenId);
+        const to   = scene.tokens.get(toTokenId);
+        if (!from || !to) {
+          console.warn("Red Thread | Create request: token not found on scene.");
+          return;
+        }
+
+        // Prevent duplicate threads
+        const existing = getThreads(scene).find(t =>
+          (t.fromTokenId === fromTokenId && t.toTokenId === toTokenId) ||
+          (t.fromTokenId === toTokenId   && t.toTokenId === fromTokenId)
+        );
+        if (existing) return;
+
+        const newThread = {
+          id:          foundry.utils.randomID(),
+          fromTokenId,
+          toTokenId,
+          color:       "red",
+          label:       "",
+          sceneId
+        };
+
+        await _writeCreate(scene, newThread);
+        break;
+      }
+
+      case "update": {
+        await _writeUpdate(scene, thread);
+        break;
+      }
+
+      case "delete": {
+        await _writeDelete(scene, threadId);
+        break;
+      }
+    }
+
+    // Sync full array to all clients after any write
+    _syncAll(scene);
+
+  } else if (type === "sync") {
+    // All clients redraw from authoritative data
+    console.log(`Red Thread | Sync received — ${packet.threads.length} thread(s).`);
+    canvas.redThread?.renderer?.redrawFromData(packet.threads);
   }
 }
 
@@ -65,31 +115,14 @@ function _handleSocketPacket(packet) {
 //  PUBLIC API
 // ─────────────────────────────────────────────────────────────
 
-/**
- * Get all threads for a scene.
- * @param {Scene} scene
- * @returns {Thread[]}
- */
 export function getThreads(scene) {
   return scene?.getFlag(FLAG_SCOPE, FLAG_KEY) ?? [];
 }
 
-/**
- * Get a single thread by ID.
- * @param {Scene} scene
- * @param {string} threadId
- * @returns {Thread|undefined}
- */
 export function getThread(scene, threadId) {
   return getThreads(scene).find(t => t.id === threadId);
 }
 
-/**
- * Get all threads connected to a specific token (either end).
- * @param {Scene} scene
- * @param {string} tokenId
- * @returns {Thread[]}
- */
 export function getThreadsForToken(scene, tokenId) {
   return getThreads(scene).filter(
     t => t.fromTokenId === tokenId || t.toTokenId === tokenId
@@ -97,126 +130,142 @@ export function getThreadsForToken(scene, tokenId) {
 }
 
 /**
- * Create a new thread between two tokens.
- * @param {Scene} scene
- * @param {string} fromTokenId
- * @param {string} toTokenId
- * @param {object} options
- * @param {string} [options.color="red"]
- * @param {string} [options.label=""]
- * @returns {Thread} the created thread
+ * Request thread creation.
+ * Players emit a request with just two token IDs.
+ * GM validates and writes.
  */
-export async function createThread(scene, fromTokenId, toTokenId, options = {}) {
-  if (!isCaseboard(scene)) return null;
+export function requestCreateThread(scene, fromTokenId, toTokenId) {
+  if (!isCaseboard(scene)) return;
 
-  // Prevent duplicate threads between the same two tokens
-  const existing = getThreads(scene).find(t =>
-    (t.fromTokenId === fromTokenId && t.toTokenId === toTokenId) ||
-    (t.fromTokenId === toTokenId   && t.toTokenId === fromTokenId)
-  );
-  if (existing) {
-    console.warn("Red Thread | Thread already exists between these tokens.");
-    return existing;
+  if (game.user.isGM) {
+    // GM handles directly
+    _handleSocketPacket({
+      type:        "request",
+      action:      "create",
+      sceneId:     scene.id,
+      fromTokenId,
+      toTokenId
+    });
+  } else {
+    if (!_gmConnected()) {
+      ui.notifications.warn("Red Thread | A GM must be connected to create threads.");
+      return;
+    }
+    _emit({ type: "request", action: "create", sceneId: scene.id, fromTokenId, toTokenId });
   }
-
-  const thread = {
-    id:          foundry.utils.randomID(),
-    fromTokenId,
-    toTokenId,
-    color:       options.color ?? "red",
-    label:       options.label ?? "",
-    sceneId:     scene.id
-  };
-
-  await _applyCreate(scene, thread);
-  _emit({ action: "create", sceneId: scene.id, thread });
-
-  return thread;
 }
 
 /**
- * Update an existing thread's properties.
- * @param {Scene} scene
- * @param {string} threadId
- * @param {Partial<Thread>} changes  — only color and label are mutable
+ * Request thread update (color/label).
  */
-export async function updateThread(scene, threadId, changes) {
+export function requestUpdateThread(scene, threadId, changes) {
   if (!isCaseboard(scene)) return;
 
-  const threads = getThreads(scene);
-  const thread  = threads.find(t => t.id === threadId);
+  const thread = getThread(scene, threadId);
   if (!thread) return;
 
-  // Only allow mutable fields to be changed
   const updated = {
     ...thread,
     color: changes.color ?? thread.color,
     label: changes.label ?? thread.label
   };
 
-  await _applyUpdate(scene, updated);
-  _emit({ action: "update", sceneId: scene.id, thread: updated });
+  if (game.user.isGM) {
+    _handleSocketPacket({
+      type:    "request",
+      action:  "update",
+      sceneId: scene.id,
+      thread:  updated
+    });
+  } else {
+    if (!_gmConnected()) {
+      ui.notifications.warn("Red Thread | A GM must be connected to update threads.");
+      return;
+    }
+    _emit({ type: "request", action: "update", sceneId: scene.id, thread: updated });
+  }
 }
 
 /**
- * Delete a thread by ID.
- * @param {Scene} scene
- * @param {string} threadId
+ * Request thread deletion.
  */
-export async function deleteThread(scene, threadId) {
+export function requestDeleteThread(scene, threadId) {
   if (!isCaseboard(scene)) return;
 
-  await _applyDelete(scene, threadId);
-  _emit({ action: "delete", sceneId: scene.id, threadId });
+  if (game.user.isGM) {
+    _handleSocketPacket({
+      type:     "request",
+      action:   "delete",
+      sceneId:  scene.id,
+      threadId
+    });
+  } else {
+    if (!_gmConnected()) {
+      ui.notifications.warn("Red Thread | A GM must be connected to delete threads.");
+      return;
+    }
+    _emit({ type: "request", action: "delete", sceneId: scene.id, threadId });
+  }
 }
 
 /**
  * Delete all threads connected to a token.
- * Called automatically when a token is removed from the scene.
- * @param {Scene} scene
- * @param {string} tokenId
+ * Called on token deletion.
  */
-export async function deleteThreadsForToken(scene, tokenId) {
+export function requestDeleteThreadsForToken(scene, tokenId) {
   const toDelete = getThreadsForToken(scene, tokenId);
   for (const thread of toDelete) {
-    await deleteThread(scene, thread.id);
+    requestDeleteThread(scene, thread.id);
   }
 }
 
 // ─────────────────────────────────────────────────────────────
-//  INTERNAL APPLY FUNCTIONS
-//  These write directly to scene flags.
-//  Called both locally (after emit) and by socket handler
-//  on remote clients (who don't re-emit).
+//  INTERNAL WRITES — GM only
 // ─────────────────────────────────────────────────────────────
 
-async function _applyCreate(scene, thread) {
+async function _writeCreate(scene, thread) {
   const threads = getThreads(scene);
-  // Guard against duplicate apply on same client
   if (threads.find(t => t.id === thread.id)) return;
   await scene.setFlag(FLAG_SCOPE, FLAG_KEY, [...threads, thread]);
 }
 
-async function _applyUpdate(scene, thread) {
+async function _writeUpdate(scene, thread) {
   const threads = getThreads(scene).map(t =>
     t.id === thread.id ? thread : t
   );
   await scene.setFlag(FLAG_SCOPE, FLAG_KEY, threads);
 }
 
-async function _applyDelete(scene, threadId) {
+async function _writeDelete(scene, threadId) {
   const threads = getThreads(scene).filter(t => t.id !== threadId);
   await scene.setFlag(FLAG_SCOPE, FLAG_KEY, threads);
 }
 
+/**
+ * Broadcast full thread array to all clients.
+ * Also redraws locally on GM since socket doesn't echo to sender.
+ */
+function _syncAll(scene) {
+  const threads = getThreads(scene);
+  _emit({ type: "sync", sceneId: scene.id, threads });
+  // GM redraws locally — socket doesn't echo back to sender
+  canvas.redThread?.renderer?.redrawFromData(threads);
+}
+
 // ─────────────────────────────────────────────────────────────
 //  AUTO-CLEANUP
-//  When a token is deleted from a caseboard scene,
-//  remove all threads connected to it automatically.
 // ─────────────────────────────────────────────────────────────
 
 Hooks.on("deleteToken", (tokenDoc) => {
   const scene = tokenDoc.parent;
   if (!scene || !isCaseboard(scene)) return;
-  deleteThreadsForToken(scene, tokenDoc.id);
+  requestDeleteThreadsForToken(scene, tokenDoc.id);
 });
+
+// ─────────────────────────────────────────────────────────────
+//  UTILITY
+// ─────────────────────────────────────────────────────────────
+
+function _gmConnected() {
+  return game.users.some(u => u.isGM && u.active);
+}

@@ -7,21 +7,15 @@ import { ThreadRenderer } from "./thread-renderer.js";
 // ─────────────────────────────────────────────────────────────
 //  RED THREAD LAYER
 //
-//  Thread drawing flow:
-//    1. Right-click token → TokenHUD shows "Connect Thread" button
-//    2. Click button → drawing mode starts, HUD closes
-//    3. Left-click any token → thread completes
-//    4. Escape → cancel drawing mode
-//
-//  Pin sprites are visual only — interaction goes through
-//  Foundry's TokenHUD and Token._onClickLeft intercept.
+//  Owns pins and thread renderer.
+//  No token permission dependencies — all interaction via
+//  middle-click at stage level.
 // ─────────────────────────────────────────────────────────────
 
 export class RedThreadLayer extends foundry.canvas.layers.CanvasLayer {
 
   constructor() {
     super();
-    /** @type {Map<string, Pin>} keyed by token placeable ID */
     this.pins     = new Map();
     this._hooks   = [];
     this.renderer = null;
@@ -37,7 +31,6 @@ export class RedThreadLayer extends foundry.canvas.layers.CanvasLayer {
   // ── Lifecycle ─────────────────────────────────────────────
 
   async _draw(options) {
-    // Force z-order — layerOptions zIndex isn't always respected on draw
     this.zIndex = 600;
     this.parent?.sortChildren();
 
@@ -57,12 +50,14 @@ export class RedThreadLayer extends foundry.canvas.layers.CanvasLayer {
     console.log("Red Thread | Caseboard scene detected — initializing layer.");
 
     this.renderer = new ThreadRenderer(this.threadsContainer, this.pins);
-
     this._registerHooks();
     this._initializePins();
 
-    // Draw existing threads after pins finish async _build()
-    setTimeout(() => this.renderer.redraw(), 100);
+    // Wait for pin sprites then draw threads
+    await this._waitForPins();
+    await this.renderer.redraw();
+
+    console.log("Red Thread | Initial draw complete.");
   }
 
   async _tearDown(options) {
@@ -77,11 +72,50 @@ export class RedThreadLayer extends foundry.canvas.layers.CanvasLayer {
     return super._tearDown(options);
   }
 
+  // ── Wait for pins ─────────────────────────────────────────
+
+  _waitForPins() {
+    return new Promise((resolve) => {
+      if (this.pins.size === 0) { resolve(); return; }
+
+      const maxWait  = 3000;
+      const interval = 50;
+      let   elapsed  = 0;
+
+      const check = () => {
+        const allReady = [...this.pins.values()].every(p => p.sprite !== null);
+        if (allReady || elapsed >= maxWait) {
+          if (!allReady) console.warn("Red Thread | Pin wait timed out.");
+          resolve();
+          return;
+        }
+        elapsed += interval;
+        setTimeout(check, interval);
+      };
+      check();
+    });
+  }
+
+  _waitForPin(tokenId) {
+    return new Promise((resolve) => {
+      const maxWait  = 2000;
+      const interval = 50;
+      let   elapsed  = 0;
+
+      const check = () => {
+        const pin = this.pins.get(tokenId);
+        if (!pin || pin.sprite !== null || elapsed >= maxWait) { resolve(); return; }
+        elapsed += interval;
+        setTimeout(check, interval);
+      };
+      check();
+    });
+  }
+
   // ── Hook registration ─────────────────────────────────────
 
   _registerHooks() {
 
-    // Reposition pins and redraw connected threads on token move
     this._hooks.push(["refreshToken",
       Hooks.on("refreshToken", (token) => {
         this.updatePin(token);
@@ -89,17 +123,16 @@ export class RedThreadLayer extends foundry.canvas.layers.CanvasLayer {
       })
     ]);
 
-    // Add pin when token is created on scene
     this._hooks.push(["createToken",
-      Hooks.on("createToken", (tokenDoc) => {
-        setTimeout(() => {
-          const placeable = tokenDoc.object;
-          if (placeable) this.addPin(placeable);
-        }, 50);
+      Hooks.on("createToken", async (tokenDoc) => {
+        await new Promise(r => setTimeout(r, 50));
+        const placeable = tokenDoc.object;
+        if (!placeable) return;
+        this.addPin(placeable);
+        await this._waitForPin(placeable.id);
       })
     ]);
 
-    // Remove pin when token is deleted
     this._hooks.push(["deleteToken",
       Hooks.on("deleteToken", (tokenDoc) => {
         this.removePin(tokenDoc.id);
@@ -107,73 +140,10 @@ export class RedThreadLayer extends foundry.canvas.layers.CanvasLayer {
       })
     ]);
 
-    // Redraw threads when scene flags change (remote client sync)
-    this._hooks.push(["updateScene",
-      Hooks.on("updateScene", (scene, changes) => {
-        if (scene.id !== canvas.scene?.id) return;
-        if (foundry.utils.hasProperty(changes, "flags.red-thread.threads")) {
-          this.renderer?.redraw();
-        }
-      })
-    ]);
-
-    // ── TokenHUD button — start drawing mode ──────────────
-    // Injects a "Connect Thread" button into the token HUD
-    // only on caseboard scenes
-    this._hooks.push(["renderTokenHUD",
-      Hooks.on("renderTokenHUD", (hud, html, data) => {
-        if (!isCaseboard(canvas.scene)) return;
-
-        const button = document.createElement("div");
-        button.classList.add("control-icon", "rt-connect-thread");
-        button.title = "Connect Thread";
-        button.innerHTML = `<i class="fa-solid fa-timeline"></i>`;
-
-        // Highlight if this token is the current drawing origin
-        if (this.renderer?._drawing &&
-            this.renderer?._fromTokenId === hud.object?.document?.id) {
-          button.classList.add("active");
-        }
-
-        button.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const tokenId = hud.object?.document?.id;
-          if (!tokenId) return;
-
-          hud.close();
-          this._onHUDConnectClick(tokenId);
-        });
-
-        // Append to the right column of the HUD
-        const col = html.querySelector(".col.right");
-        if (col) col.appendChild(button);
-      })
-    ]);
-
-    // ── Token left-click intercept — complete drawing ──────
-    // Only active when drawing mode is on
-
-    const self = this;
-    const TokenProto = foundry.canvas.placeables.Token.prototype;
-
-    if (!TokenProto._rtOriginalPropagateLeftClick) {
-      TokenProto._rtOriginalPropagateLeftClick = TokenProto._propagateLeftClick;
-    }
-
-    TokenProto._propagateLeftClick = function(event) {
-      if (self.renderer?._drawing) {
-        self._onPinClick(this.document.id);
-        return false;
-      }
-      return TokenProto._rtOriginalPropagateLeftClick.call(this, event);
-    };
-
-    // ── Escape key — cancel drawing mode ──────────────────
+    // Escape key — cancel drawing
     document.addEventListener("keydown", this._onKeyDown = (e) => {
       if (e.key === "Escape" && this.renderer?._drawing) {
         this.renderer.cancelDrawing();
-        console.log("Red Thread | Thread drawing cancelled.");
       }
     });
   }
@@ -183,13 +153,6 @@ export class RedThreadLayer extends foundry.canvas.layers.CanvasLayer {
       Hooks.off(hookName, id);
     }
     this._hooks = [];
-
-    // Restore original Token click handler
-    const TokenProto = foundry.canvas.placeables.Token.prototype;
-    if (TokenProto._rtOriginalPropagateLeftClick) {
-      TokenProto._propagateLeftClick = TokenProto._rtOriginalPropagateLeftClick;
-      delete TokenProto._rtOriginalPropagateLeftClick;
-    }
 
     if (this._onKeyDown) {
       document.removeEventListener("keydown", this._onKeyDown);
@@ -231,55 +194,24 @@ export class RedThreadLayer extends foundry.canvas.layers.CanvasLayer {
     for (const pin of this.pins.values()) pin.destroy();
     this.pins.clear();
   }
-
-  // ── Thread drawing state machine ──────────────────────────
-
-  /**
-   * Called when "Connect Thread" HUD button is clicked.
-   * Starts or cancels drawing mode.
-   */
-  _onHUDConnectClick(tokenId) {
-    if (!this.renderer) return;
-
-    if (this.renderer._drawing) {
-      if (this.renderer._fromTokenId === tokenId) {
-        // Clicking same token again cancels
-        this.renderer.cancelDrawing();
-        console.log("Red Thread | Thread drawing cancelled.");
-      } else {
-        // Clicking different token via HUD also completes
-        this.renderer.completeDrawing(tokenId);
-      }
-      return;
-    }
-
-    this.renderer.startDrawing(tokenId);
-    ui.notifications.info(`Red Thread | Click a token to connect the thread. Escape to cancel.`);
-  }
-
-  /**
-   * Called when a token is left-clicked during drawing mode.
-   * Completes the thread to the clicked token.
-   */
-  _onPinClick(tokenId) {
-    if (!this.renderer?._drawing) return;
-    this.renderer.completeDrawing(tokenId);
-  }
 }
 
 // ─────────────────────────────────────────────────────────────
-//  HOOK: z-order + logging on canvas ready
+//  CANVAS READY
 // ─────────────────────────────────────────────────────────────
 
 Hooks.on("canvasReady", () => {
   const layer = canvas.redThread;
   if (!layer) return;
 
-  // Re-apply z-index after full canvas init
   layer.zIndex = 600;
   layer.parent?.sortChildren();
 
   if (isCaseboard(canvas.scene)) {
+    // Defer stage event registration until fully ready
+    setTimeout(() => {
+      layer.renderer?._registerStageEvents();
+    }, 500);
     console.log("Red Thread | Canvas ready — caseboard active.");
   } else {
     console.log("Red Thread | Canvas ready — non-caseboard scene, layer idle.");
