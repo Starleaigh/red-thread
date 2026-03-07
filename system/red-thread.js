@@ -10,7 +10,9 @@ import { CthulhuItem } from "./items/cthulhu-items.js";
 // Red Thread systems
 import "./scene/scene-type.js";
 import { RedThreadLayer } from "./canvas/redThreadLayer.js";
-import { initThreadSocket } from "./canvas/thread-store.js";
+import { initSocket } from "./canvas/socket.js";
+import { initThreadHandlers } from "./canvas/thread-store.js";
+import { initTokenMovement } from "./canvas/token-movement.js";
 
 Hooks.once("init", () => {
   console.log("Red Thread | Initializing system");
@@ -20,25 +22,24 @@ Hooks.once("init", () => {
   CONFIG.Item.dataModels.skill = CthulhuSkillDataModel;
 
   // Register Item Document Class
-  CONFIG.Item.documentClass = Item;
   CONFIG.Item.documentClass = CthulhuItem;
 
   // Register sheets
   foundry.documents.collections.Actors.registerSheet("red-thread", EvidenceSheet, { types: ["evidence"], makeDefault: true });
   foundry.documents.collections.Actors.registerSheet("red-thread", InvestigatorSheet, { types: ["investigator"], makeDefault: true });
 
-  // ── Register the Red Thread canvas layer ──────────────────
+  // Register canvas layer
   CONFIG.Canvas.layers.redThread = {
     layerClass: RedThreadLayer,
     group: "interface"
   };
 });
 
-// ── Initialise socket once the game is ready ──────────────────
-// Must be in "ready" not "init" — sockets aren't available until
-// all clients have finished loading
 Hooks.once("ready", () => {
-  initThreadSocket();
-});
+  // Initialise central socket first — handlers register against it
+  initSocket();
 
-Hooks.on("preRenderActorSheet", () => console.trace("RENDER TRIGGERED"));
+  // Register domain handlers
+  initThreadHandlers();
+  initTokenMovement();
+});

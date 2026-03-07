@@ -102,3 +102,36 @@ Hooks.on("canvasReady", () => {
     return TokenProto._rtOriginalRefreshRuler.call(this);
   };
 });
+
+// ─────────────────────────────────────────────────────────────
+//  Allow all players to drag any token on caseboard scenes
+// ─────────────────────────────────────────────────────────────
+
+Hooks.on("init", () => {
+  const TokenProto = foundry.canvas.placeables.Token.prototype;
+  const _original  = TokenProto._canControl;
+
+  TokenProto._canControl = function(user, event) {
+    // On caseboards, allow control for drag purposes regardless of ownership
+    if (isCaseboard(canvas.scene)) {
+      if (this.layer._draggedToken) return false;
+      if (!this.layer.active || this.isPreview) return false;
+      if (canvas.controls.ruler.active) return false;
+      if (game.activeTool === "target") return true;
+      return true; // Allow all tokens to be controlled on caseboards
+    }
+    return _original.call(this, user, event);
+  };
+
+  // _canDrag also checks this.controlled so patch it too
+  const _originalCanDrag = TokenProto._canDrag;
+
+  TokenProto._canDrag = function(user, event) {
+    if (isCaseboard(canvas.scene)) {
+      if (this.layer._draggedToken) return false;
+      if (!this.layer.active || this.isPreview) return false;
+      return game.activeTool === "select";
+    }
+    return _originalCanDrag.call(this, user, event);
+  };
+});
