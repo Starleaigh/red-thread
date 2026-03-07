@@ -1,0 +1,131 @@
+<div class="investigator-sheet">
+  <div class="folder-shell">
+
+    <div class="folder-close" data-action="closeFolder">CLOSE</div>
+
+    <div class="page-stack">
+
+      {{!-- Page 0: Front Folder --}}
+      <section class="page folder" data-index="0">
+        <div class="front">
+          <div class="folder-front draggable"></div>
+          <div class="top-secret-stamp">TOP SECRET</div>
+          <div style="transform: rotate(90deg); position: absolute; right: 15px; top: 45px;">
+            <div class="folder-label" data-action="nextPage">{{actor.name}}</div>
+          </div>
+          <img style="position: absolute; width: 7%; height: 12%; top: -13px; left: 55px; transform: rotateZ(41deg);"
+               src="systems/red-thread/assets/images/paperclip-back.png"/>
+        </div>
+        <div class="back">
+          <div class="folder-back draggable">
+            <div class="photo-background">
+              <div>
+                <img class="profile-picture" data-action="changePortrait" src="{{portraitSrc}}"/>
+                <img style="position: absolute; width: 20%; top: -34px; right: 5px; transform: rotateZ(-40deg);"
+                     src="systems/red-thread/assets/images/paperclip-front.png"/>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {{!-- Pages 1-6: Paper pages — content injected by the 'content' part --}}
+      <section class="page paper" data-index="1">
+        <div class="page-spine draggable"></div>
+        <div class="front rt-page-front" data-page="1">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+          <div class="page-corner prev-page" data-action="prevPage"></div>
+          <div class="page-corner next-page" data-action="nextPage"></div>
+        </div>
+        <div class="back rt-page-back" data-page="1">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+        </div>
+      </section>
+
+      <section class="page paper" data-index="2">
+        <div class="page-spine draggable"></div>
+        <div class="front rt-page-front" data-page="2">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+          <div class="page-corner prev-page" data-action="prevPage"></div>
+          <div class="page-corner next-page" data-action="nextPage"></div>
+        </div>
+        <div class="back rt-page-back" data-page="2">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+        </div>
+      </section>
+
+      <section class="page paper" data-index="3">
+        <div class="page-spine draggable"></div>
+        <div class="front rt-page-front" data-page="3">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+          <div class="page-corner prev-page" data-action="prevPage"></div>
+          <div class="page-corner next-page" data-action="nextPage"></div>
+        </div>
+        <div class="back rt-page-back" data-page="3">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+        </div>
+      </section>
+
+      <section class="page paper" data-index="4">
+        <div class="page-spine draggable"></div>
+        <div class="front rt-page-front" data-page="4">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+          <div class="page-corner prev-page" data-action="prevPage"></div>
+          <div class="page-corner next-page" data-action="nextPage"></div>
+        </div>
+        <div class="back rt-page-back" data-page="4">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+        </div>
+      </section>
+
+      <section class="page paper" data-index="5">
+        <div class="page-spine draggable"></div>
+        <div class="front rt-page-front" data-page="5">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+          <div class="page-corner prev-page" data-action="prevPage"></div>
+          <div class="page-corner next-page" data-action="nextPage"></div>
+        </div>
+        <div class="back rt-page-back" data-page="5">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+        </div>
+      </section>
+
+      <section class="page paper" data-index="6">
+        <div class="page-spine draggable"></div>
+        <div class="front rt-page-front" data-page="6">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+          <div class="page-corner prev-page" data-action="prevPage"></div>
+          <div class="page-corner next-page" data-action="nextPage"></div>
+        </div>
+        <div class="back rt-page-back" data-page="6">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+        </div>
+      </section>
+
+      {{!-- Page 7: Back Folder --}}
+      <section class="page folder" data-index="7">
+        <div class="page-spine draggable"></div>
+        <div class="front">
+          <div class="folder-front draggable"></div>
+          <div class="page-corner prev-page" data-action="prevPage"></div>
+        </div>
+        <div class="back">
+          <section class="folder-back draggable"></section>
+        </div>
+      </section>
+
+    </div>{{!-- .page-stack --}}
+  </div>{{!-- .folder-shell --}}
+</div>{{!-- .investigator-sheet --}}

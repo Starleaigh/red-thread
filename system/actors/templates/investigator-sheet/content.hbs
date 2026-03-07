@@ -1,0 +1,289 @@
+{{!--
+  content.hbs
+  This template is the data part. It is never injected into the DOM directly —
+  instead _onRender reads it and distributes each page's content into the
+  appropriate .basePageLayout slots inside the shell.
+
+  Each block is wrapped in a <script type="text/x-handlebars-page"> with a
+  data-page and data-face attribute so _injectPageContent() can target the
+  correct slot.
+
+  The outer div is required — Foundry demands a single root element per part.
+  It is hidden so it never affects layout.
+--}}
+<div class="rt-content-store" style="display:none">
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 1 FRONT — Cover / Profile fields
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="1" data-face="front">
+  <label style="top: 50px; color:black; padding: 20px; text-align: center; font-family: 'Special Elite';">Ministry of Paranormal &amp; Occult Security</label>
+  <h3 style="padding-left: 20px; color: black; font-family: 'Special Elite'">INVESTIGATOR DOSSIER</h3>
+
+  <section class="profile-sections" style="padding-top: 5px;">
+    <label class="profile-heading">Investigator Profile:</label>
+    <div class="profile-label" style="margin-top: 5px">
+      <label for="first" style="min-width: 39px">Title</label>
+      <label for="second" style="min-width: 120px">First Name</label>
+      <label for="third" style="min-width: 120px">Middle Name</label>
+    </div>
+    <div>
+      <input class="profile-input" style="width: 39px" type="text" data-field="system.investigator.title" value="{{system.investigator.title}}"/>
+      <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.firstname" value="{{system.investigator.firstname}}"/>
+      <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.middlename" value="{{system.investigator.middlename}}"/>
+    </div>
+
+    <div class="profile-label" style="margin-top: 5px">
+      <label for="first" style="min-width: 120px">Last Name</label>
+      <label for="second" style="min-width: 40px;">Age</label>
+      <label for="third" style="min-width: 40px">Sex</label>
+    </div>
+    <div>
+      <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.lastname" value="{{system.investigator.lastname}}"/>
+      <input class="profile-input" style="width: 39px; text-align: center; transform: translateY(-2px); padding-bottom: 5px;" type="text" data-field="system.investigator.age" value="{{system.investigator.age}}" />
+      <input class="profile-input" style="width: 39px; text-align: center;" type="text" data-field="system.investigator.sex" value="{{system.investigator.sex}}" />
+    </div>
+
+    <div class="profile-label" style="margin-top: 1px">
+      <label for="first" style="width: 120px">Occupation</label>
+      <label for="second" style="width: 100px">Residence</label>
+      <label for="third" style="width: 100px">Birthplace</label>
+    </div>
+    <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.occupation" value="{{system.investigator.occupation}}" />
+    <input class="profile-input" style="width: 100px" type="text" data-field="system.investigator.residence" value="{{system.investigator.residence}}" />
+    <input class="profile-input" style="width: 100px" type="text" data-field="system.investigator.birthplace" value="{{system.investigator.birthplace}}" />
+  </section>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 1 BACK — Appearance, ideology, disorders etc.
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="1" data-face="back">
+  <section class="profile-sections">
+    <label class="profile-label" style="margin-top: 0px">Appearance and Traits:</label>
+    <textarea class="profile-textarea" data-field="system.investigator.appearance">{{system.investigator.appearance}}</textarea>
+  </section>
+  <section class="profile-sections">
+    <label class="profile-label">Ideology and Beliefs:</label>
+    <textarea class="profile-textarea" data-field="system.investigator.ideology">{{system.investigator.ideology}}</textarea>
+  </section>
+  <section class="profile-sections">
+    <label class="profile-label">Scars and disorders:</label>
+    <textarea class="profile-textarea" data-field="system.investigator.disorders">{{system.investigator.disorders}}</textarea>
+  </section>
+  <section class="profile-sections">
+    <label class="profile-label">Significant persons / locations / items:</label>
+    <textarea class="profile-textarea" data-field="system.investigator.significant">{{system.investigator.significant}}</textarea>
+  </section>
+  <section class="profile-sections">
+    <label class="profile-label">Strange Encounters:</label>
+    <textarea class="profile-textarea" data-field="system.investigator.encounters">{{system.investigator.encounters}}</textarea>
+  </section>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 2 FRONT — History / Backstory
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="2" data-face="front">
+  <section class="profile-sections" style="padding-top: 10px">
+    <label class="profile-label">History:</label>
+    <textarea class="profile-textarea" style="height: 500px" data-field="system.investigator.backstory">{{system.investigator.backstory}}</textarea>
+  </section>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 2 BACK — Characteristics + Status
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="2" data-face="back">
+  <label class="profile-heading">Characteristics</label>
+
+  <section class="characteristics">
+    <div class="stat" data-derived-row>
+      <label>STR</label>
+      <input type="number" data-derived-source data-field="system.investigator.str" value="{{system.investigator.str}}" />
+      <label data-derived-target="half"></label>
+      <label data-derived-target="fifth"></label>
+    </div>
+    <div class="stat" data-derived-row>
+      <label>CON</label>
+      <input type="number" data-derived-source data-field="system.investigator.con" value="{{system.investigator.con}}" />
+      <label data-derived-target="half"></label>
+      <label data-derived-target="fifth"></label>
+    </div>
+    <div class="stat" data-derived-row>
+      <label>DEX</label>
+      <input type="number" data-derived-source data-field="system.investigator.dex" value="{{system.investigator.dex}}" />
+      <label data-derived-target="half"></label>
+      <label data-derived-target="fifth"></label>
+    </div>
+    <div class="stat" data-derived-row>
+      <label>INT</label>
+      <input type="number" data-derived-source data-field="system.investigator.int" value="{{system.investigator.int}}" />
+      <label data-derived-target="half"></label>
+      <label data-derived-target="fifth"></label>
+    </div>
+  </section>
+
+  <section class="characteristics">
+    <div class="stat" data-derived-row>
+      <label>SIZ</label>
+      <input type="number" data-derived-source data-field="system.investigator.siz" value="{{system.investigator.siz}}" />
+      <label data-derived-target="half"></label>
+      <label data-derived-target="fifth"></label>
+    </div>
+    <div class="stat" data-derived-row>
+      <label>POW</label>
+      <input type="number" data-derived-source data-field="system.investigator.pow" value="{{system.investigator.pow}}" />
+      <label data-derived-target="half"></label>
+      <label data-derived-target="fifth"></label>
+    </div>
+    <div class="stat" data-derived-row>
+      <label>APP</label>
+      <input type="number" data-derived-source data-field="system.investigator.app" value="{{system.investigator.app}}" />
+      <label data-derived-target="half"></label>
+      <label data-derived-target="fifth"></label>
+    </div>
+    <div class="stat" data-derived-row>
+      <label>EDU</label>
+      <input type="number" data-derived-source data-field="system.investigator.edu" value="{{system.investigator.edu}}" />
+      <label data-derived-target="half"></label>
+      <label data-derived-target="fifth"></label>
+    </div>
+  </section>
+
+  <section class="status" style="width: 150px; display: inline-block;">
+    <h2>Status</h2>
+    <label><input type="checkbox" data-field="system.investigator.temp_insanity_bool" {{checked system.investigator.temp_insanity_bool}} /> Temporary Insanity</label>
+    <label><input type="checkbox" data-field="system.investigator.indef_insanity_bool" {{checked system.investigator.indef_insanity_bool}} /> Indefinite Insanity</label>
+    <label><input type="checkbox" data-field="system.investigator.major_wound_bool" {{checked system.investigator.major_wound_bool}} /> Major Wound</label>
+    <label><input type="checkbox" data-field="system.investigator.unconscious_bool" {{checked system.investigator.unconscious_bool}} /> Unconscious</label>
+    <label><input type="checkbox" data-field="system.investigator.dying_bool" {{checked system.investigator.dying_bool}} /> Dying</label>
+  </section>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 3 FRONT — Attributes + Combat
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="3" data-face="front">
+  <section class="attributes" style="width: 150px; display: inline-block;">
+    <label class="profile-heading" style="text-align: center;">Attributes</label>
+
+    <div style="display:inline-block;">
+      <div><label style="width: 100px;">Hit Points</label></div>
+      <div>
+        <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.hp" value="{{system.investigator.hp}}" />
+        <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.hp_max" value="{{system.investigator.hp_max}}" />
+      </div>
+      <div style="font-size: x-small; height: 20px">
+        <label style="width: 50px; margin: 0px;">(Current)</label>
+        <label style="width: 50px; margin: 0px;">(Max)</label>
+      </div>
+    </div>
+
+    <div>
+      <div><label style="width: 100px;">Magic Points</label></div>
+      <div>
+        <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.mp" value="{{system.investigator.mp}}" />
+        <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.mp_max" value="{{system.investigator.mp_max}}" />
+      </div>
+      <div style="font-size: x-small; height: 20px; text-align: center;">
+        <label style="width: 50px; margin: 0px;">(Current)</label>
+        <label style="width: 50px; margin: 0px;">(Max)</label>
+      </div>
+    </div>
+
+    <div>
+      <div>
+        <label>Sanity</label>
+        <input class="profile-input" style="width: 40px" type="number" data-field="system.investigator.san" value="{{system.investigator.san}}" />
+        <input class="profile-input" style="width: 40px" type="number" data-field="system.investigator.san_max" value="{{system.investigator.san_max}}" />
+      </div>
+    </div>
+  </section>
+
+  <section class="combat">
+    <h2>Combat</h2>
+    <div class="stat">
+      <div class="stat-label">Movement</div>
+      <input type="number" data-field="system.investigator.move" value="{{system.investigator.move}}" />
+    </div>
+    <div class="stat">
+      <div class="stat-label">Build</div>
+      <input type="number" data-field="system.investigator.build" value="{{system.investigator.build}}" />
+    </div>
+    <div class="stat" data-derived-row>
+      <div class="stat-label">Dodge</div>
+      <input type="number" data-derived-source data-field="system.investigator.dodge" value="{{system.investigator.dodge}}" />
+      <label data-derived-target="half"></label>
+      <label data-derived-target="fifth"></label>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Damage Bonus</div>
+      <input type="text" data-field="system.investigator.dmgbonus" value="{{system.investigator.dmgbonus}}" />
+    </div>
+  </section>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 3 BACK — Skills list
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="3" data-face="back">
+  <label class="profile-label">Skills</label>
+  {{#each skills}}
+    <div class="skill" data-derived-row data-item-id="{{this.id}}">
+      <input type="checkbox" data-item-id="{{this.id}}" data-field="system.improvement" {{checked this.improvement}} />
+      <label>{{this.name}}</label>
+      <input type="number" data-derived-source data-item-id="{{this.id}}" data-field="system.base" value="{{this.base}}" />
+      <label data-derived-target="half"></label>
+      <label data-derived-target="fifth"></label>
+      <button type="button" data-item-id="{{this.id}}" data-action="deleteSkill">X</button>
+    </div>
+  {{/each}}
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 4 FRONT — Inventory (placeholder)
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="4" data-face="front">
+  <label class="profile-heading">Inventory</label>
+  <p style="color: #999; font-style: italic;">Drag items here to add them to your inventory.</p>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 4 BACK — Attack Actions (placeholder)
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="4" data-face="back">
+  <label class="profile-heading">Attack Actions</label>
+  <p style="color: #999; font-style: italic;">Weapons added to inventory will appear here.</p>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 5 FRONT — Notes (placeholder)
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="5" data-face="front">
+  <label class="profile-heading">Notes</label>
+  <textarea class="profile-textarea" style="height: 500px" data-field="system.investigator.notes_a">{{system.investigator.notes_a}}</textarea>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 5 BACK — Notes continued
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="5" data-face="back">
+  <textarea class="profile-textarea" style="height: 560px" data-field="system.investigator.notes_b">{{system.investigator.notes_b}}</textarea>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 6 FRONT — Notes continued
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="6" data-face="front">
+  <textarea class="profile-textarea" style="height: 560px" data-field="system.investigator.notes_c">{{system.investigator.notes_c}}</textarea>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 6 BACK — Notes continued
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="6" data-face="back">
+  <textarea class="profile-textarea" style="height: 560px" data-field="system.investigator.notes_d">{{system.investigator.notes_d}}</textarea>
+</script>
+
+</div>{{!-- .rt-content-store --}}
