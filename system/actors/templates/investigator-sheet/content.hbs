@@ -242,19 +242,59 @@
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 4 FRONT — Inventory (placeholder)
+      PAGE 4 FRONT — Inventory
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="4" data-face="front">
   <label class="profile-heading">Inventory</label>
-  <p style="color: #999; font-style: italic;">Drag items here to add them to your inventory.</p>
+
+  {{#if inventory.length}}
+    <div class="inventory-list">
+      {{#each inventory}}
+        <div class="inventory-row" data-object-id="{{this.id}}">
+          <img class="inventory-img" src="{{this.img}}" title="{{this.name}}"/>
+          <span class="inventory-name">{{this.name}}</span>
+          <span class="inventory-tag inventory-tag--{{this.category}}">{{this.category}}</span>
+          <div class="inventory-actions">
+            <button type="button" class="inv-btn" data-action="examineItem" data-object-id="{{this.id}}" title="Examine">&#128269;</button>
+            <button type="button" class="inv-btn" data-action="toPartyInventory" data-object-id="{{this.id}}" title="To Evidence Box">&#128230;</button>
+            <button type="button" class="inv-btn inv-btn--drop" data-action="dropItem" data-object-id="{{this.id}}" title="Drop">&#10006;</button>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <p class="inventory-empty">Drag an object here to pick it up.</p>
+  {{/if}}
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 4 BACK — Attack Actions (placeholder)
+      PAGE 4 BACK — Attack Actions
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="4" data-face="back">
   <label class="profile-heading">Attack Actions</label>
-  <p style="color: #999; font-style: italic;">Weapons added to inventory will appear here.</p>
+
+  {{#if weapons.length}}
+    <div class="weapon-list">
+      {{#each weapons}}
+        <div class="weapon-row" data-object-id="{{this.id}}">
+          <div class="weapon-header">
+            <img class="inventory-img" src="{{this.img}}" title="{{this.name}}"/>
+            <span class="weapon-name">{{this.name}}</span>
+            <button type="button" class="inv-btn" data-action="examineItem" data-object-id="{{this.id}}" title="Examine">&#128269;</button>
+          </div>
+          <div class="weapon-stats">
+            <span class="weapon-stat"><label>Skill</label>{{this.skill}}</span>
+            <span class="weapon-stat"><label>Damage</label>{{this.damage}}</span>
+            <span class="weapon-stat"><label>Range</label>{{this.range}}</span>
+            <span class="weapon-stat"><label>Uses</label>{{this.uses}}</span>
+            <span class="weapon-stat weapon-stat--mal"><label>Malf.</label>{{this.malfunction}}</span>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <p class="inventory-empty">Weapons in your inventory appear here.</p>
+  {{/if}}
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════

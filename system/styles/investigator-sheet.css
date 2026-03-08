@@ -346,6 +346,22 @@
   font-size: 8pt;
 }
 
+.investigator-sheet .folder-evidence-box {
+  position: absolute;
+  top: 2px;
+  right: 52px;
+  height: 12pt;
+  padding: 2px 4px;
+  cursor: pointer;
+  background: #c7c1a800;
+  border-radius: 4px;
+  box-shadow: 0px 0px 0px 1px rgb(20 20 20 / 30%);
+  z-index: 9999;
+  font-size: 10pt;
+  line-height: 1;
+}
+.investigator-sheet .folder-evidence-box:hover { background: rgba(0,0,0,0.08); }
+
 .investigator-sheet .folder-label {
   position: absolute;
   width: 160px;
@@ -555,5 +571,148 @@
     padding-bottom: 0px;
     padding-left: 12px;
     padding-right: 12px;
-    
 }
+
+
+/* ------------------------------------
+
+    --- INVENTORY / ATTACK ACTIONS ---
+
+   ------------------------------------ */
+
+.investigator-sheet .inventory-list,
+.investigator-sheet .weapon-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 12px;
+}
+
+.investigator-sheet .inventory-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: rgba(0,0,0,0.04);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  font-family: "Baskerville";
+  font-size: small;
+}
+
+.investigator-sheet .inventory-img {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.investigator-sheet .inventory-name {
+  flex: 1;
+  color: #000;
+  font-size: 8pt;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.investigator-sheet .inventory-tag {
+  font-size: 6pt;
+  font-family: "Special Elite", Courier, monospace;
+  padding: 1px 4px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.investigator-sheet .inventory-tag--weapon   { background: #6b3a3a; }
+.investigator-sheet .inventory-tag--clue      { background: #3a5a6b; }
+.investigator-sheet .inventory-tag--document  { background: #5a6b3a; }
+.investigator-sheet .inventory-tag--key       { background: #7a6b3a; }
+.investigator-sheet .inventory-tag--artefact  { background: #5a3a6b; }
+.investigator-sheet .inventory-tag--other     { background: #666;    }
+
+.investigator-sheet .inventory-actions {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.investigator-sheet .inv-btn {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  font-size: 8pt;
+  line-height: 1;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 3px;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.investigator-sheet .inv-btn:hover        { background: rgba(255,255,255,0.85); }
+.investigator-sheet .inv-btn--drop        { color: #8b0000; }
+.investigator-sheet .inv-btn--drop:hover  { background: #f5c0c0; }
+
+.investigator-sheet .inventory-empty {
+  padding: 12px;
+  font-family: "Baskerville";
+  font-size: small;
+  color: #888;
+  font-style: italic;
+}
+
+/* Weapon rows */
+
+.investigator-sheet .weapon-row {
+  padding: 6px;
+  background: rgba(0,0,0,0.04);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  margin-bottom: 2px;
+}
+
+.investigator-sheet .weapon-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.investigator-sheet .weapon-name {
+  flex: 1;
+  font-family: "Baskerville";
+  font-weight: 600;
+  font-size: 9pt;
+  color: #000;
+}
+
+.investigator-sheet .weapon-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-left: 30px;
+}
+
+.investigator-sheet .weapon-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 40px;
+}
+
+.investigator-sheet .weapon-stat label {
+  font-size: 6pt;
+  font-family: "Special Elite", Courier, monospace;
+  text-transform: uppercase;
+  color: #666;
+  letter-spacing: 0.04em;
+  font-weight: normal;
+}
+
+.investigator-sheet .weapon-stat--mal label { color: #8b0000; }

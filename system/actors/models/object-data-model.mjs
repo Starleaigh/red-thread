@@ -8,6 +8,11 @@ export class ObjectDataModel extends foundry.abstract.TypeDataModel {
       // ── Core description ──────────────────────────────────
       description: new fields.StringField({ initial: "" }),
 
+      // ── Category ──────────────────────────────────────────
+      // Used to tag items in inventory and filter attack actions.
+      // Values: "weapon" | "clue" | "document" | "key" | "artefact" | "other"
+      category: new fields.StringField({ initial: "other" }),
+
       // ── GM-only investigation data ────────────────────────
       // Hidden from players until revealed
       caseSignificance: new fields.StringField({ initial: "" }),

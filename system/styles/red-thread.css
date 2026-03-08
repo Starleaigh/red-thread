@@ -61,3 +61,80 @@
   font-style: normal;
   font-display: swap;
 }
+
+
+/* ------------------------------------
+
+    --- EVIDENCE BOX WINDOW ---
+
+   ------------------------------------ */
+
+.evidence-box .evidence-box-content {
+  padding: 8px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.evidence-box .eb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.evidence-box .eb-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  background: rgba(0,0,0,0.03);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  font-family: "Baskerville";
+  font-size: small;
+}
+
+.evidence-box .eb-img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.evidence-box .eb-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.evidence-box .eb-name {
+  font-size: 9pt;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.evidence-box .eb-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.evidence-box .eb-take-select {
+  font-size: 7pt;
+  height: 20px;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 3px;
+  max-width: 120px;
+}
+
+.evidence-box .eb-empty {
+  padding: 16px;
+  text-align: center;
+  font-style: italic;
+  color: #888;
+  font-family: "Baskerville";
+}

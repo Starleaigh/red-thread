@@ -4,6 +4,8 @@ const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
 
 import { initSheetPin, teardownSheetPin } from "../../canvas/sheet-pin.js";
+import { EvidenceBox } from "../../ui/evidence-box.js";
+import { isCaseboard } from "../../scene/scene-type.js";
 
 const BASE = "./systems/red-thread/system/actors/templates/investigator-sheet";
 
@@ -31,12 +33,16 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     closeOnSubmit: false,
     resizable: false,
     actions: {
-      nextPage:       InvestigatorSheet._onNextPage,
-      prevPage:       InvestigatorSheet._onPrevPage,
-      closeFolder:    InvestigatorSheet._onCloseFolder,
-      goToPage:       InvestigatorSheet._onGoToPage,
-      changePortrait: InvestigatorSheet.prototype._openPortraitDialog,
-      deleteSkill:    InvestigatorSheet._onDeleteSkill,
+      nextPage:        InvestigatorSheet._onNextPage,
+      prevPage:        InvestigatorSheet._onPrevPage,
+      closeFolder:     InvestigatorSheet._onCloseFolder,
+      goToPage:        InvestigatorSheet._onGoToPage,
+      changePortrait:  InvestigatorSheet.prototype._openPortraitDialog,
+      deleteSkill:     InvestigatorSheet._onDeleteSkill,
+      dropItem:        InvestigatorSheet._onDropItem,
+      toPartyInventory: InvestigatorSheet._onToPartyInventory,
+      examineItem:      InvestigatorSheet._onExamineItem,
+      openEvidenceBox:  InvestigatorSheet._onOpenEvidenceBox,
     }
   };
 
@@ -88,6 +94,8 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       system:     this.actor.system,
       portraitSrc,
       skills:     this._buildSkillsData(),
+      inventory:  this._buildInventoryData(),
+      weapons:    this._buildWeaponData(),
     };
   }
 
@@ -106,6 +114,37 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
         value:       skill.value,
         half:        skill.half,
         fifth:       skill.fifth
+      }));
+  }
+
+  _buildInventoryData() {
+    if (!game.actors) return [];
+    return game.actors
+      .filter(a => a.type === "object" && a.system.carriedBy === this.actor.id)
+      .map(a => ({
+        id:       a.id,
+        name:     a.name,
+        img:      a.img,
+        category: a.system.category ?? "other",
+        isWeapon: a.system.isWeapon ?? false,
+      }));
+  }
+
+  _buildWeaponData() {
+    if (!game.actors) return [];
+    return game.actors
+      .filter(a => a.type === "object"
+               && a.system.carriedBy === this.actor.id
+               && a.system.isWeapon)
+      .map(a => ({
+        id:          a.id,
+        name:        a.name,
+        img:         a.img,
+        skill:       a.system.weapon?.skill       ?? "",
+        damage:      a.system.weapon?.damage      ?? "",
+        range:       a.system.weapon?.range       ?? "",
+        uses:        a.system.weapon?.uses        ?? "",
+        malfunction: a.system.weapon?.malfunction ?? 100,
       }));
   }
 
@@ -271,6 +310,139 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       this._updatePageClasses();
       this.isTurning = false;
     }, totalDuration);
+  }
+
+  // ── Drop handling ─────────────────────────────────────────
+  //
+  // Handles an Actor of type "object" being dropped onto the sheet.
+  // Sets carriedBy to this investigator and logs chain of custody.
+  // All other drop types fall through to the parent handler.
+
+  async _onDrop(event) {
+    let data;
+    try {
+      data = JSON.parse(event.dataTransfer.getData("text/plain"));
+    } catch {
+      return;
+    }
+
+    // Resolve the actor from either a sidebar Actor drag or a canvas Token drag
+    let object;
+    if (data.type === "Actor") {
+      object = await fromUuid(data.uuid);
+    } else if (data.type === "Token") {
+      const tokenDoc = await fromUuid(data.uuid);
+      object = tokenDoc?.actor;
+    } else {
+      return super._onDrop(event);
+    }
+
+    if (!object || object.type !== "object") return super._onDrop(event);
+
+    // Prevent claiming something already carried by someone else
+    if (object.system.carriedBy && object.system.carriedBy !== this.actor.id) {
+      const carrier = game.actors.get(object.system.carriedBy);
+      const name = carrier?.name ?? "another investigator";
+      ui.notifications.warn(`${object.name} is already carried by ${name}.`);
+      return;
+    }
+
+    const entry = {
+      actorId:   this.actor.id,
+      actorName: this.actor.name,
+      timestamp: Date.now(),
+      action:    "picked_up",
+    };
+
+    await object.update({
+      "system.carriedBy":        this.actor.id,
+      "system.inPartyInventory": false,
+      "system.chainOfCustody":   [...(object.system.chainOfCustody ?? []), entry],
+    });
+
+    this.render({ parts: ["content"] });
+  }
+
+  // ── Inventory actions ─────────────────────────────────────
+
+  static async _onDropItem(_event, target) {
+    // Dropping physical items makes no sense on a caseboard (evidence photo board)
+    if (isCaseboard(canvas.scene)) {
+      ui.notifications.warn("You can't drop items on a caseboard scene.");
+      return;
+    }
+
+    const objectId = target.dataset.objectId;
+    if (!objectId) return;
+    const object = game.actors.get(objectId);
+    if (!object) return;
+
+    const entry = {
+      actorId:   this.actor.id,
+      actorName: this.actor.name,
+      timestamp: Date.now(),
+      action:    "dropped",
+    };
+
+    await object.update({
+      "system.carriedBy":      null,
+      "system.chainOfCustody": [...(object.system.chainOfCustody ?? []), entry],
+    });
+
+    // If we're on a theatre/battlemap scene and the object has no token here,
+    // place one at the centre of the viewport so the dropped item appears in the world.
+    const scene = canvas.scene;
+    if (scene) {
+      const alreadyHere = scene.tokens.some(t => t.actorId === objectId);
+      if (!alreadyHere) {
+        const { x, y } = canvas.scene.dimensions.sceneRect;
+        const w = canvas.scene.dimensions.sceneWidth;
+        const h = canvas.scene.dimensions.sceneHeight;
+        await scene.createEmbeddedDocuments("Token", [{
+          actorId: objectId,
+          name:    object.name,
+          x:       x + w / 2,
+          y:       y + h / 2,
+          texture: { src: object.img },
+        }]);
+      }
+    }
+
+    this.render({ parts: ["content"] });
+  }
+
+  static async _onToPartyInventory(_event, target) {
+    const objectId = target.dataset.objectId;
+    if (!objectId) return;
+    const object = game.actors.get(objectId);
+    if (!object) return;
+
+    const entry = {
+      actorId:   this.actor.id,
+      actorName: this.actor.name,
+      timestamp: Date.now(),
+      action:    "recovered",
+    };
+
+    await object.update({
+      "system.carriedBy":        null,
+      "system.inPartyInventory": true,
+      "system.chainOfCustody":   [...(object.system.chainOfCustody ?? []), entry],
+    });
+
+    this.render({ parts: ["content"] });
+  }
+
+  static async _onExamineItem(_event, target) {
+    const objectId = target.dataset.objectId;
+    if (!objectId) return;
+    const object = game.actors.get(objectId);
+    if (!object) return;
+    object.sheet.render(true);
+  }
+
+  static _onOpenEvidenceBox(_event, _target) {
+    EvidenceBox.open();
   }
 
   static async _onDeleteSkill(_event, target) {

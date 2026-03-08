@@ -1,0 +1,33 @@
+<div class="evidence-box-content">
+
+  {{#if items.length}}
+    <div class="eb-list">
+      {{#each items}}
+        <div class="eb-row" data-object-id="{{this.id}}">
+          <img class="eb-img" src="{{this.img}}" title="{{this.name}}"/>
+          <div class="eb-info">
+            <span class="eb-name">{{this.name}}</span>
+            <span class="inventory-tag inventory-tag--{{this.category}}">{{this.category}}</span>
+          </div>
+          <div class="eb-controls">
+            {{#if ../myInvestigators.length}}
+              <select class="eb-take-select">
+                {{#each ../myInvestigators}}
+                  <option value="{{this.id}}">{{this.name}}</option>
+                {{/each}}
+              </select>
+              <button type="button" class="inv-btn" data-action="takeItem" data-object-id="{{this.id}}" title="Take">&#8594;</button>
+            {{/if}}
+            <button type="button" class="inv-btn" data-action="examineItem" data-object-id="{{this.id}}" title="Examine">&#128269;</button>
+            {{#if ../isGM}}
+              <button type="button" class="inv-btn inv-btn--drop" data-action="destroyItem" data-object-id="{{this.id}}" title="Destroy">&#128465;</button>
+            {{/if}}
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  {{else}}
+    <p class="eb-empty">The evidence box is empty.</p>
+  {{/if}}
+
+</div>
