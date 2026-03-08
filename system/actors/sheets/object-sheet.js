@@ -5,31 +5,27 @@ const { ActorSheetV2 } = foundry.applications.sheets;
 
 import { initSheetPin, teardownSheetPin } from "../../canvas/sheet-pin.js";
 
-export class EvidenceSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
+export class ObjectSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
   static PARTS = {
     main:{
-      template: "./systems/red-thread/system/actors/templates/evidence-sheet.hbs"
+      template: "./systems/red-thread/system/actors/templates/object-sheet.hbs"
     }
   }
 
   static DEFAULT_OPTIONS = {
     tag: "div",
-    classes: ["red-thread", "evidence-sheet"],
-    template: "./systems/red-thread/system/actors/templates/evidence-sheet.hbs",
+    classes: ["red-thread", "object-sheet"],
+    template: "./systems/red-thread/system/actors/templates/object-sheet.hbs",
     submitOnChange: false,
     closeOnSubmit: false,
-    resizeable: true,
+    resizable: true,
     actions: {
-      edit: function _onEdit(event) {this.unlockSheet()},
-      submit: function _onSubmit(event){this.submit()}
+      edit: function _onEdit(_event) {this.unlockSheet()},
+      submit: function _onSubmit(_event){this.submit()}
     }
   };
   
-  typingInterval = null;
-  typingTimeout = null;
-  lastValues = {};
-
   // ── Sheet Pin ────────────────────────────────────────────
 
   async _onRender(context, options) {
@@ -41,10 +37,6 @@ export class EvidenceSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     teardownSheetPin(this);
     return super.close(options);
   }
-
-  // ─────────────────────────────────────────────────────────
-  //  Everything below is unchanged from your original file
-  // ─────────────────────────────────────────────────────────
 
   get lock() {
     return this.actor.system.editLock ?? null;
@@ -80,7 +72,7 @@ export class EvidenceSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     return;
   }
 
-  async _readSheetData(event) {
+  async _readSheetData() {
     if (!this.isLockOwner) return;
     if(!(this.element instanceof HTMLElement)) return {};
     const data = {};
@@ -99,7 +91,7 @@ export class EvidenceSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     return update;
   }
 
-  async submit(event) {
+  async submit() {
     if (!this.isLockOwner) return;
     const data = await this._readSheetData();
     const update = await this._writeSheetData(data);

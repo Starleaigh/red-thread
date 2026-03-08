@@ -3,6 +3,8 @@
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
 
+import { initSheetPin, teardownSheetPin } from "../../canvas/sheet-pin.js";
+
 const BASE = "./systems/red-thread/system/actors/templates/investigator-sheet";
 
 export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
@@ -32,6 +34,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       nextPage:       InvestigatorSheet._onNextPage,
       prevPage:       InvestigatorSheet._onPrevPage,
       closeFolder:    InvestigatorSheet._onCloseFolder,
+      goToPage:       InvestigatorSheet._onGoToPage,
       changePortrait: InvestigatorSheet.prototype._openPortraitDialog,
       deleteSkill:    InvestigatorSheet._onDeleteSkill,
     }
@@ -88,7 +91,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     };
   }
 
-  async _preparePartContext(partId, context) {
+  async _preparePartContext(_partId, context) {
     return context;
   }
 
@@ -152,6 +155,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
 
     this._bindFieldListeners();
     this._loadDerivedRows();
+    initSheetPin(this);
   }
 
   // ── Content injection ─────────────────────────────────────
@@ -198,9 +202,13 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
         page.style.zIndex = idx < this.pageIndex ? 10 + idx : 100 - idx;
       }
     });
+
+    this.element.querySelectorAll(".page-tab[data-target-page]").forEach(tab => {
+      tab.classList.toggle("active", Number(tab.dataset.targetPage) === this.pageIndex);
+    });
   }
 
-  static async _onNextPage(event, target) {
+  static async _onNextPage(_event, _target) {
     if (this.isTurning) return;
     if (this.pageIndex >= this.pageCount - 1) return;
     const pages   = this.element.querySelectorAll(".page");
@@ -213,7 +221,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     setTimeout(() => { this.pageIndex++; this._updatePageClasses(); this.isTurning = false; }, 600);
   }
 
-  static async _onPrevPage(event, target) {
+  static async _onPrevPage(_event, _target) {
     if (this.isTurning) return;
     if (this.pageIndex <= 0) return;
     const pages = this.element.querySelectorAll(".page");
@@ -226,7 +234,46 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     setTimeout(() => { this.pageIndex--; this._updatePageClasses(); this.isTurning = false; }, 600);
   }
 
-  static async _onDeleteSkill(event, target) {
+  static async _onGoToPage(_event, target) {
+    if (this.isTurning) return;
+    const targetIndex = Number(target.dataset.targetPage);
+    if (isNaN(targetIndex) || targetIndex < 0 || targetIndex >= this.pageCount) return;
+    if (targetIndex === this.pageIndex) return;
+
+    this.isTurning = true;
+    const pages = [...this.element.querySelectorAll(".page")];
+    const flipDuration = 80;
+
+    let pagesToFlip;
+    let animClass;
+
+    if (targetIndex > this.pageIndex) {
+      // Forward — flip each page from current toward target
+      pagesToFlip = pages.slice(this.pageIndex, targetIndex);
+      animClass = "turn-forward";
+    } else {
+      // Backward — flip pages back from just before current toward target
+      pagesToFlip = pages.slice(targetIndex, this.pageIndex).reverse();
+      animClass = "turn-backward";
+    }
+
+    pagesToFlip.forEach((page, i) => {
+      setTimeout(() => {
+        playPageSound();
+        page.style.zIndex = 1000 + i;
+        this._playAnimation(page, animClass, "turn-forward", "turn-backward");
+      }, i * flipDuration);
+    });
+
+    const totalDuration = (pagesToFlip.length - 1) * flipDuration + 600;
+    setTimeout(() => {
+      this.pageIndex = targetIndex;
+      this._updatePageClasses();
+      this.isTurning = false;
+    }, totalDuration);
+  }
+
+  static async _onDeleteSkill(_event, target) {
     const itemId = target.dataset.itemId;
     if (!itemId) return;
     const item = this.actor.items.get(itemId);
@@ -283,8 +330,12 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
 
     document.addEventListener("pointermove", e => {
       if (!dragging) return;
-      sheet.style.left = `${e.clientX - grabOffset.x}px`;
-      sheet.style.top  = `${e.clientY - grabOffset.y}px`;
+      const left = e.clientX - grabOffset.x;
+      const top  = e.clientY - grabOffset.y;
+      sheet.style.left = `${left}px`;
+      sheet.style.top  = `${top}px`;
+      this.position.left = left;
+      this.position.top  = top;
     });
 
     document.addEventListener("pointerup", e => {
@@ -392,7 +443,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
 
   // ── Portrait ──────────────────────────────────────────────
 
-  async _openPortraitDialog(event, target) {
+  async _openPortraitDialog(_event, _target) {
     const sheet = this;
     const input = document.createElement("input");
     input.type   = "file";
@@ -447,7 +498,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
 
   // ── Close folder ──────────────────────────────────────────
 
-  static async _onCloseFolder(event, target) {
+  static async _onCloseFolder(_event, _target) {
     if (this.isTurning) return;
     this.isTurning = true;
 
@@ -484,6 +535,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
   }
 
   async close(options = {}) {
+    teardownSheetPin(this);
     const folderShell = this.element.querySelector(".folder-shell");
     this._playAnimation(folderShell, "close-folder-trigger", "open-folder-trigger", "close-folder-trigger");
     await Promise.all(folderShell.getAnimations().map(a => a.finished));

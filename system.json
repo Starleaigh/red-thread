@@ -19,7 +19,8 @@
   ],
   "styles": [
     "./system/styles/red-thread.css",
-    "./system/styles/investigator-sheet.css"
+    "./system/styles/investigator-sheet.css",
+    "./system/styles/sheet-pin.css"
   ],
   "packs": [],
   "languages": [
@@ -31,7 +32,7 @@
   ],
   "documentTypes": {
     "Actor": {
-      "evidence": {},
+      "object": {},
       "poi": {},
       "casefile": {},
       "investigator": {}

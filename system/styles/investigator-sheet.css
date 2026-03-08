@@ -265,7 +265,70 @@
 
     --- NAVIGATION ENTITIES ARE HERE ---
 
-   ------------------------------------ */ 
+   ------------------------------------ */
+
+/* ── Page tab navigation ────────────────────────────────────
+   Tabs live on the .front face of each paper page.
+   They stick out to the right at staggered vertical positions,
+   so all future-page tabs are visible simultaneously like real
+   folder divider tabs. backface-visibility: hidden (inherited
+   from .page .front) hides past-page tabs automatically.
+   ────────────────────────────────────────────────────────── */
+
+.investigator-sheet .page-tab {
+  position: absolute;
+  right: 0;
+  transform: translateX(100%);
+  width: 24px;
+  height: 56px;
+  padding: 4px 2px;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  font-family: 'Special Elite', Courier, monospace;
+  font-size: 7pt;
+  color: #f0ece4;
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+  letter-spacing: 0.04em;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.35);
+  pointer-events: auto;
+  z-index: 10;
+  transition: filter 0.12s ease, box-shadow 0.12s ease;
+}
+
+/* Front tabs — right edge, sticking out right */
+.investigator-sheet .page[data-index="1"] .rt-page-front .page-tab { top: 40px;  background: #4a6f82; } /* slate blue   — Profile   */
+.investigator-sheet .page[data-index="2"] .rt-page-front .page-tab { top: 94px;  background: #7a4a52; } /* dusty rose   — History   */
+.investigator-sheet .page[data-index="3"] .rt-page-front .page-tab { top: 148px; background: #4a6f52; } /* forest green — Skills    */
+.investigator-sheet .page[data-index="4"] .rt-page-front .page-tab { top: 202px; background: #5a4a7a; } /* muted purple — Inventory */
+.investigator-sheet .page[data-index="5"] .rt-page-front .page-tab { top: 256px; background: #6f5a3a; } /* warm umber   — Notes     */
+
+/* Back tabs — mirror of front: left edge, sticking out left, text counter-mirrored */
+.investigator-sheet .rt-page-back .page-tab {
+  right: auto;
+  left: 0;
+  transform: translateX(-100%); 
+  border-radius: 4px 0 0 4px;
+}
+
+.investigator-sheet .page[data-index="1"] .rt-page-back .page-tab { top: 40px;  background: #4a6f82; }
+.investigator-sheet .page[data-index="2"] .rt-page-back .page-tab { top: 94px;  background: #7a4a52; }
+.investigator-sheet .page[data-index="3"] .rt-page-back .page-tab { top: 148px; background: #4a6f52; }
+.investigator-sheet .page[data-index="4"] .rt-page-back .page-tab { top: 202px; background: #5a4a7a; }
+.investigator-sheet .page[data-index="5"] .rt-page-back .page-tab { top: 256px; background: #6f5a3a; }
+
+.investigator-sheet .page-tab:hover {
+  filter: brightness(1.2);
+  box-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+}
+
+.investigator-sheet .page-tab.active {
+  filter: brightness(1.3);
+  box-shadow: 4px 3px 7px rgba(0,0,0,0.45);
+  font-weight: 600;
+}
+
 
 .investigator-sheet .folder-close {
   position: absolute;
@@ -362,6 +425,7 @@
   height: auto;
   padding: 40px;
   opacity: 10%;
+  pointer-events: none;
 }
 
 
@@ -479,7 +543,7 @@
   font-family: "IM Fell DW Pica";
   font-weight: 600;
   font-size: large;
-  width:400px;
+
   padding-top: 10px;
   padding-bottom: 5px;
   display: block;

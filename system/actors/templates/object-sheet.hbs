@@ -1,16 +1,16 @@
-<div class="evidence-sheet flexcol">
-    <div class="rt-pin-anchor"></div>
+<div class="object-sheet flexcol">
+  <div class="rt-pin-anchor"></div>
   <header class="sheet-header flexrow">
 
     <img src="{{actor.img}}" width="64" height="64">
 
     <h1>
       <input
-        id="evidence-text"
-        name="text"
+        id="object-name"
+        name="name"
         type="text"
-        data-field="text"
-        value="{{system.text}}"
+        data-field="name"
+        value="{{actor.name}}"
         {{#unless isLockOwner}}disabled{{/unless}}
       >
     </h1>
