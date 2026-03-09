@@ -48,12 +48,19 @@ export function initTokenMovement() {
     return _origCanControl.call(this, user, event);
   };
 
-  // Allow any token to be dragged on caseboards
+  // Allow any token to be dragged on caseboards.
+  // Block non-GM players from dragging Object actor tokens on
+  // theatre/battlemap scenes — Pick Up via Token HUD is the
+  // intended interaction there.
   TokenProto._canDrag = function(user, event) {
     if (isCaseboard(canvas.scene)) {
       if (this.layer._draggedToken) return false;
       if (!this.layer.active || this.isPreview) return false;
       return game.activeTool === "select";
+    }
+    if (!game.user.isGM) {
+      const actor = game.actors.get(this.document?.actorId);
+      if (actor?.type === "object") return false;
     }
     return _origCanDrag.call(this, user, event);
   };

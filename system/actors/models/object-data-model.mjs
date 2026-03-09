@@ -48,6 +48,12 @@ export class ObjectDataModel extends foundry.abstract.TypeDataModel {
         malfunction: new fields.NumberField({ initial: 100 }), // jam/misfire threshold
       }),
 
+      // ── Lost and Found ────────────────────────────────────
+      // Set by the scene cleanup hook when an object's physical
+      // token is deleted/scene deactivates and the object is
+      // otherwise unclaimed. Cleared when recovered.
+      inLostAndFound: new fields.BooleanField({ initial: false }),
+
       // ── Edit lock (collaborative editing) ────────────────
       // Mirrors the pattern from the original evidence sheet.
       // Null when unlocked; set to lock owner when editing.

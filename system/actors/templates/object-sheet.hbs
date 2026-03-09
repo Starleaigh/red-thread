@@ -1,48 +1,142 @@
 <div class="object-sheet flexcol">
   <div class="rt-pin-anchor"></div>
-  <header class="sheet-header flexrow">
 
-    <img src="{{actor.img}}" width="64" height="64">
-
-    <h1>
+  <!-- Header: image + name + status bar -->
+  <header class="sheet-header ob-header flexrow">
+    <img class="ob-portrait" src="{{actor.img}}" width="64" height="64">
+    <div class="ob-header-right">
       <input
         id="object-name"
         name="name"
         type="text"
+        class="ob-name-input"
         data-field="name"
         value="{{actor.name}}"
         {{#unless isLockOwner}}disabled{{/unless}}
       >
-    </h1>
+      <div class="ob-status-bar">
+        <span class="inventory-tag inventory-tag--{{system.category}}">{{system.category}}</span>
+        <span class="ob-state-badge ob-state--{{stateKey}}">{{stateLabel}}</span>
+        {{#if system.isWeapon}}<span class="inventory-tag inventory-tag--weapon">Weapon</span>{{/if}}
+      </div>
+    </div>
   </header>
 
-  <section class="sheet-body">
-    <textarea
-      id="evidence-description"
-      name="description"
-      data-field="description"
-      {{#unless isLockOwner}}disabled{{/unless}}
-    >{{system.description}}</textarea>
-  </section>
+  <!-- Tab bar — GM only -->
+  {{#if isGM}}
+  <nav class="ob-tabs">
+    <button type="button" class="ob-tab" data-tab="details">Details</button>
+    <button type="button" class="ob-tab" data-tab="gm">GM</button>
+  </nav>
+  {{/if}}
 
-  <footer class="sheet-footer flexrow">
+  <!-- Body -->
+  <section class="sheet-body ob-body">
 
-    {{#if isLockOwner}}
-      <button type="button" data-action="submit">
-        Submit
-      </button>
+    <!-- Panel: Details (everyone) -->
+    <div class="ob-tab-panel" data-panel="details">
 
-    {{else if isLocked}}
-      <button type="button" disabled>
-        Claimed by {{lockUser}}
-      </button>
+      <div class="ob-section">
+        <label class="ob-label">Notes</label>
+        <textarea
+          class="ob-textarea"
+          name="description"
+          data-field="description"
+          {{#unless isLockOwner}}disabled{{/unless}}
+        >{{system.description}}</textarea>
+      </div>
 
-    {{else}}
-      <button type="button" data-action="edit">
-        Edit
-      </button>
+    </div>
+
+    <!-- Panel: GM (GM only) -->
+    {{#if isGM}}
+    <div class="ob-tab-panel" data-panel="gm">
+
+      {{#if chainOfCustody.length}}
+      <div class="ob-section ob-custody-section">
+        <div class="ob-label">Chain of Custody</div>
+        <ul class="ob-custody-log">
+          {{#each chainOfCustody}}
+          <li class="ob-custody-entry">
+            <span class="ob-custody-action ob-action--{{this.action}}">{{this.actionLabel}}</span>
+            <span class="ob-custody-name">{{this.actorName}}</span>
+            <span class="ob-custody-time">{{this.timeLabel}}</span>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+      {{/if}}
+
+      <div class="ob-section ob-gm-section">
+
+        <div class="ob-field-row">
+          <span class="ob-label">Category</span>
+          <select class="ob-select" data-field="category" {{#unless isLockOwner}}disabled{{/unless}}>
+            {{#each categories}}
+            <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        <label class="ob-weapon-toggle">
+          <input type="checkbox" data-field="isWeapon" {{#if system.isWeapon}}checked{{/if}} {{#unless isLockOwner}}disabled{{/unless}}>
+          Is a Weapon
+        </label>
+
+      </div>
+
+      {{#if system.isWeapon}}
+      <div class="ob-section ob-weapon-section">
+        <div class="ob-label">Weapon Stats</div>
+        <div class="ob-weapon-grid">
+          <div class="ob-weapon-row">
+            <span class="ob-weapon-key">Skill</span>
+            <input class="ob-weapon-val" type="text"   data-field="weapon.skill"        value="{{system.weapon.skill}}"        {{#unless isLockOwner}}disabled{{/unless}}>
+          </div>
+          <div class="ob-weapon-row">
+            <span class="ob-weapon-key">Damage</span>
+            <input class="ob-weapon-val" type="text"   data-field="weapon.damage"       value="{{system.weapon.damage}}"       {{#unless isLockOwner}}disabled{{/unless}}>
+          </div>
+          <div class="ob-weapon-row">
+            <span class="ob-weapon-key">Range</span>
+            <input class="ob-weapon-val" type="text"   data-field="weapon.range"        value="{{system.weapon.range}}"        {{#unless isLockOwner}}disabled{{/unless}}>
+          </div>
+          <div class="ob-weapon-row">
+            <span class="ob-weapon-key">Uses</span>
+            <input class="ob-weapon-val" type="text"   data-field="weapon.uses"         value="{{system.weapon.uses}}"         {{#unless isLockOwner}}disabled{{/unless}}>
+          </div>
+          <div class="ob-weapon-row">
+            <span class="ob-weapon-key">Malfunction</span>
+            <input class="ob-weapon-val" type="number" data-field="weapon.malfunction"  value="{{system.weapon.malfunction}}"  {{#unless isLockOwner}}disabled{{/unless}}>
+          </div>
+        </div>
+      </div>
+      {{/if}}
+
+      <div class="ob-section ob-gm-section">
+        <label class="ob-label">Case Significance</label>
+        <textarea
+          class="ob-textarea ob-textarea--short"
+          name="caseSignificance"
+          data-field="caseSignificance"
+          {{#unless isLockOwner}}disabled{{/unless}}
+        >{{system.caseSignificance}}</textarea>
+      </div>
+
+    </div>
     {{/if}}
 
+  </section>
+
+  <!-- Footer: edit lock -->
+  <footer class="sheet-footer flexrow">
+    {{#if isLockOwner}}
+      <button type="button" data-action="submit">Save</button>
+    {{else if isLocked}}
+      <button type="button" disabled>Claimed by {{lockUser}}</button>
+    {{else}}
+      <button type="button" data-action="edit">Edit</button>
+    {{/if}}
   </footer>
 
 </div>

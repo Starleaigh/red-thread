@@ -332,7 +332,8 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       object = await fromUuid(data.uuid);
     } else if (data.type === "Token") {
       const tokenDoc = await fromUuid(data.uuid);
-      object = tokenDoc?.actor;
+      // Use world actor (not synthetic token copy) so updates persist
+      object = game.actors.get(tokenDoc?.actorId) ?? tokenDoc?.actor;
     } else {
       return super._onDrop(event);
     }
@@ -357,6 +358,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     await object.update({
       "system.carriedBy":        this.actor.id,
       "system.inPartyInventory": false,
+      "system.inLostAndFound":   false,
       "system.chainOfCustody":   [...(object.system.chainOfCustody ?? []), entry],
     });
 
@@ -408,6 +410,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       }
     }
 
+    if (EvidenceBox._instance?.rendered) EvidenceBox._instance.render();
     this.render({ parts: ["content"] });
   }
 
@@ -430,6 +433,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       "system.chainOfCustody":   [...(object.system.chainOfCustody ?? []), entry],
     });
 
+    if (EvidenceBox._instance?.rendered) EvidenceBox._instance.render();
     this.render({ parts: ["content"] });
   }
 

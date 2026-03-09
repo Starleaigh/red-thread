@@ -65,6 +65,35 @@
 
 /* ------------------------------------
 
+    --- SHARED INVENTORY BUTTON ---
+    Used in Evidence Box, Lost and Found,
+    and Investigator Sheet inventory rows.
+
+   ------------------------------------ */
+
+.red-thread .inv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 3px;
+  background: rgba(255,255,255,0.6);
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.red-thread .inv-btn:hover       { background: rgba(255,255,255,0.9); }
+.red-thread .inv-btn--drop       { color: #8b0000; }
+.red-thread .inv-btn--drop:hover { background: #f5c0c0; }
+.red-thread .inv-btn--box        { color: #1a5276; }
+.red-thread .inv-btn--box:hover  { background: #d6eaf8; }
+
+/* ------------------------------------
+
     --- EVIDENCE BOX WINDOW ---
 
    ------------------------------------ */
@@ -138,3 +167,432 @@
   color: #888;
   font-family: "Baskerville";
 }
+
+.evidence-box .eb-footer {
+  padding: 6px 8px;
+  border-top: 1px solid rgba(0,0,0,0.08);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.evidence-box .eb-lf-btn {
+  font-size: 7.5pt;
+  font-family: "Baskerville", serif;
+  padding: 3px 10px;
+  border: 1px solid rgba(139,0,0,0.3);
+  border-radius: 10px;
+  background: rgba(139,0,0,0.05);
+  color: #8b0000;
+  cursor: pointer;
+}
+.evidence-box .eb-lf-btn:hover {
+  background: rgba(139,0,0,0.12);
+}
+
+/* ------------------------------------
+
+    --- OBJECT SHEET ---
+
+   ------------------------------------ */
+
+.object-sheet {
+  font-family: "Baskerville", serif;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Header */
+.object-sheet .ob-header {
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px 6px;
+  border-bottom: 1px solid rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.03);
+}
+
+.object-sheet .ob-portrait {
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.2);
+  flex-shrink: 0;
+}
+
+.object-sheet .ob-header-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.object-sheet .ob-name-input {
+  width: 100%;
+  font-family: "Special Elite", serif;
+  font-size: 14pt;
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+  background: transparent;
+  padding: 2px 0;
+  color: #1a1a1a;
+}
+
+.object-sheet .ob-name-input:disabled {
+  border-color: transparent;
+}
+
+/* Category tags (mirrors investigator-sheet scoping) */
+.object-sheet .inventory-tag {
+  display: inline-block;
+  font-size: 6.5pt;
+  padding: 1px 7px;
+  border-radius: 10px;
+  color: #fff;
+  background: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: "Special Elite", serif;
+}
+.object-sheet .inventory-tag--weapon   { background: #6b3a3a; }
+.object-sheet .inventory-tag--clue     { background: #3a5a6b; }
+.object-sheet .inventory-tag--document { background: #5a6b3a; }
+.object-sheet .inventory-tag--key      { background: #7a6b3a; }
+.object-sheet .inventory-tag--artefact { background: #5a3a6b; }
+.object-sheet .inventory-tag--other    { background: #666; }
+
+/* Status bar */
+.object-sheet .ob-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.object-sheet .ob-state-badge {
+  font-size: 7.5pt;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-family: "Baskerville", serif;
+  letter-spacing: 0.02em;
+}
+.object-sheet .ob-state--carried  { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.object-sheet .ob-state--box      { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+.object-sheet .ob-state--field    { background: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
+
+.object-sheet .ob-weapon-toggle {
+  font-size: 7.5pt;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+/* Tabs */
+.object-sheet .ob-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(0,0,0,0.15);
+  padding: 0 10px;
+  gap: 2px;
+}
+
+.object-sheet .ob-tab {
+  font-family: "Baskerville", serif;
+  font-size: 8pt;
+  background: none;
+  border: 1px solid transparent;
+  border-bottom: none;
+  padding: 3px 10px;
+  cursor: pointer;
+  color: #555;
+  border-radius: 3px 3px 0 0;
+  margin-bottom: -1px;
+}
+
+.object-sheet .ob-tab.active {
+  background: #faf8f4;
+  border-color: rgba(0,0,0,0.15);
+  border-bottom-color: #faf8f4;
+  color: #222;
+  font-weight: bold;
+}
+
+.object-sheet .ob-tab-panel--hidden {
+  display: none;
+}
+
+.object-sheet .ob-field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.object-sheet .ob-select {
+  font-family: "Baskerville", serif;
+  font-size: 8pt;
+  flex: 1;
+}
+
+.object-sheet .ob-select:disabled {
+  border-color: transparent;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+/* Body */
+.object-sheet .ob-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.object-sheet .ob-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.object-sheet .ob-label {
+  font-size: 7pt;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #666;
+  font-family: "Special Elite", serif;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.object-sheet .ob-gm-badge {
+  font-size: 6pt;
+  background: #8b0000;
+  color: #fff;
+  padding: 0px 5px;
+  border-radius: 8px;
+  letter-spacing: 0.05em;
+}
+
+.object-sheet .ob-textarea {
+  width: 100%;
+  min-height: 80px;
+  resize: vertical;
+  font-family: "Baskerville", serif;
+  font-size: 9.5pt;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 3px;
+  padding: 5px 7px;
+  background: rgba(255,255,255,0.5);
+  color: #1a1a1a;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.object-sheet .ob-textarea--short {
+  min-height: 48px;
+}
+
+.object-sheet .ob-textarea:disabled {
+  border-color: transparent;
+  background: transparent;
+  resize: none;
+}
+
+/* GM section */
+.object-sheet .ob-gm-section {
+  border-top: 1px dashed rgba(139,0,0,0.25);
+  padding-top: 6px;
+}
+
+/* Weapon stats */
+.object-sheet .ob-weapon-section {
+  border-top: 1px solid rgba(0,0,0,0.1);
+  padding-top: 6px;
+}
+
+.object-sheet .ob-weapon-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 2px 8px;
+  align-items: center;
+}
+
+.object-sheet .ob-weapon-row {
+  display: contents;
+}
+
+.object-sheet .ob-weapon-key {
+  font-size: 7.5pt;
+  color: #555;
+  white-space: nowrap;
+  padding: 2px 0;
+}
+
+.object-sheet .ob-weapon-val {
+  font-family: "Baskerville", serif;
+  font-size: 9pt;
+  border: none;
+  border-bottom: 1px solid rgba(0,0,0,0.15);
+  background: transparent;
+  padding: 1px 2px;
+  width: 100%;
+}
+
+.object-sheet .ob-weapon-val:disabled {
+  border-color: transparent;
+}
+
+/* Chain of custody */
+.object-sheet .ob-custody-section {
+  border-top: 1px solid rgba(0,0,0,0.1);
+  padding-top: 6px;
+}
+
+.object-sheet .ob-custody-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.object-sheet .ob-custody-entry {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 4px;
+  font-size: 7.5pt;
+  color: #444;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+
+.object-sheet .ob-custody-action {
+  color: #555;
+  white-space: nowrap;
+}
+.object-sheet .ob-action--picked_up   { color: #155724; }
+.object-sheet .ob-action--dropped     { color: #856404; }
+.object-sheet .ob-action--transferred { color: #004085; }
+.object-sheet .ob-action--recovered   { color: #721c24; }
+
+.object-sheet .ob-custody-name {
+  font-weight: bold;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.object-sheet .ob-custody-time {
+  color: #888;
+  white-space: nowrap;
+  font-size: 6.5pt;
+}
+
+/* Footer */
+.object-sheet .sheet-footer {
+  padding: 6px 10px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.02);
+}
+
+/* ------------------------------------
+
+    --- LOST AND FOUND WINDOW ---
+
+   ------------------------------------ */
+
+.lost-and-found .lf-content {
+  padding: 8px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.lost-and-found .lf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.lost-and-found .lf-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  background: rgba(139,0,0,0.04);
+  border-bottom: 1px solid rgba(139,0,0,0.12);
+  font-family: "Baskerville";
+  font-size: small;
+}
+
+.lost-and-found .lf-img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.lost-and-found .lf-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.lost-and-found .lf-name {
+  font-size: 9pt;
+  color: #000;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lost-and-found .lf-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.lost-and-found .lf-inv-select {
+  font-size: 7pt;
+  height: 20px;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 3px;
+  max-width: 110px;
+}
+
+.lost-and-found .lf-empty {
+  padding: 16px;
+  text-align: center;
+  font-style: italic;
+  color: #888;
+  font-family: "Baskerville";
+}
+
+/* Inherit inventory-tag styles via .lost-and-found scope */
+.lost-and-found .inventory-tag {
+  display: inline-block;
+  font-size: 6.5pt;
+  padding: 1px 7px;
+  border-radius: 10px;
+  color: #fff;
+  background: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: "Special Elite", serif;
+}
+.lost-and-found .inventory-tag--weapon   { background: #6b3a3a; }
+.lost-and-found .inventory-tag--clue     { background: #3a5a6b; }
+.lost-and-found .inventory-tag--document { background: #5a6b3a; }
+.lost-and-found .inventory-tag--key      { background: #7a6b3a; }
+.lost-and-found .inventory-tag--artefact { background: #5a3a6b; }
+.lost-and-found .inventory-tag--other    { background: #666; }

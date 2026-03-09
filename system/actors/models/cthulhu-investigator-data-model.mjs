@@ -58,7 +58,13 @@ export class InvestigatorDataModel extends foundry.abstract.TypeDataModel {
         unconscious_bool: new fields.BooleanField({  initial: false }),
         dying_bool: new fields.BooleanField({  initial: false }),
 
-      })
+      }),
+
+      // ── Notes pages ───────────────────────────────────────
+      notes_a: new fields.StringField({ initial: "" }),
+      notes_b: new fields.StringField({ initial: "" }),
+      notes_c: new fields.StringField({ initial: "" }),
+      notes_d: new fields.StringField({ initial: "" }),
     };
   }
 }

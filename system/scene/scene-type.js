@@ -39,6 +39,15 @@ export function isCaseboard(scene) {
   return getSceneType(scene) === SCENE_TYPES.CASEBOARD;
 }
 
+/**
+ * Returns true if the given scene is a theatre scene.
+ * @param {Scene} scene
+ * @returns {boolean}
+ */
+export function isTheatre(scene) {
+  return getSceneType(scene) === SCENE_TYPES.THEATRE;
+}
+
 // ─────────────────────────────────────────────────────────────
 //  HOOK: Inject dropdown into Scene Config sheet
 // ─────────────────────────────────────────────────────────────
@@ -88,9 +97,9 @@ Hooks.on("renderSceneConfig", (app, html, data) => {
 });
 
 Hooks.on("canvasReady", () => {
-  if (!isCaseboard(canvas.scene)) return;
+  if (!isCaseboard(canvas.scene) && !isTheatre(canvas.scene)) return;
 
-  // Suppress per-token ruler on caseboard scenes
+  // Suppress per-token ruler on caseboard and theatre scenes
   const TokenProto = foundry.canvas.placeables.Token.prototype;
 
   if (!TokenProto._rtOriginalRefreshRuler) {
@@ -98,7 +107,7 @@ Hooks.on("canvasReady", () => {
   }
 
   TokenProto._refreshRuler = function() {
-    if (isCaseboard(canvas.scene)) return;
+    if (isCaseboard(canvas.scene) || isTheatre(canvas.scene)) return;
     return TokenProto._rtOriginalRefreshRuler.call(this);
   };
 });

@@ -26,11 +26,33 @@ export class ObjectSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }
   };
   
+  // ── Active tab ────────────────────────────────────────────
+
+  _activeTab = "details";
+
+  _applyTab(tab) {
+    this.element.querySelectorAll(".ob-tab").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.tab === tab);
+    });
+    this.element.querySelectorAll(".ob-tab-panel").forEach(panel => {
+      panel.classList.toggle("ob-tab-panel--hidden", panel.dataset.panel !== tab);
+    });
+  }
+
   // ── Sheet Pin ────────────────────────────────────────────
 
   async _onRender(context, options) {
     await super._onRender(context, options);
     initSheetPin(this);
+
+    // Apply active tab and wire tab buttons
+    this._applyTab(this._activeTab);
+    this.element.querySelectorAll(".ob-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        this._activeTab = btn.dataset.tab;
+        this._applyTab(this._activeTab);
+      });
+    });
   }
 
   async close(options = {}) {
@@ -51,12 +73,59 @@ export class ObjectSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   }
 
   async _prepareContext() {
+    const sys = this.actor.system;
+
+    // Resolve carriedBy → actor name
+    const carrier = sys.carriedBy ? game.actors.get(sys.carriedBy) : null;
+    const carriedByName = carrier?.name ?? null;
+
+    // Determine state label/key for badge
+    let stateKey, stateLabel;
+    if (carriedByName) {
+      stateKey   = "carried";
+      stateLabel = `Held by ${carriedByName}`;
+    } else if (sys.inPartyInventory) {
+      stateKey   = "box";
+      stateLabel = "Evidence Box";
+    } else {
+      stateKey   = "field";
+      stateLabel = "In the Field";
+    }
+
+    // Format chain of custody entries
+    const ACTION_LABELS = {
+      picked_up:   "Picked up by",
+      dropped:     "Dropped by",
+      transferred: "Transferred to",
+      recovered:   "Recovered by",
+    };
+    const chainOfCustody = (sys.chainOfCustody ?? []).map(entry => ({
+      ...entry,
+      actionLabel: ACTION_LABELS[entry.action] ?? entry.action,
+      timeLabel:   entry.timestamp
+        ? new Date(entry.timestamp).toLocaleString(undefined, { dateStyle: "short", timeStyle: "short" })
+        : "",
+    }));
+
+    const CATEGORIES = ["weapon", "clue", "document", "key", "artefact", "other"];
+    const categories = CATEGORIES.map(v => ({
+      value:    v,
+      label:    v.charAt(0).toUpperCase() + v.slice(1),
+      selected: sys.category === v,
+    }));
+
     return {
-      actor: this.actor,
-      system: this.actor.system,
-      isLocked: this.isLocked,
-      isLockOwner: this.isLockOwner,
-      lockUser: this.lock?.username ?? null
+      actor:         this.actor,
+      system:        sys,
+      isLocked:      this.isLocked,
+      isLockOwner:   this.isLockOwner,
+      lockUser:      this.lock?.username ?? null,
+      isGM:          game.user.isGM,
+      carriedByName,
+      stateKey,
+      stateLabel,
+      chainOfCustody,
+      categories,
     };
   }
 
@@ -74,10 +143,14 @@ export class ObjectSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
   async _readSheetData() {
     if (!this.isLockOwner) return;
-    if(!(this.element instanceof HTMLElement)) return {};
+    if (!(this.element instanceof HTMLElement)) return {};
     const data = {};
     this.element.querySelectorAll("[data-field]").forEach(el => {
-      data[el.dataset.field] = el.value;
+      if (el.type === "checkbox") {
+        data[el.dataset.field] = el.checked;
+      } else {
+        data[el.dataset.field] = el.value;
+      }
     });
     return data;
   }

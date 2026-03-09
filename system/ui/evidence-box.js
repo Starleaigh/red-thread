@@ -12,9 +12,10 @@ export class EvidenceBox extends HandlebarsApplicationMixin(ApplicationV2) {
     position: { width: 420, height: 500 },
     resizable: true,
     actions: {
-      takeItem:    EvidenceBox._onTakeItem,
-      examineItem: EvidenceBox._onExamineItem,
-      destroyItem: EvidenceBox._onDestroyItem,
+      takeItem:       EvidenceBox._onTakeItem,
+      examineItem:    EvidenceBox._onExamineItem,
+      archiveItem:    EvidenceBox._onArchiveItem,
+      openLostAndFound: EvidenceBox._onOpenLostAndFound,
     }
   };
 
@@ -29,7 +30,7 @@ export class EvidenceBox extends HandlebarsApplicationMixin(ApplicationV2) {
   static _instance = null;
 
   static open() {
-    if (!EvidenceBox._instance || EvidenceBox._instance._state < 1) {
+    if (!EvidenceBox._instance || !EvidenceBox._instance.rendered) {
       EvidenceBox._instance = new EvidenceBox();
     }
     EvidenceBox._instance.render(true);
@@ -52,7 +53,10 @@ export class EvidenceBox extends HandlebarsApplicationMixin(ApplicationV2) {
       .filter(a => a.type === "investigator" && a.isOwner)
       .map(a => ({ id: a.id, name: a.name }));
 
-    return { items, myInvestigators, isGM: game.user.isGM };
+    const lostCount = (game.actors ?? [])
+      .filter(a => a.type === "object" && a.system.inLostAndFound).length;
+
+    return { items, myInvestigators, isGM: game.user.isGM, lostCount };
   }
 
   // ── Actions ───────────────────────────────────────────────
@@ -86,6 +90,9 @@ export class EvidenceBox extends HandlebarsApplicationMixin(ApplicationV2) {
       "system.chainOfCustody":   [...(object.system.chainOfCustody ?? []), entry],
     });
 
+    // Re-render the target investigator's sheet if it's open
+    const targetSheet = game.actors.get(investigatorId)?.sheet;
+    if (targetSheet?.rendered) targetSheet.render({ parts: ["content"] });
     this.render();
   }
 
@@ -95,18 +102,31 @@ export class EvidenceBox extends HandlebarsApplicationMixin(ApplicationV2) {
     object.sheet.render(true);
   }
 
-  static async _onDestroyItem(_event, target) {
+  /** Archive to Lost and Found instead of permanent delete.
+   *  True permanent delete is available from the Lost and Found window. */
+  static async _onArchiveItem(_event, target) {
     if (!game.user.isGM) return;
     const object = game.actors.get(target.dataset.objectId);
     if (!object) return;
 
     const confirmed = await foundry.applications.api.DialogV2.confirm({
-      window: { title: "Destroy Object" },
-      content: `<p>Permanently delete <strong>${object.name}</strong>? This cannot be undone.</p>`,
+      window: { title: "Remove from Evidence Box" },
+      content: `<p>Remove <strong>${object.name}</strong> from the Evidence Box? It will be moved to Lost &amp; Found.</p>`,
     });
     if (!confirmed) return;
 
-    await object.delete();
+    await object.update({
+      "system.inPartyInventory": false,
+      "system.inLostAndFound":   true,
+    });
+
+    // Refresh Lost and Found if open
+    const lf = game.redThread?.LostAndFound;
+    if (lf?._instance?.rendered) lf._instance.render();
     this.render();
+  }
+
+  static _onOpenLostAndFound(_event, _target) {
+    game.redThread?.LostAndFound?.open();
   }
 }

@@ -8,6 +8,7 @@ import { ObjectSheet } from "./actors/sheets/object-sheet.js";
 import { InvestigatorSheet } from "./actors/sheets/investigator-sheet.js";
 import { CthulhuItem } from "./items/cthulhu-items.js";
 import { EvidenceBox } from "./ui/evidence-box.js";
+import { LostAndFound } from "./ui/lost-and-found.js";
 
 // Red Thread systems
 import "./scene/scene-type.js";
@@ -16,6 +17,22 @@ import { RedThreadLayer } from "./canvas/redThreadLayer.js";
 import { initSocket } from "./canvas/socket.js";
 import { initThreadHandlers } from "./canvas/thread-store.js";
 import { initTokenMovement } from "./canvas/token-movement.js";
+// ── Object actor: OWNER for all players ──────────────────────
+//
+// All players need OWNER on Object actors so they can right-click
+// for the Token HUD and see the "Pick Up" button.  Dragging is
+// blocked separately in token-movement.js (_canDrag patch) so
+// ownership level alone does not allow physical movement.
+// Blink movement is set so any accidental keyboard-key movement
+// teleports rather than animates.
+
+Hooks.on("preCreateActor", (actorDoc, _data, _options, _userId) => {
+  if (actorDoc.type !== "object") return;
+  actorDoc.updateSource({
+    "ownership.default":           CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER,
+    "prototypeToken.movementAction": "blink",
+  });
+});
 
 Hooks.once("init", () => {
   console.log("Red Thread | Initializing system");
@@ -47,59 +64,160 @@ Hooks.once("ready", () => {
   initThreadHandlers();
   initTokenMovement();
 
-  // Expose Evidence Box globally so it can be opened from macros
+  // Expose globals for macro access
   game.redThread = game.redThread ?? {};
-  game.redThread.EvidenceBox = EvidenceBox;
+  game.redThread.EvidenceBox  = EvidenceBox;
+  game.redThread.LostAndFound = LostAndFound;
 });
 
-// ── Token right-click: "Pick Up" ──────────────────────────
+// ── Token HUD: "Pick Up" button ───────────────────────────
 //
-// Adds a "Pick Up" option to the token context menu on
-// theatre / battlemap scenes. Assigns the Object actor to
-// the player's first owned investigator.
+// In Foundry V13, right-clicking a token opens the Token HUD
+// (renderTokenHUD hook) — getTokenContextOptions no longer fires.
+// We inject a "Pick Up" control-icon button into the HUD's left
+// column when the token is an unclaimed Object actor on a
+// theatre or battlemap scene.
 //
-// NOTE: This works directly for GMs. For players who don't
-// own the Object actor, this needs routing through the GM
-// relay socket (same pattern as token-movement.js). TODO.
+// All players have OWNER on Object actors so this always uses
+// the direct write path.
 
-Hooks.on("getTokenContextOptions", (token, options) => {
+Hooks.on("renderTokenHUD", (hud, html, _data) => {
   if (isCaseboard(canvas.scene)) return;
 
-  const actor = token.document?.actor;
+  // Use the world actor (not a synthetic token copy) so updates persist
+  const actor = game.actors.get(hud.object?.document?.actorId);
   if (!actor || actor.type !== "object") return;
+  if (actor.system.carriedBy) return;
 
-  options.push({
-    name: "Pick Up",
-    icon: '<i class="fas fa-hand-paper"></i>',
-    condition: () => !actor.system.carriedBy,
-    callback: async () => {
-      const investigators = (game.actors ?? []).filter(
-        a => a.type === "investigator" && a.isOwner
-      );
+  const investigators = (game.actors ?? []).filter(
+    a => a.type === "investigator" && a.isOwner
+  );
+  if (!investigators.length) return;
 
-      if (!investigators.length) {
-        ui.notifications.warn("You have no investigator to assign this item to.");
-        return;
-      }
+  const btn = document.createElement("div");
+  btn.classList.add("control-icon");
+  btn.setAttribute("title", "Pick Up");
+  btn.innerHTML = '<i class="fas fa-hand-paper"></i>';
 
-      // If player owns multiple investigators, pick the first for now.
-      // TODO: show a picker dialog when multiple investigators exist.
-      const investigator = investigators[0];
+  btn.addEventListener("click", async (event) => {
+    event.preventDefault();
 
-      const entry = {
-        actorId:   investigator.id,
-        actorName: investigator.name,
-        timestamp: Date.now(),
-        action:    "picked_up",
-      };
+    // If player owns multiple investigators, pick the first for now.
+    // TODO: show a picker dialog when multiple investigators exist.
+    const investigator = investigators[0];
 
-      await actor.update({
-        "system.carriedBy":        investigator.id,
-        "system.inPartyInventory": false,
-        "system.chainOfCustody":   [...(actor.system.chainOfCustody ?? []), entry],
-      });
+    const entry = {
+      actorId:   investigator.id,
+      actorName: investigator.name,
+      timestamp: Date.now(),
+      action:    "picked_up",
+    };
 
-      ui.notifications.info(`${actor.name} picked up by ${investigator.name}.`);
-    }
+    await actor.update({
+      "system.carriedBy":        investigator.id,
+      "system.inPartyInventory": false,
+      "system.inLostAndFound":   false,
+      "system.chainOfCustody":   [...(actor.system.chainOfCustody ?? []), entry],
+    });
+
+    // Remove the token from the scene — the item is now in the investigator's inventory
+    await hud.object.document.delete();
+
+    if (investigator.sheet?.rendered) investigator.sheet.render({ parts: ["content"] });
+    ui.notifications.info(`${actor.name} picked up by ${investigator.name}.`);
   });
+
+  const col = html.querySelector(".col.left") ?? html[0]?.querySelector(".col.left");
+  col?.prepend(btn);
+});
+
+// ── Lost and Found: token deletion cleanup ────────────────
+//
+// When an Object actor's physical token is deleted from a
+// non-caseboard scene, check whether the object is now fully
+// stranded (no other physical tokens, not carried, not in any
+// inventory). If so, move it to Lost and Found.
+//
+// "Physical token" excludes caseboard tokens, which are
+// permanent evidence photos and don't indicate possession.
+
+Hooks.on("deleteToken", (tokenDoc, _options, _userId) => {
+  if (!game.user.isGM) return;
+  if (isCaseboard(tokenDoc.parent)) return;
+
+  const actor = game.actors.get(tokenDoc.actorId);
+  if (!actor || actor.type !== "object") return;
+  if (actor.system.carriedBy || actor.system.inPartyInventory || actor.system.inLostAndFound) return;
+
+  // Check for remaining physical tokens on any non-caseboard scene
+  const hasPhysicalToken = game.scenes.some(scene =>
+    !isCaseboard(scene) &&
+    scene.tokens.some(t => t.actorId === actor.id && t.id !== tokenDoc.id)
+  );
+  if (hasPhysicalToken) return;
+
+  actor.update({ "system.inLostAndFound": true });
+
+  // Refresh Lost and Found window if open
+  if (LostAndFound._instance?.rendered) LostAndFound._instance.render();
+});
+
+// ── Lost and Found: scene deactivation cleanup ────────────
+//
+// When a theatre/battlemap scene is deactivated (another scene
+// goes active), sweep its remaining Object tokens. Any that are
+// unclaimed and have no other physical presence go to Lost and
+// Found rather than being abandoned invisibly.
+
+Hooks.on("updateScene", async (scene, changes) => {
+  if (!game.user.isGM) return;
+  if (!("active" in changes) || changes.active !== false) return;
+  if (isCaseboard(scene)) return;
+
+  let anyMoved = false;
+  for (const tokenDoc of scene.tokens) {
+    const actor = game.actors.get(tokenDoc.actorId);
+    if (!actor || actor.type !== "object") continue;
+    if (actor.system.carriedBy || actor.system.inPartyInventory || actor.system.inLostAndFound) continue;
+
+    // Check for physical tokens on other scenes
+    const hasPhysicalToken = game.scenes.some(s =>
+      s.id !== scene.id &&
+      !isCaseboard(s) &&
+      s.tokens.some(t => t.actorId === actor.id)
+    );
+    if (hasPhysicalToken) continue;
+
+    await actor.update({ "system.inLostAndFound": true });
+    anyMoved = true;
+  }
+
+  if (anyMoved && LostAndFound._instance?.rendered) LostAndFound._instance.render();
+});
+
+// ── Object actor: live UI sync for all clients ────────────
+//
+// When an Object actor's inventory state changes (carriedBy,
+// inPartyInventory, inLostAndFound), the change is written by
+// whoever initiated it but all other clients need their open
+// windows updated too.  This hook fires on every client and
+// does targeted content-only re-renders — it never triggers
+// a full shell re-render so the folder animation is safe.
+
+Hooks.on("updateActor", (actorDoc, changes) => {
+  if (actorDoc.type !== "object") return;
+  const sys = changes.system;
+  if (!sys) return;
+  if (!("carriedBy" in sys || "inPartyInventory" in sys || "inLostAndFound" in sys)) return;
+
+  // Re-render every open investigator sheet (content only)
+  for (const actor of game.actors) {
+    if (actor.type === "investigator" && actor.sheet?.rendered) {
+      actor.sheet.render({ parts: ["content"] });
+    }
+  }
+
+  // Re-render Evidence Box and Lost & Found if open
+  if (EvidenceBox._instance?.rendered)  EvidenceBox._instance.render();
+  if (LostAndFound._instance?.rendered) LostAndFound._instance.render();
 });
