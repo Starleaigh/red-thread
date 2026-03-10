@@ -89,42 +89,68 @@ Hooks.on("renderTokenHUD", (hud, html, _data) => {
   if (!actor || actor.type !== "object") return;
   if (actor.system.carriedBy) return;
 
-  const investigators = (game.actors ?? []).filter(
-    a => a.type === "investigator" && a.isOwner
-  );
-  if (!investigators.length) return;
+  // Players need at least one active investigator to see the Pick Up button
+  if (!game.user.isGM) {
+    const hasActive = (game.actors ?? []).some(
+      a => a.type === "investigator" && a.isOwner && a.system.status === "active"
+    );
+    if (!hasActive) return;
+  }
 
   const btn = document.createElement("div");
   btn.classList.add("control-icon");
-  btn.setAttribute("title", "Pick Up");
-  btn.innerHTML = '<i class="fas fa-hand-paper"></i>';
+
+  if (game.user.isGM) {
+    btn.setAttribute("title", "Move to Lost and Found");
+    btn.innerHTML = '<i class="fas fa-box-archive"></i>';
+  } else {
+    btn.setAttribute("title", "Pick Up");
+    btn.innerHTML = '<i class="fas fa-hand-paper"></i>';
+  }
 
   btn.addEventListener("click", async (event) => {
     event.preventDefault();
 
-    // If player owns multiple investigators, pick the first for now.
-    // TODO: show a picker dialog when multiple investigators exist.
-    const investigator = investigators[0];
+    if (game.user.isGM) {
+      // GM: move directly to Lost and Found
+      const entry = {
+        actorId:   "GM",
+        actorName: "GM",
+        timestamp: Date.now(),
+        action:    "recovered",
+      };
+      await actor.update({
+        "system.inLostAndFound":   true,
+        "system.inPartyInventory": false,
+        "system.chainOfCustody":   [...(actor.system.chainOfCustody ?? []), entry],
+      });
+      await hud.object.document.delete();
+      ui.notifications.info(`${actor.name} moved to Lost and Found.`);
 
-    const entry = {
-      actorId:   investigator.id,
-      actorName: investigator.name,
-      timestamp: Date.now(),
-      action:    "picked_up",
-    };
+    } else {
+      // Player: assign to their active investigator
+      const investigators = (game.actors ?? []).filter(
+        a => a.type === "investigator" && a.isOwner && a.system.status === "active"
+      );
+      // TODO: show a picker dialog when multiple active investigators exist
+      const investigator = investigators[0];
 
-    await actor.update({
-      "system.carriedBy":        investigator.id,
-      "system.inPartyInventory": false,
-      "system.inLostAndFound":   false,
-      "system.chainOfCustody":   [...(actor.system.chainOfCustody ?? []), entry],
-    });
-
-    // Remove the token from the scene — the item is now in the investigator's inventory
-    await hud.object.document.delete();
-
-    if (investigator.sheet?.rendered) investigator.sheet.render({ parts: ["content"] });
-    ui.notifications.info(`${actor.name} picked up by ${investigator.name}.`);
+      const entry = {
+        actorId:   investigator.id,
+        actorName: investigator.name,
+        timestamp: Date.now(),
+        action:    "picked_up",
+      };
+      await actor.update({
+        "system.carriedBy":        investigator.id,
+        "system.inPartyInventory": false,
+        "system.inLostAndFound":   false,
+        "system.chainOfCustody":   [...(actor.system.chainOfCustody ?? []), entry],
+      });
+      await hud.object.document.delete();
+      if (investigator.sheet?.rendered) investigator.sheet.render({ parts: ["content"] });
+      ui.notifications.info(`${actor.name} picked up by ${investigator.name}.`);
+    }
   });
 
   const col = html.querySelector(".col.left") ?? html[0]?.querySelector(".col.left");
@@ -205,19 +231,26 @@ Hooks.on("updateScene", async (scene, changes) => {
 // a full shell re-render so the folder animation is safe.
 
 Hooks.on("updateActor", (actorDoc, changes) => {
+  const sys = changes.system ?? {};
+
+  // Investigator status change → update stamp + refresh Evidence Box / L&F lists
+  if (actorDoc.type === "investigator" && "status" in sys) {
+    actorDoc.sheet?._updateStatusStamp?.();
+    if (EvidenceBox._instance?.rendered)  EvidenceBox._instance.render();
+    if (LostAndFound._instance?.rendered) LostAndFound._instance.render();
+    return;
+  }
+
+  // Object inventory change → re-render open investigator sheets + Evidence Box + L&F
   if (actorDoc.type !== "object") return;
-  const sys = changes.system;
-  if (!sys) return;
   if (!("carriedBy" in sys || "inPartyInventory" in sys || "inLostAndFound" in sys)) return;
 
-  // Re-render every open investigator sheet (content only)
   for (const actor of game.actors) {
     if (actor.type === "investigator" && actor.sheet?.rendered) {
       actor.sheet.render({ parts: ["content"] });
     }
   }
 
-  // Re-render Evidence Box and Lost & Found if open
   if (EvidenceBox._instance?.rendered)  EvidenceBox._instance.render();
   if (LostAndFound._instance?.rendered) LostAndFound._instance.render();
 });

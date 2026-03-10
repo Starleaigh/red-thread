@@ -65,6 +65,10 @@ export class InvestigatorDataModel extends foundry.abstract.TypeDataModel {
       notes_b: new fields.StringField({ initial: "" }),
       notes_c: new fields.StringField({ initial: "" }),
       notes_d: new fields.StringField({ initial: "" }),
+
+      // ── Investigator status ───────────────────────────────
+      // active | inactive | deceased | retired
+      status: new fields.StringField({ initial: "active" }),
     };
   }
 }

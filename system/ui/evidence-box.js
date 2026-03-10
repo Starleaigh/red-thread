@@ -50,7 +50,7 @@ export class EvidenceBox extends HandlebarsApplicationMixin(ApplicationV2) {
       }));
 
     const myInvestigators = (game.actors ?? [])
-      .filter(a => a.type === "investigator" && a.isOwner)
+      .filter(a => a.type === "investigator" && a.isOwner && a.system.status === "active")
       .map(a => ({ id: a.id, name: a.name }));
 
     const lostCount = (game.actors ?? [])

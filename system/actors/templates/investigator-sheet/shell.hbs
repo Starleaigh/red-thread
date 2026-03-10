@@ -12,6 +12,7 @@
         <div class="front">
           <div class="folder-front draggable"></div>
           <div class="top-secret-stamp">TOP SECRET</div>
+          <div class="status-stamp" data-status-stamp></div>
           <div style="transform: rotate(90deg); position: absolute; right: 15px; top: 45px;">
             <div class="folder-label" data-action="nextPage">{{actor.name}}</div>
           </div>
@@ -31,7 +32,7 @@
         </div>
       </section>
 
-      {{!-- Pages 1-6: Paper pages — content injected by the 'content' part --}}
+      {{!-- Pages 1-7: Paper pages — content injected by the 'content' part --}}
       <section class="page paper" data-index="1">
         <div class="page-spine draggable"></div>
         <div class="front rt-page-front" data-page="1">
@@ -67,7 +68,7 @@
       <section class="page paper" data-index="3">
         <div class="page-spine draggable"></div>
         <div class="front rt-page-front" data-page="3">
-          <button class="page-tab" data-action="goToPage" data-target-page="3">Skills</button>
+          <button class="page-tab" data-action="goToPage" data-target-page="3">Combat</button>
           <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
           <div class="basePageLayout"></div>
           <div class="page-corner prev-page" data-action="prevPage"></div>
@@ -83,7 +84,7 @@
       <section class="page paper" data-index="4">
         <div class="page-spine draggable"></div>
         <div class="front rt-page-front" data-page="4">
-          <button class="page-tab" data-action="goToPage" data-target-page="4">Inventory</button>
+          <button class="page-tab" data-action="goToPage" data-target-page="4">Skills</button>
           <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
           <div class="basePageLayout"></div>
           <div class="page-corner prev-page" data-action="prevPage"></div>
@@ -99,7 +100,7 @@
       <section class="page paper" data-index="5">
         <div class="page-spine draggable"></div>
         <div class="front rt-page-front" data-page="5">
-          <button class="page-tab" data-action="goToPage" data-target-page="5">Notes</button>
+          <button class="page-tab" data-action="goToPage" data-target-page="5">Gear</button>
           <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
           <div class="basePageLayout"></div>
           <div class="page-corner prev-page" data-action="prevPage"></div>
@@ -115,19 +116,35 @@
       <section class="page paper" data-index="6">
         <div class="page-spine draggable"></div>
         <div class="front rt-page-front" data-page="6">
+          <button class="page-tab" data-action="goToPage" data-target-page="6">Notes</button>
           <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
           <div class="basePageLayout"></div>
           <div class="page-corner prev-page" data-action="prevPage"></div>
           <div class="page-corner next-page" data-action="nextPage"></div>
         </div>
         <div class="back rt-page-back" data-page="6">
+          <button class="page-tab page-tab-back" data-action="goToPage" data-target-page="6"></button>
           <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
           <div class="basePageLayout"></div>
         </div>
       </section>
 
-      {{!-- Page 7: Back Folder --}}
-      <section class="page folder" data-index="7">
+      <section class="page paper" data-index="7">
+        <div class="page-spine draggable"></div>
+        <div class="front rt-page-front" data-page="7">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+          <div class="page-corner prev-page" data-action="prevPage"></div>
+          <div class="page-corner next-page" data-action="nextPage"></div>
+        </div>
+        <div class="back rt-page-back" data-page="7">
+          <img class="watermark" src="systems/red-thread/assets/images/Coven-trans.png"/>
+          <div class="basePageLayout"></div>
+        </div>
+      </section>
+
+      {{!-- Page 8: Back Folder --}}
+      <section class="page folder" data-index="8">
         <div class="page-spine draggable"></div>
         <div class="front">
           <div class="folder-front draggable"></div>

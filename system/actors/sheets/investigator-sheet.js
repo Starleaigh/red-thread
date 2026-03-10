@@ -48,7 +48,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
 
   pageIndex    = 0;
   previousPage = 0;
-  pageCount    = 8;
+  pageCount    = 9;
   isTurning    = false;
 
   // ── Render guard ─────────────────────────────────────────
@@ -88,14 +88,27 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     let portraitSrc = system.portrait;
     if (!portraitSrc) portraitSrc = system.defaultportrait;
 
+    const STATUS_OPTIONS = ["active", "inactive", "deceased", "retired"];
+    const statusOptions = STATUS_OPTIONS.map(v => ({
+      value:    v,
+      label:    v.charAt(0).toUpperCase() + v.slice(1),
+      selected: this.actor.system.status === v,
+    }));
+
+    const allSkills = this._buildSkillsData().sort((a, b) => a.name.localeCompare(b.name));
+    const mid = Math.ceil(allSkills.length / 2);
+
     return {
       ...context,
-      actor:      this.actor,
-      system:     this.actor.system,
+      actor:         this.actor,
+      system:        this.actor.system,
       portraitSrc,
-      skills:     this._buildSkillsData(),
-      inventory:  this._buildInventoryData(),
-      weapons:    this._buildWeaponData(),
+      skillsFront:   allSkills.slice(0, mid),
+      skillsBack:    allSkills.slice(mid),
+      inventory:     this._buildInventoryData(),
+      weapons:       this._buildWeaponData(),
+      statusOptions,
+      statusStamp:   this.actor.system.status !== "active" ? this.actor.system.status : null,
     };
   }
 
@@ -190,6 +203,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
 
       this._updatePageClasses();
       this._bindDragBehaviour();
+      this._updateStatusStamp();
     }
 
     this._bindFieldListeners();
@@ -529,6 +543,25 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     });
   }
 
+  // ── Status stamp ─────────────────────────────────────────
+  //
+  // Directly updates the stamp DOM element — no re-render needed.
+  // Called on full render and from the updateActor hook whenever
+  // this investigator's status changes.
+
+  _updateStatusStamp() {
+    const stamp = this.element?.querySelector("[data-status-stamp]");
+    if (!stamp) return;
+    const status  = this.actor.system.status ?? "active";
+    const visible = status !== "active";
+
+    stamp.classList.toggle("status-stamp--visible",   visible);
+    stamp.classList.toggle("status-stamp--inactive",  visible && status === "inactive");
+    stamp.classList.toggle("status-stamp--deceased",  visible && status === "deceased");
+    stamp.classList.toggle("status-stamp--retired",   visible && status === "retired");
+    stamp.textContent = visible ? status : "";
+  }
+
   // ── Field listeners ───────────────────────────────────────
 
   _bindFieldListeners() {
@@ -537,10 +570,73 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     this._delegatedInputHandler ??= event => {
       const el = event.target;
       if (!(el instanceof HTMLElement)) return;
-      if (el.dataset.itemId)     this._onSkillFieldChange(event);
-      else if (el.dataset.field) this._onFieldChange(event);
+      if (el.classList.contains("notes-field")) this._onNotesInput(el);
+      else if (el.dataset.itemId)               this._onSkillFieldChange(event);
+      else if (el.dataset.field)                this._onFieldChange(event);
     };
     this.element.addEventListener("input", this._delegatedInputHandler);
+  }
+
+  // ── Notes overflow ────────────────────────────────────────
+  //
+  // When a notes textarea overflows its visible height, the excess text
+  // is pushed to the next notes field. A "continued →" indicator appears
+  // at the bottom of the page when the next field has content.
+
+  _onNotesInput(textarea) {
+    const nextField = textarea.dataset.notesNext;
+
+    // Update the indicator regardless of overflow state
+    const indicator = textarea.closest(".notes-page")?.querySelector(".notes-continue-indicator");
+
+    if (textarea.scrollHeight > textarea.clientHeight + 2 && nextField) {
+      const fullText   = textarea.value;
+      const splitPoint = this._findNotesSplitPoint(textarea, fullText);
+      const thisText   = fullText.substring(0, splitPoint).trimEnd();
+      const overflow   = fullText.substring(splitPoint).trimStart();
+
+      const nextTextarea = this.element.querySelector(`[data-field="${nextField}"]`);
+      const nextValue    = overflow + (nextTextarea?.value ? "\n" + nextTextarea.value : "");
+
+      textarea.value = thisText;
+      if (nextTextarea) nextTextarea.value = nextValue;
+
+      this.dataActor.update({
+        [textarea.dataset.field]: thisText,
+        [nextField]:              nextValue,
+      }, { render: false });
+    } else {
+      this.dataActor.update({ [textarea.dataset.field]: textarea.value }, { render: false });
+    }
+
+    // Show indicator when next field has content
+    if (indicator && nextField) {
+      const nextTextarea = this.element.querySelector(`[data-field="${nextField}"]`);
+      indicator.classList.toggle("notes-continue-indicator--visible", !!nextTextarea?.value);
+    }
+  }
+
+  _findNotesSplitPoint(textarea, fullText) {
+    const clone = textarea.cloneNode(false);
+    clone.style.cssText   = window.getComputedStyle(textarea).cssText;
+    clone.style.position  = "absolute";
+    clone.style.visibility = "hidden";
+    clone.style.pointerEvents = "none";
+    document.body.appendChild(clone);
+
+    const maxH = textarea.clientHeight;
+    let lo = 0, hi = fullText.length;
+    while (lo < hi) {
+      const mid = Math.floor((lo + hi + 1) / 2);
+      clone.value = fullText.substring(0, mid);
+      if (clone.scrollHeight <= maxH) lo = mid;
+      else hi = mid - 1;
+    }
+    document.body.removeChild(clone);
+
+    // Snap back to last word boundary (within 30 chars)
+    const lastSpace = fullText.lastIndexOf(" ", lo);
+    return lastSpace > lo - 30 ? lastSpace : lo;
   }
 
   get dataActor() {
@@ -554,6 +650,25 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       ? el.checked
       : (el.type === "number" ? Number(el.value) : el.value);
     await this.dataActor.update({ [el.dataset.field]: value }, { render: false });
+
+    // Status change: update stamp + enforce one-active-per-player for non-GM users
+    if (el.dataset.field === "system.status") {
+      this._updateStatusStamp();
+      if (value === "active" && !game.user.isGM) {
+        for (const actor of game.actors) {
+          if (actor.id !== this.dataActor.id &&
+              actor.type === "investigator" &&
+              actor.isOwner &&
+              actor.system.status === "active") {
+            await actor.update({ "system.status": "inactive" }, { render: false });
+            // Explicitly update the stamp on the deactivated sheet after the
+            // update resolves — don't rely solely on the hook for local timing
+            actor.sheet?._updateStatusStamp?.();
+          }
+        }
+      }
+    }
+
     if (el.type === "number") this._updateDerived(el.closest("[data-derived-row]"), value);
     if ([
       "system.investigator.title",

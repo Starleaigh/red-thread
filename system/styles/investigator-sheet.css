@@ -74,6 +74,14 @@
   cursor: pointer;
 }
 
+/* Shadows on the two folder cover faces. backface-visibility: hidden ensures each
+   shadow is only visible when that face is actually facing the viewer.
+   :first-child / :last-child keeps this robust when paper pages are added. */
+.investigator-sheet .page.folder:first-child .back,
+.investigator-sheet .page.folder:last-child .front {
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.38);
+}
+
 /* BACK COVER */
 .investigator-sheet .page .folder-back {
   position: absolute;
@@ -171,8 +179,8 @@
   border: #969696;
   backface-visibility: hidden;
   box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.2);
-
 }
+
 
 .investigator-sheet .basePageLayout {
   position: absolute;
@@ -212,25 +220,25 @@
 
 /* Page flip forward */
 @keyframes turn-page-forward {
-  0% { transform: rotateY(0deg); }
+  0%   { transform: rotateY(0deg); }
   100% { transform: rotateY(-180deg); }
 }
 
 /* Page flip backward */
 @keyframes turn-page-backward {
-  0% { transform: rotateY(-180deg); }
+  0%   { transform: rotateY(-180deg); }
   100% { transform: rotateY(0deg); }
 }
 
-@keyframes open-folder{
-  0% { transform: rotateZ(-90deg) scale(5%)}
-  80% { transform: rotateZ(-95deg) scale(100%)}
-  100% { transform: rotateZ(0deg) scale(100%)}
+@keyframes open-folder {
+  0%   { transform: rotateZ(-90deg) scale(5%);   }
+  80%  { transform: rotateZ(-95deg) scale(100%); }
+  100% { transform: rotateZ(0deg)   scale(100%); }
 }
 
-@keyframes close-folder{
-  0% { transform: rotateZ(0deg) scale(100%)}
-  100% { transform: rotateZ(-90deg) scale(5%)}
+@keyframes close-folder {
+  0%   { transform: rotateZ(0deg)   scale(100%); }
+  100% { transform: rotateZ(-90deg) scale(5%);   }
 }
 
 /* Trigger classes */
@@ -298,25 +306,27 @@
 }
 
 /* Front tabs — right edge, sticking out right */
-.investigator-sheet .page[data-index="1"] .rt-page-front .page-tab { top: 40px;  background: #4a6f82; } /* slate blue   — Profile   */
-.investigator-sheet .page[data-index="2"] .rt-page-front .page-tab { top: 94px;  background: #7a4a52; } /* dusty rose   — History   */
-.investigator-sheet .page[data-index="3"] .rt-page-front .page-tab { top: 148px; background: #4a6f52; } /* forest green — Skills    */
-.investigator-sheet .page[data-index="4"] .rt-page-front .page-tab { top: 202px; background: #5a4a7a; } /* muted purple — Inventory */
-.investigator-sheet .page[data-index="5"] .rt-page-front .page-tab { top: 256px; background: #6f5a3a; } /* warm umber   — Notes     */
+.investigator-sheet .page[data-index="1"] .rt-page-front .page-tab { top: 40px;  background: #4a6f82; } /* slate blue   — Profile  */
+.investigator-sheet .page[data-index="2"] .rt-page-front .page-tab { top: 90px;  background: #7a4a52; } /* dusty rose   — History  */
+.investigator-sheet .page[data-index="3"] .rt-page-front .page-tab { top: 140px; background: #4a6f52; } /* forest green — Combat   */
+.investigator-sheet .page[data-index="4"] .rt-page-front .page-tab { top: 190px; background: #5a4a7a; } /* muted purple — Skills   */
+.investigator-sheet .page[data-index="5"] .rt-page-front .page-tab { top: 240px; background: #6f5a3a; } /* warm umber   — Gear     */
+.investigator-sheet .page[data-index="6"] .rt-page-front .page-tab { top: 290px; background: #3a6464; } /* dark teal    — Notes    */
 
 /* Back tabs — mirror of front: left edge, sticking out left, text counter-mirrored */
 .investigator-sheet .rt-page-back .page-tab {
   right: auto;
   left: 0;
-  transform: translateX(-100%); 
+  transform: translateX(-100%);
   border-radius: 4px 0 0 4px;
 }
 
 .investigator-sheet .page[data-index="1"] .rt-page-back .page-tab { top: 40px;  background: #4a6f82; }
-.investigator-sheet .page[data-index="2"] .rt-page-back .page-tab { top: 94px;  background: #7a4a52; }
-.investigator-sheet .page[data-index="3"] .rt-page-back .page-tab { top: 148px; background: #4a6f52; }
-.investigator-sheet .page[data-index="4"] .rt-page-back .page-tab { top: 202px; background: #5a4a7a; }
-.investigator-sheet .page[data-index="5"] .rt-page-back .page-tab { top: 256px; background: #6f5a3a; }
+.investigator-sheet .page[data-index="2"] .rt-page-back .page-tab { top: 90px;  background: #7a4a52; }
+.investigator-sheet .page[data-index="3"] .rt-page-back .page-tab { top: 140px; background: #4a6f52; }
+.investigator-sheet .page[data-index="4"] .rt-page-back .page-tab { top: 190px; background: #5a4a7a; }
+.investigator-sheet .page[data-index="5"] .rt-page-back .page-tab { top: 240px; background: #6f5a3a; }
+.investigator-sheet .page[data-index="6"] .rt-page-back .page-tab { top: 290px; background: #3a6464; }
 
 .investigator-sheet .page-tab:hover {
   filter: brightness(1.2);
@@ -414,6 +424,53 @@
   font-size: xx-large;
   font-family: 'SPECIAL ELITE';
   pointer-events: none;
+}
+
+/* Status stamps — rubber-stamp overlay on the folder cover.
+   Hidden until .status-stamp--visible is added via JS.
+   Bottom-left, rotated -20deg (distinct from TOP SECRET at 50deg). */
+.investigator-sheet .status-stamp {
+  display: none;
+  position: absolute;
+  bottom: 18%;
+  left: 6%;
+  width: 200px;
+  padding: 6px 14px;
+  transform: rotateZ(-20deg);
+  border-style: dashed;
+  border-width: 2px;
+  text-align: center;
+  font-size: 14pt;
+  font-family: 'SPECIAL ELITE';
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.investigator-sheet .status-stamp--visible {
+  display: block;
+}
+
+.investigator-sheet .status-stamp--deceased {
+  color: #6b0000b0;
+  border-color: #6b0000b0;
+}
+
+.investigator-sheet .status-stamp--inactive {
+  color: #555a;
+  border-color: #555a;
+}
+
+.investigator-sheet .status-stamp--retired {
+  color: #8b6914b0;
+  border-color: #8b6914b0;
+}
+
+/* Status select on profile page */
+.investigator-sheet .profile-status-select {
+  font-family: inherit;
+  font-size: inherit;
+  width: 120px;
 }
 
 .investigator-sheet .photo-background {
@@ -716,3 +773,155 @@
 }
 
 .investigator-sheet .weapon-stat--mal label { color: #8b0000; }
+
+
+/* ------------------------------------
+
+    --- PAGE 2 BACK — CHARACTERISTICS ---
+
+   ------------------------------------ */
+
+.investigator-sheet .char-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 8px 12px;
+  gap: 6px;
+  font-family: "Baskerville";
+  color: #000;
+}
+
+.investigator-sheet .char-top {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.investigator-sheet .char-stats {
+  flex: 1;
+}
+
+.investigator-sheet .char-cols {
+  display: flex;
+  gap: 6px;
+}
+
+.investigator-sheet .char-vitals {
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.investigator-sheet .vital-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.investigator-sheet .vital-label {
+  width: 22px;
+  font-weight: 600;
+  font-size: small;
+}
+
+.investigator-sheet .vital-inputs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.investigator-sheet .vital-sep {
+  font-size: small;
+  color: #666;
+  padding: 0 1px;
+}
+
+.investigator-sheet .char-derived-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border-top: 1px solid rgba(0,0,0,0.12);
+  padding-top: 6px;
+}
+
+.investigator-sheet .derived-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.investigator-sheet .derived-label {
+  font-weight: 600;
+  font-size: small;
+  width: 42px;
+}
+
+.investigator-sheet .derived-sep {
+  font-size: 7pt;
+  color: #888;
+  padding: 0 1px;
+}
+
+.investigator-sheet .char-status-row {
+  border-top: 1px solid rgba(0,0,0,0.12);
+  padding-top: 6px;
+}
+
+.investigator-sheet .status-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.investigator-sheet .status-check {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 8pt;
+  font-family: "Baskerville";
+}
+
+
+/* ------------------------------------
+
+    --- NOTES PAGES ---
+
+   ------------------------------------ */
+
+.investigator-sheet .notes-page {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 28px;
+}
+
+.investigator-sheet .notes-field {
+  flex: 1;
+  width: 100%;
+  background: transparent;
+  font-family: "Baskerville";
+  font-size: small;
+  color: #000;
+  border: none;
+  outline: none;
+  border-radius: 0;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+.investigator-sheet .notes-continue-indicator {
+  position: absolute;
+  bottom: 6px;
+  right: 10px;
+  font-size: 7pt;
+  font-family: "Special Elite", Courier, monospace;
+  color: #888;
+  letter-spacing: 0.05em;
+  display: none;
+}
+
+.investigator-sheet .notes-continue-indicator--visible {
+  display: block;
+}

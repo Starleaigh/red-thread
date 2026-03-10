@@ -14,7 +14,7 @@
 <div class="rt-content-store" style="display:none">
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 1 FRONT — Cover / Profile fields
+      PAGE 1 FRONT — Profile fields
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="1" data-face="front">
   <label style="top: 50px; color:black; padding: 20px; text-align: center; font-family: 'Special Elite';">Ministry of Paranormal &amp; Occult Security</label>
@@ -52,6 +52,15 @@
     <input class="profile-input" style="width: 120px" type="text" data-field="system.investigator.occupation" value="{{system.investigator.occupation}}" />
     <input class="profile-input" style="width: 100px" type="text" data-field="system.investigator.residence" value="{{system.investigator.residence}}" />
     <input class="profile-input" style="width: 100px" type="text" data-field="system.investigator.birthplace" value="{{system.investigator.birthplace}}" />
+
+    <div class="profile-label" style="margin-top: 6px">
+      <label style="width: 60px">Status</label>
+    </div>
+    <select class="profile-input profile-status-select" data-field="system.status">
+      {{#each statusOptions}}
+      <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
+      {{/each}}
+    </select>
   </section>
 </script>
 
@@ -92,159 +101,222 @@
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 2 BACK — Characteristics + Status
+      PAGE 2 BACK — Characteristics + Vitals + Luck/San + Status
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="2" data-face="back">
-  <label class="profile-heading">Characteristics</label>
+  <div class="char-page">
 
-  <section class="characteristics">
-    <div class="stat" data-derived-row>
-      <label>STR</label>
-      <input type="number" data-derived-source data-field="system.investigator.str" value="{{system.investigator.str}}" />
-      <label data-derived-target="half"></label>
-      <label data-derived-target="fifth"></label>
-    </div>
-    <div class="stat" data-derived-row>
-      <label>CON</label>
-      <input type="number" data-derived-source data-field="system.investigator.con" value="{{system.investigator.con}}" />
-      <label data-derived-target="half"></label>
-      <label data-derived-target="fifth"></label>
-    </div>
-    <div class="stat" data-derived-row>
-      <label>DEX</label>
-      <input type="number" data-derived-source data-field="system.investigator.dex" value="{{system.investigator.dex}}" />
-      <label data-derived-target="half"></label>
-      <label data-derived-target="fifth"></label>
-    </div>
-    <div class="stat" data-derived-row>
-      <label>INT</label>
-      <input type="number" data-derived-source data-field="system.investigator.int" value="{{system.investigator.int}}" />
-      <label data-derived-target="half"></label>
-      <label data-derived-target="fifth"></label>
-    </div>
-  </section>
+    <div class="char-top">
+      {{!-- Characteristics columns --}}
+      <div class="char-stats">
+        <label class="profile-heading" style="display:block; margin-bottom:4px;">Characteristics</label>
+        <div class="char-cols">
+          <div>
+            <div class="stat" data-derived-row>
+              <label>STR</label>
+              <input type="number" data-derived-source data-field="system.investigator.str" value="{{system.investigator.str}}" />
+              <label data-derived-target="half"></label>
+              <label data-derived-target="fifth"></label>
+            </div>
+            <div class="stat" data-derived-row>
+              <label>CON</label>
+              <input type="number" data-derived-source data-field="system.investigator.con" value="{{system.investigator.con}}" />
+              <label data-derived-target="half"></label>
+              <label data-derived-target="fifth"></label>
+            </div>
+            <div class="stat" data-derived-row>
+              <label>DEX</label>
+              <input type="number" data-derived-source data-field="system.investigator.dex" value="{{system.investigator.dex}}" />
+              <label data-derived-target="half"></label>
+              <label data-derived-target="fifth"></label>
+            </div>
+            <div class="stat" data-derived-row>
+              <label>INT</label>
+              <input type="number" data-derived-source data-field="system.investigator.int" value="{{system.investigator.int}}" />
+              <label data-derived-target="half"></label>
+              <label data-derived-target="fifth"></label>
+            </div>
+          </div>
+          <div>
+            <div class="stat" data-derived-row>
+              <label>SIZ</label>
+              <input type="number" data-derived-source data-field="system.investigator.siz" value="{{system.investigator.siz}}" />
+              <label data-derived-target="half"></label>
+              <label data-derived-target="fifth"></label>
+            </div>
+            <div class="stat" data-derived-row>
+              <label>POW</label>
+              <input type="number" data-derived-source data-field="system.investigator.pow" value="{{system.investigator.pow}}" />
+              <label data-derived-target="half"></label>
+              <label data-derived-target="fifth"></label>
+            </div>
+            <div class="stat" data-derived-row>
+              <label>APP</label>
+              <input type="number" data-derived-source data-field="system.investigator.app" value="{{system.investigator.app}}" />
+              <label data-derived-target="half"></label>
+              <label data-derived-target="fifth"></label>
+            </div>
+            <div class="stat" data-derived-row>
+              <label>EDU</label>
+              <input type="number" data-derived-source data-field="system.investigator.edu" value="{{system.investigator.edu}}" />
+              <label data-derived-target="half"></label>
+              <label data-derived-target="fifth"></label>
+            </div>
+          </div>
+        </div>
+      </div>
 
-  <section class="characteristics">
-    <div class="stat" data-derived-row>
-      <label>SIZ</label>
-      <input type="number" data-derived-source data-field="system.investigator.siz" value="{{system.investigator.siz}}" />
-      <label data-derived-target="half"></label>
-      <label data-derived-target="fifth"></label>
+      {{!-- Vitals — top right --}}
+      <div class="char-vitals">
+        <label class="profile-heading" style="display:block; margin-bottom:4px;">Vitals</label>
+        <div class="vital-row">
+          <label class="vital-label">HP</label>
+          <div class="vital-inputs">
+            <input class="profile-input" style="width:36px" type="number" data-field="system.investigator.hp" value="{{system.investigator.hp}}" />
+            <span class="vital-sep">/</span>
+            <input class="profile-input" style="width:36px" type="number" data-field="system.investigator.hp_max" value="{{system.investigator.hp_max}}" />
+          </div>
+        </div>
+        <div class="vital-row">
+          <label class="vital-label">MP</label>
+          <div class="vital-inputs">
+            <input class="profile-input" style="width:36px" type="number" data-field="system.investigator.mp" value="{{system.investigator.mp}}" />
+            <span class="vital-sep">/</span>
+            <input class="profile-input" style="width:36px" type="number" data-field="system.investigator.mp_max" value="{{system.investigator.mp_max}}" />
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="stat" data-derived-row>
-      <label>POW</label>
-      <input type="number" data-derived-source data-field="system.investigator.pow" value="{{system.investigator.pow}}" />
-      <label data-derived-target="half"></label>
-      <label data-derived-target="fifth"></label>
-    </div>
-    <div class="stat" data-derived-row>
-      <label>APP</label>
-      <input type="number" data-derived-source data-field="system.investigator.app" value="{{system.investigator.app}}" />
-      <label data-derived-target="half"></label>
-      <label data-derived-target="fifth"></label>
-    </div>
-    <div class="stat" data-derived-row>
-      <label>EDU</label>
-      <input type="number" data-derived-source data-field="system.investigator.edu" value="{{system.investigator.edu}}" />
-      <label data-derived-target="half"></label>
-      <label data-derived-target="fifth"></label>
-    </div>
-  </section>
 
-  <section class="status" style="width: 150px; display: inline-block;">
-    <h2>Status</h2>
-    <label><input type="checkbox" data-field="system.investigator.temp_insanity_bool" {{checked system.investigator.temp_insanity_bool}} /> Temporary Insanity</label>
-    <label><input type="checkbox" data-field="system.investigator.indef_insanity_bool" {{checked system.investigator.indef_insanity_bool}} /> Indefinite Insanity</label>
-    <label><input type="checkbox" data-field="system.investigator.major_wound_bool" {{checked system.investigator.major_wound_bool}} /> Major Wound</label>
-    <label><input type="checkbox" data-field="system.investigator.unconscious_bool" {{checked system.investigator.unconscious_bool}} /> Unconscious</label>
-    <label><input type="checkbox" data-field="system.investigator.dying_bool" {{checked system.investigator.dying_bool}} /> Dying</label>
-  </section>
+    {{!-- Luck and Sanity --}}
+    <div class="char-derived-row">
+      <div class="derived-group">
+        <label class="derived-label">Luck</label>
+        <input class="profile-input" style="width:36px" type="number" data-field="system.investigator.luck" value="{{system.investigator.luck}}" />
+        <span class="derived-sep">start</span>
+        <input class="profile-input" style="width:36px" type="number" data-field="system.investigator.luck_start" value="{{system.investigator.luck_start}}" />
+      </div>
+      <div class="derived-group">
+        <label class="derived-label">Sanity</label>
+        <input class="profile-input" style="width:36px" type="number" data-field="system.investigator.san" value="{{system.investigator.san}}" />
+        <span class="derived-sep">/</span>
+        <input class="profile-input" style="width:36px" type="number" data-field="system.investigator.san_max" value="{{system.investigator.san_max}}" />
+        <span class="derived-sep">max</span>
+        <input class="profile-input" style="width:36px" type="number" data-field="system.investigator.insane" value="{{system.investigator.insane}}" />
+      </div>
+    </div>
+
+    {{!-- Status effects --}}
+    <div class="char-status-row">
+      <label class="profile-heading" style="display:block; margin-bottom:4px;">Status</label>
+      <div class="status-checks">
+        <label class="status-check"><input type="checkbox" data-field="system.investigator.temp_insanity_bool" {{checked system.investigator.temp_insanity_bool}} /> Temp. Insanity</label>
+        <label class="status-check"><input type="checkbox" data-field="system.investigator.indef_insanity_bool" {{checked system.investigator.indef_insanity_bool}} /> Indef. Insanity</label>
+        <label class="status-check"><input type="checkbox" data-field="system.investigator.major_wound_bool" {{checked system.investigator.major_wound_bool}} /> Major Wound</label>
+        <label class="status-check"><input type="checkbox" data-field="system.investigator.unconscious_bool" {{checked system.investigator.unconscious_bool}} /> Unconscious</label>
+        <label class="status-check"><input type="checkbox" data-field="system.investigator.dying_bool" {{checked system.investigator.dying_bool}} /> Dying</label>
+      </div>
+    </div>
+
+  </div>
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 3 FRONT — Attributes + Combat
+      PAGE 3 FRONT — Combat stats + Attack Actions
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="3" data-face="front">
-  <section class="attributes" style="width: 150px; display: inline-block;">
-    <label class="profile-heading" style="text-align: center;">Attributes</label>
-
-    <div style="display:inline-block;">
-      <div><label style="width: 100px;">Hit Points</label></div>
-      <div>
-        <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.hp" value="{{system.investigator.hp}}" />
-        <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.hp_max" value="{{system.investigator.hp_max}}" />
+  <section class="combat" style="padding: 10px 16px 6px;">
+    <label class="profile-heading">Combat</label>
+    <div style="display:flex; flex-wrap:wrap; gap:6px;">
+      <div class="stat">
+        <div class="stat-label">Move</div>
+        <input type="number" data-field="system.investigator.move" value="{{system.investigator.move}}" />
       </div>
-      <div style="font-size: x-small; height: 20px">
-        <label style="width: 50px; margin: 0px;">(Current)</label>
-        <label style="width: 50px; margin: 0px;">(Max)</label>
+      <div class="stat">
+        <div class="stat-label">Build</div>
+        <input type="number" data-field="system.investigator.build" value="{{system.investigator.build}}" />
       </div>
-    </div>
-
-    <div>
-      <div><label style="width: 100px;">Magic Points</label></div>
-      <div>
-        <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.mp" value="{{system.investigator.mp}}" />
-        <input class="profile-input" style="width: 50px" type="number" data-field="system.investigator.mp_max" value="{{system.investigator.mp_max}}" />
+      <div class="stat" data-derived-row>
+        <div class="stat-label">Dodge</div>
+        <input type="number" data-derived-source data-field="system.investigator.dodge" value="{{system.investigator.dodge}}" />
+        <label data-derived-target="half"></label>
+        <label data-derived-target="fifth"></label>
       </div>
-      <div style="font-size: x-small; height: 20px; text-align: center;">
-        <label style="width: 50px; margin: 0px;">(Current)</label>
-        <label style="width: 50px; margin: 0px;">(Max)</label>
-      </div>
-    </div>
-
-    <div>
-      <div>
-        <label>Sanity</label>
-        <input class="profile-input" style="width: 40px" type="number" data-field="system.investigator.san" value="{{system.investigator.san}}" />
-        <input class="profile-input" style="width: 40px" type="number" data-field="system.investigator.san_max" value="{{system.investigator.san_max}}" />
+      <div class="stat">
+        <div class="stat-label">DMG Bonus</div>
+        <input type="text" style="width:48px" data-field="system.investigator.dmg_bonus" value="{{system.investigator.dmg_bonus}}" />
       </div>
     </div>
   </section>
 
-  <section class="combat">
-    <h2>Combat</h2>
-    <div class="stat">
-      <div class="stat-label">Movement</div>
-      <input type="number" data-field="system.investigator.move" value="{{system.investigator.move}}" />
-    </div>
-    <div class="stat">
-      <div class="stat-label">Build</div>
-      <input type="number" data-field="system.investigator.build" value="{{system.investigator.build}}" />
-    </div>
-    <div class="stat" data-derived-row>
-      <div class="stat-label">Dodge</div>
-      <input type="number" data-derived-source data-field="system.investigator.dodge" value="{{system.investigator.dodge}}" />
-      <label data-derived-target="half"></label>
-      <label data-derived-target="fifth"></label>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Damage Bonus</div>
-      <input type="text" data-field="system.investigator.dmgbonus" value="{{system.investigator.dmgbonus}}" />
-    </div>
+  <section style="padding: 0 16px;">
+    <label class="profile-heading">Attack Actions</label>
+    {{#if weapons.length}}
+      <div class="weapon-list">
+        {{#each weapons}}
+          <div class="weapon-row" data-object-id="{{this.id}}">
+            <div class="weapon-header">
+              <img class="inventory-img" src="{{this.img}}" title="{{this.name}}"/>
+              <span class="weapon-name">{{this.name}}</span>
+            </div>
+            <div class="weapon-stats">
+              <span class="weapon-stat"><label>Skill</label>{{this.skill}}</span>
+              <span class="weapon-stat"><label>Damage</label>{{this.damage}}</span>
+              <span class="weapon-stat"><label>Range</label>{{this.range}}</span>
+              <span class="weapon-stat"><label>Uses</label>{{this.uses}}</span>
+              <span class="weapon-stat weapon-stat--mal"><label>Malf.</label>{{this.malfunction}}</span>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    {{else}}
+      <p class="inventory-empty">Weapons in your inventory appear here.</p>
+    {{/if}}
   </section>
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 3 BACK — Skills list
+      PAGE 3 BACK — Skills A–M
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="3" data-face="back">
-  <label class="profile-label">Skills</label>
-  {{#each skills}}
-    <div class="skill" data-derived-row data-item-id="{{this.id}}">
-      <input type="checkbox" data-item-id="{{this.id}}" data-field="system.improvement" {{checked this.improvement}} />
-      <label>{{this.name}}</label>
-      <input type="number" data-derived-source data-item-id="{{this.id}}" data-field="system.base" value="{{this.base}}" />
-      <label data-derived-target="half"></label>
-      <label data-derived-target="fifth"></label>
-      <button type="button" data-item-id="{{this.id}}" data-action="deleteSkill">X</button>
-    </div>
-  {{/each}}
+  <div class="skills-page">
+    <label class="profile-heading">Skills (A–M)</label>
+    {{#each skillsFront}}
+      <div class="skill" data-derived-row data-item-id="{{this.id}}">
+        <input type="checkbox" data-item-id="{{this.id}}" data-field="system.improvement" {{checked this.improvement}} />
+        <label>{{this.name}}</label>
+        <input type="number" data-derived-source data-item-id="{{this.id}}" data-field="system.base" value="{{this.base}}" />
+        <label data-derived-target="half"></label>
+        <label data-derived-target="fifth"></label>
+        <button type="button" data-item-id="{{this.id}}" data-action="deleteSkill">X</button>
+      </div>
+    {{/each}}
+  </div>
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 4 FRONT — Inventory
+      PAGE 4 FRONT — Skills N–Z
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="4" data-face="front">
+  <div class="skills-page">
+    <label class="profile-heading">Skills (N–Z)</label>
+    {{#each skillsBack}}
+      <div class="skill" data-derived-row data-item-id="{{this.id}}">
+        <input type="checkbox" data-item-id="{{this.id}}" data-field="system.improvement" {{checked this.improvement}} />
+        <label>{{this.name}}</label>
+        <input type="number" data-derived-source data-item-id="{{this.id}}" data-field="system.base" value="{{this.base}}" />
+        <label data-derived-target="half"></label>
+        <label data-derived-target="fifth"></label>
+        <button type="button" data-item-id="{{this.id}}" data-action="deleteSkill">X</button>
+      </div>
+    {{/each}}
+  </div>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 4 BACK — Inventory
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="4" data-face="back">
   <label class="profile-heading">Inventory</label>
 
   {{#if inventory.length}}
@@ -268,62 +340,69 @@
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 4 BACK — Attack Actions
+      PAGE 5 FRONT — Gear (weapon reference, read-only)
 ════════════════════════════════════════════════════════════ --}}
-<script type="text/x-handlebars-page" data-page="4" data-face="back">
-  <label class="profile-heading">Attack Actions</label>
+<script type="text/x-handlebars-page" data-page="5" data-face="front">
+  <label class="profile-heading">Gear</label>
 
-  {{#if weapons.length}}
-    <div class="weapon-list">
-      {{#each weapons}}
-        <div class="weapon-row" data-object-id="{{this.id}}">
-          <div class="weapon-header">
-            <img class="inventory-img" src="{{this.img}}" title="{{this.name}}"/>
-            <span class="weapon-name">{{this.name}}</span>
+  {{#if inventory.length}}
+    <div class="inventory-list">
+      {{#each inventory}}
+        <div class="inventory-row" data-object-id="{{this.id}}">
+          <img class="inventory-img" src="{{this.img}}" title="{{this.name}}"/>
+          <span class="inventory-name">{{this.name}}</span>
+          <span class="inventory-tag inventory-tag--{{this.category}}">{{this.category}}</span>
+          <div class="inventory-actions">
             <button type="button" class="inv-btn" data-action="examineItem" data-object-id="{{this.id}}" title="Examine">&#128269;</button>
-          </div>
-          <div class="weapon-stats">
-            <span class="weapon-stat"><label>Skill</label>{{this.skill}}</span>
-            <span class="weapon-stat"><label>Damage</label>{{this.damage}}</span>
-            <span class="weapon-stat"><label>Range</label>{{this.range}}</span>
-            <span class="weapon-stat"><label>Uses</label>{{this.uses}}</span>
-            <span class="weapon-stat weapon-stat--mal"><label>Malf.</label>{{this.malfunction}}</span>
+            <button type="button" class="inv-btn" data-action="toPartyInventory" data-object-id="{{this.id}}" title="To Evidence Box">&#128230;</button>
+            <button type="button" class="inv-btn inv-btn--drop" data-action="dropItem" data-object-id="{{this.id}}" title="Drop">&#10006;</button>
           </div>
         </div>
       {{/each}}
     </div>
   {{else}}
-    <p class="inventory-empty">Weapons in your inventory appear here.</p>
+    <p class="inventory-empty">Drag an object here to pick it up.</p>
   {{/if}}
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 5 FRONT — Notes (placeholder)
-════════════════════════════════════════════════════════════ --}}
-<script type="text/x-handlebars-page" data-page="5" data-face="front">
-  <label class="profile-heading">Notes</label>
-  <textarea class="profile-textarea" style="height: 500px" data-field="system.investigator.notes_a">{{system.investigator.notes_a}}</textarea>
-</script>
-
-{{!-- ═══════════════════════════════════════════════════════
-      PAGE 5 BACK — Notes continued
+      PAGE 5 BACK — Notes A
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="5" data-face="back">
-  <textarea class="profile-textarea" style="height: 560px" data-field="system.investigator.notes_b">{{system.investigator.notes_b}}</textarea>
+  <div class="notes-page" data-notes-page="a">
+    <label class="profile-heading">Notes</label>
+    <textarea class="notes-field" data-field="system.notes_a" data-notes-next="system.notes_b" data-notes-continue-page="6">{{system.notes_a}}</textarea>
+    <span class="notes-continue-indicator">continued &#8594;</span>
+  </div>
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 6 FRONT — Notes continued
+      PAGE 6 FRONT — Notes B
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="6" data-face="front">
-  <textarea class="profile-textarea" style="height: 560px" data-field="system.investigator.notes_c">{{system.investigator.notes_c}}</textarea>
+  <div class="notes-page" data-notes-page="b">
+    <textarea class="notes-field" data-field="system.notes_b" data-notes-next="system.notes_c" data-notes-continue-page="7">{{system.notes_b}}</textarea>
+    <span class="notes-continue-indicator">continued &#8594;</span>
+  </div>
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 6 BACK — Notes continued
+      PAGE 6 BACK — Notes C
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="6" data-face="back">
-  <textarea class="profile-textarea" style="height: 560px" data-field="system.investigator.notes_d">{{system.investigator.notes_d}}</textarea>
+  <div class="notes-page" data-notes-page="c">
+    <textarea class="notes-field" data-field="system.notes_c" data-notes-next="system.notes_d" data-notes-continue-page="7">{{system.notes_c}}</textarea>
+    <span class="notes-continue-indicator">continued &#8594;</span>
+  </div>
+</script>
+
+{{!-- ═══════════════════════════════════════════════════════
+      PAGE 7 FRONT — Notes D
+════════════════════════════════════════════════════════════ --}}
+<script type="text/x-handlebars-page" data-page="7" data-face="front">
+  <div class="notes-page" data-notes-page="d">
+    <textarea class="notes-field" data-field="system.notes_d">{{system.notes_d}}</textarea>
+  </div>
 </script>
 
 </div>{{!-- .rt-content-store --}}
