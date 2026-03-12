@@ -19,6 +19,7 @@ import { initSocket } from "./canvas/socket.js";
 import { initThreadHandlers } from "./canvas/thread-store.js";
 import { initTokenMovement } from "./canvas/token-movement.js";
 import { initTokenAppearance } from "./canvas/token-appearance.js";
+import { registerFilterSettings, initSceneFilter } from "./canvas/scene-filter.js";
 // ── Object actor: OWNER for all players ──────────────────────
 //
 // All players need OWNER on Object actors so they can right-click
@@ -83,6 +84,9 @@ Hooks.once("init", () => {
   // interface layer holds pins so they remain interactive above tokens in both modes.
   CONFIG.Canvas.layers.redThreadBg = { layerClass: RedThreadBgLayer, group: "primary" };
   CONFIG.Canvas.layers.redThread   = { layerClass: RedThreadLayer,   group: "interface" };
+
+  // Register scene color filter settings
+  registerFilterSettings();
 });
 
 Hooks.once("ready", () => {
@@ -93,6 +97,7 @@ Hooks.once("ready", () => {
   initThreadHandlers();
   initTokenMovement();
   initTokenAppearance();
+  initSceneFilter();
 
   // Expose globals for macro access
   game.redThread = game.redThread ?? {};
