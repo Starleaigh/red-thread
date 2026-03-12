@@ -34,13 +34,21 @@ export class RedThreadLayer extends foundry.canvas.layers.CanvasLayer {
     this.zIndex = 600;
     this.parent?.sortChildren();
 
-    this.threadsContainer = this.addChild(new PIXI.Container());
-    this.threadsContainer.sortableChildren = true;
-    this.threadsContainer.zIndex = 1;
+    // Two thread containers — renderer uses whichever the setting selects:
+    //   threadsContainerAbove — child of this interface layer, always above tokens
+    //   threadsContainerBelow — child of RedThreadBgLayer (primary), always below tokens
+    this.threadsContainerAbove = this.addChild(new PIXI.Container());
+    this.threadsContainerAbove.sortableChildren = true;
+    this.threadsContainerAbove.zIndex = 0;  // below pins (zIndex 2) within interface layer
 
     this.pinsContainer = this.addChild(new PIXI.Container());
     this.pinsContainer.sortableChildren = true;
     this.pinsContainer.zIndex = 2;
+
+    const below = game.settings.get("red-thread", "threadsBelow");
+    this.threadsContainer = below
+      ? (canvas.redThreadBg?.threadsContainer ?? this.threadsContainerAbove)
+      : this.threadsContainerAbove;
 
     if (!isCaseboard(canvas.scene)) {
       console.log("Red Thread | Scene is not a caseboard — layer idle.");
@@ -68,6 +76,10 @@ export class RedThreadLayer extends foundry.canvas.layers.CanvasLayer {
       this.renderer.destroy();
       this.renderer = null;
     }
+
+    this.threadsContainerAbove?.destroy({ children: true });
+    this.threadsContainerAbove = null;
+    this.threadsContainer = null;
 
     return super._tearDown(options);
   }

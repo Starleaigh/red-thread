@@ -9,7 +9,7 @@
 // ─────────────────────────────────────────────────────────────
 
 const PIN_SRC  = "systems/red-thread/assets/images/pin-set.svg";
-const PIN_SIZE = 40;
+const PIN_SIZE = 20;
 const PIN_DEFAULT_COLOR = 0xffffff; // no tint — let SVG colors show
 
 export class Pin {
@@ -101,7 +101,7 @@ export class Pin {
     if (!this.sprite) return;
     const pos = this._getPinPosition();
     this.sprite.x = pos.x;
-    this.sprite.y = pos.y;
+    this.sprite.y = pos.y + 5;  // sprite sits 5px below thread anchor
   }
 
   // ── Color ─────────────────────────────────────────────────

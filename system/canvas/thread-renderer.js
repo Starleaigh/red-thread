@@ -21,7 +21,7 @@ import {
 // ─────────────────────────────────────────────────────────────
 
 const STRING_SRC     = "systems/red-thread/assets/images/thread-string.svg";
-const STRING_HEIGHT  = 6;
+const STRING_HEIGHT  = 3;
 const CATENARY_STEPS = 40;
 const SAG_FACTOR     = 0.15;
 const SNAP_MS        = 300;
@@ -227,20 +227,31 @@ export class ThreadRenderer {
   }
 
   _strokePoints(gfx, points, color) {
-    if (!points.length || !this._stringTexture) return;
+    if (!points.length) return;
 
+    // Pass 1: solid colored line — full vibrant color
     gfx.lineStyle({
-      width:   STRING_HEIGHT,
+      width: STRING_HEIGHT,
       color,
-      alpha:   1,
-      cap:     PIXI.LINE_CAP.ROUND,
-      join:    PIXI.LINE_JOIN.ROUND,
-      texture: this._stringTexture
+      alpha: 1,
+      cap:   PIXI.LINE_CAP.ROUND,
+      join:  PIXI.LINE_JOIN.ROUND,
     });
-
     gfx.moveTo(points[0].x, points[0].y);
-    for (let i = 1; i < points.length; i++) {
-      gfx.lineTo(points[i].x, points[i].y);
+    for (let i = 1; i < points.length; i++) gfx.lineTo(points[i].x, points[i].y);
+
+    // Pass 2: rope texture overlay — subtle weave without desaturating the color
+    if (this._stringTexture) {
+      gfx.lineStyle({
+        width:   STRING_HEIGHT,
+        color:   0xffffff,
+        alpha:   0.22,
+        cap:     PIXI.LINE_CAP.ROUND,
+        join:    PIXI.LINE_JOIN.ROUND,
+        texture: this._stringTexture,
+      });
+      gfx.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) gfx.lineTo(points[i].x, points[i].y);
     }
   }
 
@@ -352,9 +363,13 @@ export class ThreadRenderer {
 
     for (const { key, label } of [
       { key: "red",    label: "🔴 Red"    },
-      { key: "white",  label: "⚪ White"  },
+      { key: "orange", label: "🟠 Orange" },
       { key: "yellow", label: "🟡 Yellow" },
-      { key: "blue",   label: "🔵 Blue"   }
+      { key: "green",  label: "🟢 Green"  },
+      { key: "blue",   label: "🔵 Blue"   },
+      { key: "purple", label: "🟣 Purple" },
+      { key: "white",  label: "⚪ White"  },
+      { key: "black",  label: "⚫ Black"  },
     ]) {
       const item = _menuItem(label, () => {
         menu.remove();
@@ -405,6 +420,16 @@ export class ThreadRenderer {
         { label: "Cancel", action: "cancel" }
       ]
     }).render(true);
+  }
+
+  // ── Container switch (threads above/below setting) ───────────
+
+  switchContainer(newContainer) {
+    // Destroy graphics in the old container and redraw in the new one
+    for (const { gfx } of this.threads.values()) gfx.destroy();
+    this.threads.clear();
+    this.container = newContainer;
+    this.redraw();
   }
 
   // ── Teardown ──────────────────────────────────────────────

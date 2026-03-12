@@ -11,7 +11,7 @@ import { request, registerHandler, registerReceiver } from "./socket.js";
 //    id:          string   — unique identifier
 //    fromTokenId: string   — token document id
 //    toTokenId:   string   — token document id
-//    color:       string   — "red" | "white" | "yellow" | "blue"
+//    color:       string   — "red" | "orange" | "yellow" | "green" | "blue" | "purple" | "white" | "black"
 //    label:       string   — optional display label
 //    sceneId:     string   — owning scene id
 //  }
@@ -22,9 +22,13 @@ import { request, registerHandler, registerReceiver } from "./socket.js";
 
 export const THREAD_COLORS = {
   red:    0xcc2200,
-  white:  0xf0ede0,
+  orange: 0xe06010,
   yellow: 0xf5c842,
-  blue:   0x2255cc
+  green:  0x1a8c2a,
+  blue:   0x2255cc,
+  purple: 0x7722cc,
+  white:  0xf0ede0,
+  black:  0x111111,
 };
 
 const FLAG_SCOPE = "red-thread";

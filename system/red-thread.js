@@ -14,9 +14,11 @@ import { LostAndFound } from "./ui/lost-and-found.js";
 import "./scene/scene-type.js";
 import { isCaseboard } from "./scene/scene-type.js";
 import { RedThreadLayer } from "./canvas/redThreadLayer.js";
+import { RedThreadBgLayer, applyThreadsLayerOrder } from "./canvas/redThreadBgLayer.js";
 import { initSocket } from "./canvas/socket.js";
 import { initThreadHandlers } from "./canvas/thread-store.js";
 import { initTokenMovement } from "./canvas/token-movement.js";
+import { initTokenAppearance } from "./canvas/token-appearance.js";
 // ── Object actor: OWNER for all players ──────────────────────
 //
 // All players need OWNER on Object actors so they can right-click
@@ -26,10 +28,27 @@ import { initTokenMovement } from "./canvas/token-movement.js";
 // Blink movement is set so any accidental keyboard-key movement
 // teleports rather than animates.
 
+// ── Object token on caseboard: enforce 1×1 max before placement ──
+//
+// Proportional aspect-ratio correction happens async in createToken
+// (token-appearance.js). This synchronous guard prevents any token
+// larger than 1×1 from being placed on a caseboard to begin with.
+
+Hooks.on("preCreateToken", (tokenDoc, _data, _options, _userId) => {
+  if (!isCaseboard(canvas.scene)) return;
+  if (tokenDoc.width <= 1 && tokenDoc.height <= 1) return;
+  const scale = Math.max(tokenDoc.width, tokenDoc.height);
+  tokenDoc.updateSource({
+    width:  Math.round((tokenDoc.width  / scale) * 100) / 100,
+    height: Math.round((tokenDoc.height / scale) * 100) / 100,
+  });
+});
+
 Hooks.on("preCreateActor", (actorDoc, _data, _options, _userId) => {
   if (actorDoc.type !== "object") return;
   actorDoc.updateSource({
-    "ownership.default":           CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER,
+    "ownership.default":             CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER,
+    "prototypeToken.actorLink":      true,
     "prototypeToken.movementAction": "blink",
   });
 });
@@ -49,11 +68,21 @@ Hooks.once("init", () => {
   foundry.documents.collections.Actors.registerSheet("red-thread", ObjectSheet, { types: ["object"], makeDefault: true });
   foundry.documents.collections.Actors.registerSheet("red-thread", InvestigatorSheet, { types: ["investigator"], makeDefault: true });
 
-  // Register canvas layer
-  CONFIG.Canvas.layers.redThread = {
-    layerClass: RedThreadLayer,
-    group: "interface"
-  };
+  // Register thread layer setting
+  game.settings.register("red-thread", "threadsBelow", {
+    name: "Threads below tokens",
+    hint: "Draw connecting threads beneath token photos rather than on top of them.",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: false,
+    onChange: () => applyThreadsLayerOrder(),
+  });
+
+  // Register canvas layers — bg layer (primary group) holds thread graphics;
+  // interface layer holds pins so they remain interactive above tokens in both modes.
+  CONFIG.Canvas.layers.redThreadBg = { layerClass: RedThreadBgLayer, group: "primary" };
+  CONFIG.Canvas.layers.redThread   = { layerClass: RedThreadLayer,   group: "interface" };
 });
 
 Hooks.once("ready", () => {
@@ -63,6 +92,7 @@ Hooks.once("ready", () => {
   // Register domain handlers
   initThreadHandlers();
   initTokenMovement();
+  initTokenAppearance();
 
   // Expose globals for macro access
   game.redThread = game.redThread ?? {};
