@@ -21,11 +21,11 @@ export class ObjectSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     closeOnSubmit: false,
     resizable: true,
     actions: {
-      edit: function _onEdit(_event) {this.unlockSheet()},
-      submit: function _onSubmit(_event){this.submit()}
+      edit:   function _onEdit(_event) { this.unlockSheet(); },
+      submit: function _onSubmit(_event) { this.submit(); },
     }
   };
-  
+
   // ── Active tab ────────────────────────────────────────────
 
   _activeTab = "details";
@@ -121,6 +121,7 @@ export class ObjectSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       isLockOwner:   this.isLockOwner,
       lockUser:      this.lock?.username ?? null,
       isGM:          game.user.isGM,
+      isWeapon:      sys.category === "weapon",
       carriedByName,
       stateKey,
       stateLabel,

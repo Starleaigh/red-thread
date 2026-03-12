@@ -43,6 +43,7 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       toPartyInventory: InvestigatorSheet._onToPartyInventory,
       examineItem:      InvestigatorSheet._onExamineItem,
       openEvidenceBox:  InvestigatorSheet._onOpenEvidenceBox,
+      toggleEquip:      InvestigatorSheet._onToggleEquip,
     }
   };
 
@@ -95,20 +96,24 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
       selected: this.actor.system.status === v,
     }));
 
-    const allSkills = this._buildSkillsData().sort((a, b) => a.name.localeCompare(b.name));
-    const mid = Math.ceil(allSkills.length / 2);
+    const allSkills    = this._buildSkillsData().sort((a, b) => a.name.localeCompare(b.name));
+    const SKILLS_PER_PAGE = 34; // 17 rows × 2 columns
+
+    const allInventory = this._buildInventoryData();
+    const INV_PER_PAGE = 12;
 
     return {
       ...context,
-      actor:         this.actor,
-      system:        this.actor.system,
+      actor:           this.actor,
+      system:          this.actor.system,
       portraitSrc,
-      skillsFront:   allSkills.slice(0, mid),
-      skillsBack:    allSkills.slice(mid),
-      inventory:     this._buildInventoryData(),
-      weapons:       this._buildWeaponData(),
+      skillsFront:     allSkills.slice(0, SKILLS_PER_PAGE),
+      skillsBack:      allSkills.slice(SKILLS_PER_PAGE),
+      inventoryPage1:  allInventory.slice(0, INV_PER_PAGE),
+      inventoryPage2:  allInventory.slice(INV_PER_PAGE),
+      weapons:         this._buildWeaponData(),
       statusOptions,
-      statusStamp:   this.actor.system.status !== "active" ? this.actor.system.status : null,
+      statusStamp:     this.actor.system.status !== "active" ? this.actor.system.status : null,
     };
   }
 
@@ -139,16 +144,20 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
         name:     a.name,
         img:      a.img,
         category: a.system.category ?? "other",
-        isWeapon: a.system.isWeapon ?? false,
+        isWeapon: a.system.category === "weapon",
+        equipped: a.system.equipped ?? false,
       }));
   }
 
   _buildWeaponData() {
     if (!game.actors) return [];
+    const WEAPON_CAP = 5;
     return game.actors
       .filter(a => a.type === "object"
                && a.system.carriedBy === this.actor.id
-               && a.system.isWeapon)
+               && a.system.category === "weapon"
+               && a.system.equipped)
+      .slice(0, WEAPON_CAP)
       .map(a => ({
         id:          a.id,
         name:        a.name,
@@ -463,17 +472,43 @@ export class InvestigatorSheet extends HandlebarsApplicationMixin(ActorSheetV2) 
     EvidenceBox.open();
   }
 
+  static async _onToggleEquip(_event, target) {
+    const objectId = target.dataset.objectId;
+    if (!objectId) return;
+    const object = game.actors.get(objectId);
+    if (!object || object.system.category !== "weapon") return;
+
+    // Enforce cap when equipping
+    if (!object.system.equipped) {
+      const WEAPON_CAP = 5;
+      const equippedCount = game.actors
+        .filter(a => a.type === "object"
+                  && a.system.carriedBy === this.actor.id
+                  && a.system.category === "weapon"
+                  && a.system.equipped
+                  && a.id !== objectId)
+        .length;
+      if (equippedCount >= WEAPON_CAP) {
+        ui.notifications.warn("Maximum weapons equipped (5).");
+        return;
+      }
+    }
+
+    await object.update({ "system.equipped": !object.system.equipped });
+  }
+
   static async _onDeleteSkill(_event, target) {
     const itemId = target.dataset.itemId;
     if (!itemId) return;
     const item = this.actor.items.get(itemId);
     if (!item) return;
 
-    // Remove the row from the DOM immediately — no flicker, no wait
+    // Remove the row from the DOM immediately for instant feedback
     target.closest(".skill")?.remove();
 
-    // Delete from the data model with render suppressed
+    // Delete then re-render content so pagination reflows across both skill pages
     await item.delete({ render: false });
+    this.render({ parts: ["content"] });
   }
 
   _playAnimation(el, className, rem1, rem2) {

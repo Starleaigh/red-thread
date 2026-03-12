@@ -241,9 +241,9 @@ Hooks.on("updateActor", (actorDoc, changes) => {
     return;
   }
 
-  // Object inventory change → re-render open investigator sheets + Evidence Box + L&F
+  // Object inventory/equip change → re-render open investigator sheets + Evidence Box + L&F
   if (actorDoc.type !== "object") return;
-  if (!("carriedBy" in sys || "inPartyInventory" in sys || "inLostAndFound" in sys)) return;
+  if (!("carriedBy" in sys || "inPartyInventory" in sys || "inLostAndFound" in sys || "equipped" in sys)) return;
 
   for (const actor of game.actors) {
     if (actor.type === "investigator" && actor.sheet?.rendered) {

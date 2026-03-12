@@ -17,7 +17,6 @@
       <div class="ob-status-bar">
         <span class="inventory-tag inventory-tag--{{system.category}}">{{system.category}}</span>
         <span class="ob-state-badge ob-state--{{stateKey}}">{{stateLabel}}</span>
-        {{#if system.isWeapon}}<span class="inventory-tag inventory-tag--weapon">Weapon</span>{{/if}}
       </div>
     </div>
   </header>
@@ -78,14 +77,9 @@
           </select>
         </div>
 
-        <label class="ob-weapon-toggle">
-          <input type="checkbox" data-field="isWeapon" {{#if system.isWeapon}}checked{{/if}} {{#unless isLockOwner}}disabled{{/unless}}>
-          Is a Weapon
-        </label>
-
       </div>
 
-      {{#if system.isWeapon}}
+      {{#if isWeapon}}
       <div class="ob-section ob-weapon-section">
         <div class="ob-label">Weapon Stats</div>
         <div class="ob-weapon-grid">

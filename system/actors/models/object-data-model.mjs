@@ -37,9 +37,9 @@ export class ObjectDataModel extends foundry.abstract.TypeDataModel {
       ),
 
       // ── Weapon stats (optional) ───────────────────────────
-      // Only relevant if this object is a weapon.
-      // Populates the attack actions page on carrier's sheet.
-      isWeapon: new fields.BooleanField({ initial: false }),
+      // Weapon stats are shown whenever category === "weapon".
+      // equipped: player toggles to include it on the attack actions page.
+      equipped: new fields.BooleanField({ initial: false }),
       weapon: new fields.SchemaField({
         skill:      new fields.StringField({ initial: "" }),   // skill name used to attack
         damage:     new fields.StringField({ initial: "" }),   // e.g. "1d6+db"

@@ -206,6 +206,31 @@
       </div>
     </div>
 
+    {{!-- Combat stats --}}
+    <div class="char-combat-row">
+      <label class="profile-heading" style="display:block; margin-bottom:4px;">Combat</label>
+      <div class="char-combat-stats">
+        <div class="stat">
+          <div class="stat-label">Move</div>
+          <input type="number" data-field="system.investigator.move" value="{{system.investigator.move}}" />
+        </div>
+        <div class="stat">
+          <div class="stat-label">Build</div>
+          <input type="number" data-field="system.investigator.build" value="{{system.investigator.build}}" />
+        </div>
+        <div class="stat" data-derived-row>
+          <div class="stat-label">Dodge</div>
+          <input type="number" data-derived-source data-field="system.investigator.dodge" value="{{system.investigator.dodge}}" />
+          <label data-derived-target="half"></label>
+          <label data-derived-target="fifth"></label>
+        </div>
+        <div class="stat">
+          <div class="stat-label">DMG Bonus</div>
+          <input type="text" style="width:48px" data-field="system.investigator.dmg_bonus" value="{{system.investigator.dmg_bonus}}" />
+        </div>
+      </div>
+    </div>
+
     {{!-- Status effects --}}
     <div class="char-status-row">
       <label class="profile-heading" style="display:block; margin-bottom:4px;">Status</label>
@@ -222,34 +247,10 @@
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 3 FRONT — Combat stats + Attack Actions
+      PAGE 3 FRONT — Attack Actions
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="3" data-face="front">
-  <section class="combat" style="padding: 10px 16px 6px;">
-    <label class="profile-heading">Combat</label>
-    <div style="display:flex; flex-wrap:wrap; gap:6px;">
-      <div class="stat">
-        <div class="stat-label">Move</div>
-        <input type="number" data-field="system.investigator.move" value="{{system.investigator.move}}" />
-      </div>
-      <div class="stat">
-        <div class="stat-label">Build</div>
-        <input type="number" data-field="system.investigator.build" value="{{system.investigator.build}}" />
-      </div>
-      <div class="stat" data-derived-row>
-        <div class="stat-label">Dodge</div>
-        <input type="number" data-derived-source data-field="system.investigator.dodge" value="{{system.investigator.dodge}}" />
-        <label data-derived-target="half"></label>
-        <label data-derived-target="fifth"></label>
-      </div>
-      <div class="stat">
-        <div class="stat-label">DMG Bonus</div>
-        <input type="text" style="width:48px" data-field="system.investigator.dmg_bonus" value="{{system.investigator.dmg_bonus}}" />
-      </div>
-    </div>
-  </section>
-
-  <section style="padding: 0 16px;">
+  <section style="padding: 10px 16px 0;">
     <label class="profile-heading">Attack Actions</label>
     {{#if weapons.length}}
       <div class="weapon-list">
@@ -280,17 +281,19 @@
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="3" data-face="back">
   <div class="skills-page">
-    <label class="profile-heading">Skills (A–M)</label>
-    {{#each skillsFront}}
-      <div class="skill" data-derived-row data-item-id="{{this.id}}">
-        <input type="checkbox" data-item-id="{{this.id}}" data-field="system.improvement" {{checked this.improvement}} />
-        <label>{{this.name}}</label>
-        <input type="number" data-derived-source data-item-id="{{this.id}}" data-field="system.base" value="{{this.base}}" />
-        <label data-derived-target="half"></label>
-        <label data-derived-target="fifth"></label>
-        <button type="button" data-item-id="{{this.id}}" data-action="deleteSkill">X</button>
-      </div>
-    {{/each}}
+    <label class="profile-heading">Skills</label>
+    <div class="skills-grid">
+      {{#each skillsFront}}
+        <div class="skill" data-derived-row data-item-id="{{this.id}}">
+          <input type="checkbox" data-item-id="{{this.id}}" data-field="system.improvement" {{checked this.improvement}} />
+          <label>{{this.name}}</label>
+          <input type="number" data-derived-source data-item-id="{{this.id}}" data-field="system.base" value="{{this.base}}" />
+          <label data-derived-target="half"></label>
+          <label data-derived-target="fifth"></label>
+          <button type="button" data-item-id="{{this.id}}" data-action="deleteSkill">×</button>
+        </div>
+      {{/each}}
+    </div>
   </div>
 </script>
 
@@ -299,34 +302,37 @@
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="4" data-face="front">
   <div class="skills-page">
-    <label class="profile-heading">Skills (N–Z)</label>
-    {{#each skillsBack}}
-      <div class="skill" data-derived-row data-item-id="{{this.id}}">
-        <input type="checkbox" data-item-id="{{this.id}}" data-field="system.improvement" {{checked this.improvement}} />
-        <label>{{this.name}}</label>
-        <input type="number" data-derived-source data-item-id="{{this.id}}" data-field="system.base" value="{{this.base}}" />
-        <label data-derived-target="half"></label>
-        <label data-derived-target="fifth"></label>
-        <button type="button" data-item-id="{{this.id}}" data-action="deleteSkill">X</button>
-      </div>
-    {{/each}}
+    <label class="profile-heading">Skills (continued)</label>
+    <div class="skills-grid">
+      {{#each skillsBack}}
+        <div class="skill" data-derived-row data-item-id="{{this.id}}">
+          <input type="checkbox" data-item-id="{{this.id}}" data-field="system.improvement" {{checked this.improvement}} />
+          <label>{{this.name}}</label>
+          <input type="number" data-derived-source data-item-id="{{this.id}}" data-field="system.base" value="{{this.base}}" />
+          <label data-derived-target="half"></label>
+          <label data-derived-target="fifth"></label>
+          <button type="button" data-item-id="{{this.id}}" data-action="deleteSkill">×</button>
+        </div>
+      {{/each}}
+    </div>
   </div>
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 4 BACK — Inventory
+      PAGE 4 BACK — Inventory (first 12)
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="4" data-face="back">
   <label class="profile-heading">Inventory</label>
 
-  {{#if inventory.length}}
+  {{#if inventoryPage1.length}}
     <div class="inventory-list">
-      {{#each inventory}}
+      {{#each inventoryPage1}}
         <div class="inventory-row" data-object-id="{{this.id}}">
           <img class="inventory-img" src="{{this.img}}" title="{{this.name}}"/>
           <span class="inventory-name">{{this.name}}</span>
           <span class="inventory-tag inventory-tag--{{this.category}}">{{this.category}}</span>
           <div class="inventory-actions">
+            {{#if this.isWeapon}}<button type="button" class="inv-btn inv-btn--equip{{#if this.equipped}} inv-btn--equipped{{/if}}" data-action="toggleEquip" data-object-id="{{this.id}}" title="{{#if this.equipped}}Unequip{{else}}Equip{{/if}}">&#9876;</button>{{/if}}
             <button type="button" class="inv-btn" data-action="examineItem" data-object-id="{{this.id}}" title="Examine">&#128269;</button>
             <button type="button" class="inv-btn" data-action="toPartyInventory" data-object-id="{{this.id}}" title="To Evidence Box">&#128230;</button>
             <button type="button" class="inv-btn inv-btn--drop" data-action="dropItem" data-object-id="{{this.id}}" title="Drop">&#10006;</button>
@@ -340,19 +346,20 @@
 </script>
 
 {{!-- ═══════════════════════════════════════════════════════
-      PAGE 5 FRONT — Gear (weapon reference, read-only)
+      PAGE 5 FRONT — Gear overflow (items 13+)
 ════════════════════════════════════════════════════════════ --}}
 <script type="text/x-handlebars-page" data-page="5" data-face="front">
-  <label class="profile-heading">Gear</label>
+  <label class="profile-heading">Gear (continued)</label>
 
-  {{#if inventory.length}}
+  {{#if inventoryPage2.length}}
     <div class="inventory-list">
-      {{#each inventory}}
+      {{#each inventoryPage2}}
         <div class="inventory-row" data-object-id="{{this.id}}">
           <img class="inventory-img" src="{{this.img}}" title="{{this.name}}"/>
           <span class="inventory-name">{{this.name}}</span>
           <span class="inventory-tag inventory-tag--{{this.category}}">{{this.category}}</span>
           <div class="inventory-actions">
+            {{#if this.isWeapon}}<button type="button" class="inv-btn inv-btn--equip{{#if this.equipped}} inv-btn--equipped{{/if}}" data-action="toggleEquip" data-object-id="{{this.id}}" title="{{#if this.equipped}}Unequip{{else}}Equip{{/if}}">&#9876;</button>{{/if}}
             <button type="button" class="inv-btn" data-action="examineItem" data-object-id="{{this.id}}" title="Examine">&#128269;</button>
             <button type="button" class="inv-btn" data-action="toPartyInventory" data-object-id="{{this.id}}" title="To Evidence Box">&#128230;</button>
             <button type="button" class="inv-btn inv-btn--drop" data-action="dropItem" data-object-id="{{this.id}}" title="Drop">&#10006;</button>
@@ -361,7 +368,7 @@
       {{/each}}
     </div>
   {{else}}
-    <p class="inventory-empty">Drag an object here to pick it up.</p>
+    <p class="inventory-empty">Overflow items appear here.</p>
   {{/if}}
 </script>
 

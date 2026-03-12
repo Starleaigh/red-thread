@@ -551,35 +551,55 @@
   border: 1px solid #000;
 }
 
+.investigator-sheet .skills-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px 4px;
+  padding: 2px 2px;
+}
+
 .investigator-sheet .skill {
   display: flex;
   align-items: center;
-  gap: 5px;
-  margin-top: 0px;
-  max-width: 50%;
-  justify-content: center;
+  gap: 3px;
+  margin-top: 0;
+  min-width: 0;
 }
 .investigator-sheet .skill label {
-  width: 75px;
-  font-size: 8pt;
+  width: 62px;
+  font-size: 7.5pt;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .investigator-sheet .skill input {
-  width: 30px;
-  height: 20px;
+  width: 26px;
+  height: 18px;
   color: #000;
   background: transparent;
-  justify-items: center;
   padding: 0px;
   border: 1px solid #000;
+  text-align: center;
+  font-size: 7.5pt;
 }
 
 .investigator-sheet .skill input[type="checkbox"] {
     border: none;
-    --checkbox-size: 15px;
+    --checkbox-size: 13px;
     --checkbox-checked-color: darkgreen;
     position: relative;
-    top: 3px;
+    top: 1px;
+    flex-shrink: 0;
+}
+
+.investigator-sheet .skill button[data-action="deleteSkill"] {
+  width: 14px;
+  height: 14px;
+  font-size: 8pt;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .investigator-sheet .profile-input {
@@ -713,9 +733,13 @@
   justify-content: center;
 }
 
-.investigator-sheet .inv-btn:hover        { background: rgba(255,255,255,0.85); }
-.investigator-sheet .inv-btn--drop        { color: #8b0000; }
-.investigator-sheet .inv-btn--drop:hover  { background: #f5c0c0; }
+.investigator-sheet .inv-btn:hover           { background: rgba(255,255,255,0.85); }
+.investigator-sheet .inv-btn--drop          { color: #8b0000; }
+.investigator-sheet .inv-btn--drop:hover    { background: #f5c0c0; }
+.investigator-sheet .inv-btn--equip         { color: #555; }
+.investigator-sheet .inv-btn--equip:hover   { background: rgba(255,255,255,0.85); }
+.investigator-sheet .inv-btn--equipped      { color: #1a5c1a; background: rgba(180,230,180,0.5); border-color: #1a5c1a; }
+.investigator-sheet .inv-btn--equipped:hover{ background: rgba(140,210,140,0.7); }
 
 .investigator-sheet .inventory-empty {
   padding: 12px;
@@ -860,6 +884,17 @@
   font-size: 7pt;
   color: #888;
   padding: 0 1px;
+}
+
+.investigator-sheet .char-combat-row {
+  border-top: 1px solid rgba(0,0,0,0.12);
+  padding-top: 6px;
+}
+
+.investigator-sheet .char-combat-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 
 .investigator-sheet .char-status-row {
